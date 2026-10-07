@@ -20,7 +20,7 @@ describe("vectors", () => {
       spansToPlain(formatStandardSpans("info", "api", "hello world")),
     ).toBe(vectors.defaultPlain);
     expect(
-      spansToPlain(formatStandardSpans("info", "api", "hello world", "classic")),
+      spansToPlain(formatStandardSpans("info", "api", "hello world", "module-first")),
     ).toBe(vectors.classicPlain);
   });
 });

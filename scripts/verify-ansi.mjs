@@ -37,5 +37,13 @@ if (escapes < 4) {
   console.error("FAIL: expected ANSI escapes in pretty line, got:", JSON.stringify(line));
   process.exit(1);
 }
+const { resolveAnsiMode } = await import(join(root, "dist/src/color/gate.js"));
+const palette = resolveAnsiMode({ ansiMode: "auto" });
 console.log("OK: ANSI escapes in pretty output:", escapes);
+console.log(
+  `palette=${palette} COLORTERM=${process.env.COLORTERM ?? "(unset)"} — sample strips ANSI below`,
+);
 console.log("Sample (visible):", line.replace(/\u001B\[[0-9;]*m/g, ""));
+if (!line.includes("38;5;") && !line.includes("38;2;")) {
+  console.warn("WARN: expected 38;5 (256) or 38;2 (truecolor) sequences");
+}

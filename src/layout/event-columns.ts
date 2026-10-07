@@ -1,4 +1,4 @@
-import spec from "../../spec/const.json" with { type: "json" };
+import { spec } from "./layout.data.js";
 import { displayWidth } from "./width.js";
 import type { EventColumnSpec, LogSpan } from "../types.js";
 

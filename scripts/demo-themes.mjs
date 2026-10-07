@@ -158,17 +158,17 @@ function runSolarizedModuleRamp(themeId) {
 }
 
 function runSolarizedLayouts(themeId) {
-  process.stdout.write("\n  layouts — default vs classic\n");
+  process.stdout.write("\n  layouts — module-right vs module-first\n");
   const msg = "same message, different column template";
   createLogger("layout-default", {
     ...loggerOptions,
     theme: themeId,
     layout: "default",
   }).info(msg);
-  createLogger("layout-classic", {
+  createLogger("layout-module-first", {
     ...loggerOptions,
     theme: themeId,
-    layout: "classic",
+    layout: "module-first",
   }).info(msg);
 }
 

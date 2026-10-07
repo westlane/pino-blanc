@@ -1,4 +1,4 @@
-import spec from "../../spec/const.json" with { type: "json" };
+import { spec } from "./layout.data.js";
 import { chipSpan } from "./chip.js";
 import { padEndDisplay } from "./pad.js";
 import { applySymbol, splitPrefix } from "./symbol.js";

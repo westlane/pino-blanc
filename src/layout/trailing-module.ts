@@ -1,5 +1,5 @@
-import { resolveLayoutTemplate } from "../../layouts/index.js";
-import spec from "../../spec/const.json" with { type: "json" };
+import { resolveLayoutTemplate } from "./presets.js";
+import { spec } from "./layout.data.js";
 import type { LogSpan } from "../types.js";
 import { formatLayoutSpans } from "./template.js";
 import { displayWidth } from "./width.js";

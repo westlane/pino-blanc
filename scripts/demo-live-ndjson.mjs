@@ -98,8 +98,10 @@ async function simulateWebSocketFeed(log, label) {
   );
 
   for (let i = 0; i < ticks; i += 1) {
+    // `_liveReplace` rewrites the same terminal block each tick (not scrollback spam).
     log.event("ws.frame", {
       _emoji: "📨",
+      _liveReplace: true,
       seq: i + 1,
       bytes: 64 + i * 17,
       path: "/ws/",
@@ -110,6 +112,7 @@ async function simulateWebSocketFeed(log, label) {
     }
   }
 
+  // Non-live event commits the last frame into history, then appends done.
   log.event("ws.batch_done", {
     _emoji: "✅",
     frames: ticks,

@@ -1,9 +1,9 @@
-import spec from "../../spec/const.json" with { type: "json" };
+import { spec } from "./layout.data.js";
 import { formatEmojiColumn } from "./event-columns.js";
 import { padEndDisplay, padStartDisplay } from "./pad.js";
 import type { LogLayoutField, LogSpan, LogLevelName } from "../types.js";
 
-export { CLASSIC_LOG_LAYOUT, DEFAULT_LOG_LAYOUT } from "../../layouts/index.js";
+export { CLASSIC_LOG_LAYOUT, DEFAULT_LOG_LAYOUT } from "./presets.js";
 
 const FIELD_RE = /%([a-z]+)(?::(left|right))?%/g;
 

@@ -1,6 +1,6 @@
 # Built-in themes
 
-Log color palettes live here as `LogTheme` objects (`src/types.ts`). Level and role mappings are chosen for readable NDJSON pretty output; they are not a full terminal or editor theme port.
+Each palette is a `LogTheme` module in this folder (`src/types.ts`). Register new themes in [`index.ts`](index.ts).
 
 ## Attribution
 
@@ -12,3 +12,5 @@ Log color palettes live here as `LogTheme` objects (`src/types.ts`). Level and r
 | `gruvbox-light` | Same as above | Gruvbox palette (light background). |
 
 Solarized is Copyright (c) 2011 Ethan Schoonover and distributed under the [MIT License](https://github.com/altercation/solarized/blob/master/LICENSE). Gruvbox is distributed under the [MIT License](https://github.com/morhetz/gruvbox/blob/master/LICENSE). Hex choices here are for logger styling only; see each project for the full specification.
+
+Default theme id: `solarized-dark` in [`src/defaults.ts`](../src/defaults.ts).

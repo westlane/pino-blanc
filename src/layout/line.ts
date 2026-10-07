@@ -1,4 +1,4 @@
-import { resolveLayoutTemplate } from "../../layouts/index.js";
+import { resolveLayoutTemplate } from "./presets.js";
 import type { LogSpan, LogLevelName } from "../types.js";
 import { formatLayoutSpans } from "./template.js";
 

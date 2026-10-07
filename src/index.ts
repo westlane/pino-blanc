@@ -35,7 +35,7 @@ export {
   type LogLayoutPreset,
   type LogLayoutPresetId,
   type LogEventLayoutPresetId,
-} from "../layouts/index.js";
+} from "./layout/presets.js";
 export { formatLayoutSpans, parseLogLayout } from "./layout/template.js";
 export {
   formatEventLayoutSpans,

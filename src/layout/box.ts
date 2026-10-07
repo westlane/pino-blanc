@@ -1,4 +1,4 @@
-import spec from "../../spec/const.json" with { type: "json" };
+import { spec } from "./layout.data.js";
 
 export function formatBoxLine(text: string, width = spec.box.width): string {
   const minW = spec.box.minInner;

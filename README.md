@@ -60,18 +60,30 @@ Env: `PINO_BLANC_THEME=solarized-light`
 
 **Demo:** `yarn demo:themes` (all palettes) or `yarn demo:solarized` (Solarized dark + light with tint-ramp modules, rich events, layouts, and multi-DID banners). `PINO_BLANC_DEMO=gruvbox` limits to Gruvbox pair.
 
-**Live NDJSON:** `yarn demo:live` — simulates WebSocket-style `log.event` ticks through the worker transport, an inline NDJSON→pretty `Writable`, and a shell-style `producer | pretty` pipe. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`, `PINO_BLANC_LIVE_MODE=transport|peer|createLogger|all` (`peer` = inline `Writable`; `createLogger` =  in-process pretty). Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
+**Live NDJSON:** `yarn demo:live` — simulates WebSocket-style `log.event` ticks through the worker transport, an inline NDJSON→pretty `Writable`, and a shell-style `producer | pretty` pipe. Frame ticks use `_liveReplace: true` so each tick rewrites one terminal block (CSI up + erase) instead of stacking scrollback; a following non-live event (e.g. `ws.batch_done`) commits the last frame. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`, `PINO_BLANC_LIVE_MODE=transport|peer|createLogger|all` (`peer` = inline `Writable`; `createLogger` =  in-process pretty). Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
 
-Palette credits and licenses: [themes/README.md](themes/README.md).
+Line layout and column widths: edit [config/layout.yml](config/layout.yml), then `yarn build`. Palettes: [themes/](themes/) — credits in [themes/README.md](themes/README.md).
 
 ### Line layout
 
-One layout drives **text lines and `log.event()`** (shared columns; see [layouts/README.md](layouts/README.md)). Tokens: `%level%`, `%emoji%`, `%message%` / `%event%`, `%module%` (`:left` / `:right`).
+Edit [config/layout.yml](config/layout.yml), then `yarn build`.
+
+| Preset id | Applies to | What it is |
+| --- | --- | --- |
+| **`module-right`** (YAML `default`) | `info` / `warn` / … | Level, emoji slot, message, `[module]` in the last column. |
+| **`module-first`** | Same text lines | Level → `[module]` → message (no emoji column). |
+| **`identity-meta`** | `log.event()` only | Two rows: identity chip + event name, then JSON under the name. Set `eventLayout: "identity-meta"`. |
+
+Tokens: `%level%`, `%emoji%`, `%message%` / `%event%`, `%module%` (`:left` / `:right`), `%identity%`, `%meta%`.
 
 ```ts
-createLogger("api"); // layout: default — tag in last column
-createLogger("api", { layout: "classic" });
-createLogger("api", { layout: "%level% %message% %module:right%" });
+createLogger("api"); // YAML `default` → module-right
+createLogger("api", { layout: "module-first" });
+createLogger("gateway", {
+  eventLayout: "identity-meta",
+  symbolMap: { host: "/" },
+});
+log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port: 3030 });
 ```
 
 ### Line colors
@@ -89,9 +101,11 @@ createLogger("api", { layout: "%level% %message% %module:right%" });
 - `consolePrettyDelivery` — MCP-style hosts: emit side channel, return `false` to skip stdout
 - `buildSessionBannerSpans` / `renderSessionBannerBlock` — full-width DID-tinted session banners (parity)
 - `stripPinoBindings`, `isBlancEventRecord`, `consoleLeadingNewlineUnless` — record helpers
+- `_liveReplace: true` on a record — pretty transport overwrites the previous live block in-place (high-frequency ticks / WS frames)
 - `tint` / `columns` — `TintResolver` and `ColumnDecorator` hooks
 - `themeOverrides` — partial theme merge
-- `forceColor` — default **on** for `createLogger` (pretty ANSI even when Cursor sets `NO_COLOR`). Opt out: `forceColor: false`, `PINO_BLANC_FORCE_COLOR=0`, or `PINO_BLANC_PLAIN=1`. Run `yarn verify:ansi` after build.
+- `forceColor` — default **on** for `createLogger` (pretty ANSI even when Cursor sets `NO_COLOR`). Opt out: `forceColor: false`, `PINO_BLANC_FORCE_COLOR=0`, or `PINO_BLANC_PLAIN=1`.
+- `ansiMode` / `PINO_BLANC_ANSI` — `auto` (default) uses **256-color** when `COLORTERM` is unset (Cursor integrated terminal); set `truecolor` or `PINO_BLANC_ANSI=truecolor` for iTerm. Run `yarn verify:ansi` after build.
 - `log.event(msg, meta)` — writes at info with `blancEvent: true` for custom layouts
 - `renderBannerLine(title, theme)` — centered box headline using `theme.roles.box`
 

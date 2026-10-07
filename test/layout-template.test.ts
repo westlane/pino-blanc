@@ -3,7 +3,7 @@ import {
   CLASSIC_LOG_LAYOUT,
   DEFAULT_LOG_LAYOUT,
   resolveLayoutTemplate,
-} from "../layouts/index.js";
+} from "../src/layout/presets.js";
 import { spansToPlain, formatStandardSpans } from "../src/layout/line.js";
 import { formatLayoutSpans, parseLogLayout } from "../src/layout/template.js";
 
@@ -74,15 +74,16 @@ describe("log layout template", () => {
   });
 
   it("resolveLayoutTemplate accepts preset ids", () => {
+    expect(resolveLayoutTemplate("module-first")).toBe(CLASSIC_LOG_LAYOUT);
+    expect(resolveLayoutTemplate("module-right")).toBe(DEFAULT_LOG_LAYOUT);
     expect(resolveLayoutTemplate("classic")).toBe(CLASSIC_LOG_LAYOUT);
-    expect(resolveLayoutTemplate("default")).toBe(DEFAULT_LOG_LAYOUT);
     expect(resolveLayoutTemplate("%level% %message%")).toBe("%level% %message%");
   });
 
   it("formatStandardSpans uses default preset", () => {
     const plain = spansToPlain(formatStandardSpans("info", "api", "hello world"));
     const classic = spansToPlain(
-      formatStandardSpans("info", "api", "hello world", "classic"),
+      formatStandardSpans("info", "api", "hello world", "module-first"),
     );
     expect(plain).not.toBe(classic);
     expect(classic).toBe("INFO   [api]              hello world");

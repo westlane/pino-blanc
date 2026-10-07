@@ -1,0 +1,32 @@
+# yarn build → src/layout/layout.data.ts
+#
+# default          Preset id from `text` used when createLogger omits `layout`.
+# text.*           Plain log lines (info, warn, …) — layout: "<id>"
+# event.*          log.event() only — eventLayout: "<id>"
+
+default: module-right
+
+text:
+  module-right: "%level% %emoji%  %message% %module:right%"
+  module-first: "%level% %module% %message%"
+
+event:
+  identity-meta: |
+    %identity% %emoji%  %event%
+    %identity% %emoji%  %meta%
+
+columns:
+  levelWidth: 6
+  moduleWidth: 18
+  messageWidth: 34
+  event:
+    emojiWidth: 4
+    eventNameWidth: 28
+    identityWidth: 28
+    identityToContentGap: "  "
+  box:
+    width: 80
+    minInner: 20
+    pad: 4
+    ellipsis: 3
+  hashShift: 5
