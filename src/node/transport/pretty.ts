@@ -1,5 +1,9 @@
 import { Writable } from "node:stream";
 import { resolvePrettyColor } from "../../color/gate.js";
+import {
+  isLiveReplaceRecord,
+  LiveReplaceTracker,
+} from "../../format/live-replace.js";
 import type { FormatContext } from "../format-record.js";
 import { formatPinoLogLine } from "../format-record.js";
 
@@ -12,6 +16,7 @@ function formatNdjsonLine(
   opts: PrettyTransportOptions,
   dest: NodeJS.WritableStream,
   plain: boolean,
+  live: LiveReplaceTracker,
 ): void {
   const trimmed = line.trim();
   if (!trimmed) {
@@ -33,9 +38,10 @@ function formatNdjsonLine(
     const writeStdout =
       opts.options.consolePrettyDelivery?.(out, record) ?? true;
     if (writeStdout) {
-      dest.write(out);
+      dest.write(live.prepare(out, isLiveReplaceRecord(record)));
     }
   } catch {
+    live.reset();
     dest.write(`${trimmed}\n`);
   }
 }
@@ -43,12 +49,13 @@ function formatNdjsonLine(
 export default function build(opts: PrettyTransportOptions = { options: {} }) {
   const dest = opts.destination ?? process.stdout;
   const plain = !resolvePrettyColor(opts.options);
+  const live = new LiveReplaceTracker();
   return new Writable({
     write(chunk, _enc, cb) {
       const text = chunk.toString();
       const lines = text.split("\n");
       for (const line of lines) {
-        formatNdjsonLine(line, opts, dest, plain);
+        formatNdjsonLine(line, opts, dest, plain, live);
       }
       cb();
     },

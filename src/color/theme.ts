@@ -1,17 +1,11 @@
+import { DEFAULT_THEME_ID } from "../defaults.js";
 import type { Colorize, LogTheme, LogThemeId, TintResolver } from "../types.js";
+import { BUILT_IN_THEMES, builtInThemeIds as listBuiltInThemeIds } from "../../themes/index.js";
 import { colorFromId } from "./id.js";
-import { gruvboxDark } from "../../themes/gruvbox-dark.js";
-import { gruvboxLight } from "../../themes/gruvbox-light.js";
-import { solarizedDark } from "../../themes/solarized-dark.js";
-import { solarizedLight } from "../../themes/solarized-light.js";
 import { resolveThemeIdFromEnv } from "./gate.js";
 
-const BUILT_IN: Record<string, LogTheme> = {
-  "solarized-dark": solarizedDark,
-  "solarized-light": solarizedLight,
-  "gruvbox-dark": gruvboxDark,
-  "gruvbox-light": gruvboxLight,
-};
+const FALLBACK_THEME =
+  BUILT_IN_THEMES[DEFAULT_THEME_ID] ?? BUILT_IN_THEMES["solarized-dark"];
 
 export function resolveTheme(
   theme?: LogThemeId | LogTheme,
@@ -20,9 +14,10 @@ export function resolveTheme(
   let base: LogTheme;
   if (!theme) {
     const fromEnv = resolveThemeIdFromEnv();
-    base = BUILT_IN[fromEnv ?? "solarized-dark"] ?? solarizedDark;
+    const id = fromEnv ?? DEFAULT_THEME_ID;
+    base = BUILT_IN_THEMES[id] ?? FALLBACK_THEME;
   } else if (typeof theme === "string") {
-    base = BUILT_IN[theme] ?? solarizedDark;
+    base = BUILT_IN_THEMES[theme] ?? FALLBACK_THEME;
   } else {
     base = theme;
   }
@@ -70,4 +65,8 @@ export function roleHex(
   role: string,
 ): string | undefined {
   return theme.roles?.[role as keyof NonNullable<LogTheme["roles"]>];
+}
+
+export function builtInThemeIds(): string[] {
+  return listBuiltInThemeIds();
 }

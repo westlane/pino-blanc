@@ -2,7 +2,7 @@ import { chromeColors } from "../color/chrome.js";
 import { hexToCssChrome } from "../color/css.js";
 import { wrapAnsiChrome } from "../color/ansi.js";
 import { displayWidth } from "../layout/width.js";
-import type { BannerChrome, LogSpan } from "../types.js";
+import type { BannerChrome, LogSpan, ResolvedAnsiPalette } from "../types.js";
 import type { SpanRenderContext } from "./span.js";
 import { resolveIdentityHex } from "./span.js";
 
@@ -39,9 +39,13 @@ function bannerColors(
   return { background: colors.background, foreground: colors.foreground, bold };
 }
 
-export function renderBannerBarAnsi(span: LogSpan, ctx: SpanRenderContext): string {
+export function renderBannerBarAnsi(
+  span: LogSpan,
+  ctx: SpanRenderContext,
+  palette: ResolvedAnsiPalette,
+): string {
   const { background, foreground, bold } = bannerColors(span, ctx);
-  return wrapAnsiChrome(span.text, background, foreground, bold);
+  return wrapAnsiChrome(span.text, background, foreground, bold, palette);
 }
 
 export function renderBannerBarCss(span: LogSpan, ctx: SpanRenderContext): string {

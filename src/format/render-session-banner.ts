@@ -1,4 +1,4 @@
-import { supportsColors } from "../color/gate.js";
+import { resolvePrettyColor } from "../color/gate.js";
 import { createTintResolver, resolveTheme } from "../color/theme.js";
 import { CONSOLE_TRIPLE_COLOR_RESET } from "../format/console-output.js";
 import { renderAnsi } from "../render/ansi.js";
@@ -25,7 +25,7 @@ export function renderSessionBannerBlock(
   const level = "info";
 
   if (typeof process !== "undefined" && process.versions?.node) {
-    if (!supportsColors()) {
+    if (!resolvePrettyColor(options)) {
       return { mode: "plain", line: renderPlain(spans) };
     }
     const line =

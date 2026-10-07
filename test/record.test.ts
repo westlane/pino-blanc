@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  BLANC_CONTROL_META_KEYS,
   BLANC_EVENT_KEY,
+  BLANC_LIVE_REPLACE_KEY,
   isBlancEventRecord,
   stripPinoBindings,
 } from "../src/record.js";
@@ -22,5 +24,18 @@ describe("record", () => {
         did: "y5Yk",
       }),
     ).toEqual({ did: "y5Yk" });
+  });
+
+  it("stripPinoBindings drops control meta when listed", () => {
+    expect(
+      stripPinoBindings(
+        {
+          seq: 1,
+          _emoji: "📨",
+          [BLANC_LIVE_REPLACE_KEY]: true,
+        },
+        [...BLANC_CONTROL_META_KEYS],
+      ),
+    ).toEqual({ seq: 1 });
   });
 });

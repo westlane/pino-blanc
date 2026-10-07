@@ -97,6 +97,11 @@ export type ConsoleLeadingNewline =
 
 export type ConsoleColorReset = "triple" | "none";
 
+/** ANSI palette for Node pretty output (`auto` → 256 when not truecolor). */
+export type AnsiMode = "auto" | "truecolor" | "256" | "16";
+
+export type ResolvedAnsiPalette = "truecolor" | "256" | "16";
+
 export type EventColumnSpec = {
   emojiWidth?: number;
   eventNameWidth?: number;
@@ -109,13 +114,13 @@ export type CreateLoggerOptions = {
   theme?: LogThemeId | LogTheme;
   themeOverrides?: Partial<LogTheme>;
   /**
-   * Preset id (`default`, `classic`) or a `%level%` / `%module%` / `%message%` template.
-   * See repo `layouts/README.md`.
+   * Preset id (`module-right`, `module-first`) or a `%level%` / `%module%` / `%message%` template.
+   * See `config/layout.yml`.
    */
   layout?: string;
   /**
    * Event-only layout (`log.event` / `blancEvent`). May include a newline for row 2
-   * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset: `identity-event`.
+   * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset: `identity-meta`.
    */
   eventLayout?: string;
   /** Fixed display width for `%identity%` in `eventLayout` (: 24). */
@@ -138,6 +143,8 @@ export type CreateLoggerOptions = {
   plainStdout?: boolean;
   /** Emit ANSI even when `NO_COLOR` / non-TTY (dev terminals, worker pretty thread). */
   forceColor?: boolean;
+  /** `auto` uses 256-color when `COLORTERM` is not truecolor (Cursor / VS Code). */
+  ansiMode?: AnsiMode;
   /** In-process pretty stream (no worker transport); use for tests or custom hooks. */
   syncPretty?: boolean;
   /** When using the worker pretty transport, flush each log synchronously (live NDJSON). */

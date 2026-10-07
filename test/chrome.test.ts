@@ -4,7 +4,9 @@ import {
   contrastRatio,
   readableForeground,
 } from "../src/color/chrome.js";
-import { solarizedDark } from "../themes/solarized-dark.js";
+import { resolveTheme } from "../src/color/theme.js";
+
+const solarizedDark = resolveTheme("solarized-dark");
 
 describe("chrome", () => {
   it("picks readable foreground on inverted fill", () => {

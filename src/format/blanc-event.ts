@@ -1,10 +1,14 @@
-import { resolveEventLayoutTemplate } from "../../layouts/index.js";
+import { resolveEventLayoutTemplate } from "../layout/presets.js";
 import { padEventNameColumn, eventRow2TailSpans, resolveEmojiFromMeta } from "../layout/event-columns.js";
 import { formatEventLayoutSpans } from "../layout/event-template.js";
 import { formatStandardSpans } from "../layout/line.js";
 import { padEndDisplay } from "../layout/pad.js";
-import spec from "../../spec/const.json" with { type: "json" };
-import { isBlancEventRecord, stripPinoBindings } from "../record.js";
+import { spec } from "../layout/layout.data.js";
+import {
+  BLANC_CONTROL_META_KEYS,
+  isBlancEventRecord,
+  stripPinoBindings,
+} from "../record.js";
 import type { CreateLoggerOptions, LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 import { jsonMetaSpans } from "./json-meta.js";
 
@@ -29,7 +33,7 @@ export function formatBlancEventSpans(
 
   const message = String(record.msg ?? "");
   const emoji = resolveEmojiFromMeta(record);
-  const payload = stripPinoBindings(record, ["_emoji"]);
+  const payload = stripPinoBindings(record, [...BLANC_CONTROL_META_KEYS]);
 
   const eventMessage = padEndDisplay(
     padEventNameColumn(message),

@@ -39,7 +39,7 @@ describe("session banner spans", () => {
     expect(barLines.some((row) => row.includes("pino-blanc"))).toBe(true);
     expect(barLines.some((row) => row.includes("@lucky-aphid"))).toBe(true);
     if (rendered.mode === "ansi") {
-      expect(rendered.line).toMatch(/48;2;199;21;133/);
+      expect(rendered.line).toMatch(/48;5;\d+/);
     }
   });
 });

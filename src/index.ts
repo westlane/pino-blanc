@@ -3,6 +3,7 @@ export { levelFromPinoNumber } from "./node/levels.js";
 export { formatBoxLine } from "./layout/box.js";
 export { colorFromId, hashString } from "./color/id.js";
 export {
+  resolveAnsiMode,
   resolvePrettyColor,
   supportsColors,
   resolveThemeIdFromEnv,
@@ -78,7 +79,9 @@ export {
   resolveEmojiFromMeta,
 } from "./layout/event-columns.js";
 export {
+  BLANC_CONTROL_META_KEYS,
   BLANC_EVENT_KEY,
+  BLANC_LIVE_REPLACE_KEY,
   isBlancEventRecord,
   PINO_BINDING_KEYS,
   stripPinoBindings,
@@ -91,6 +94,12 @@ export {
   consoleLeadingNewlineUnless,
   shouldLeadWithNewline,
 } from "./format/console-output.js";
+export {
+  countTerminalLines,
+  isLiveReplaceRecord,
+  liveReplacePrefix,
+  LiveReplaceTracker,
+} from "./format/live-replace.js";
 export { defineFormatRecord } from "./format/define-format-record.js";
 export type {
   BannerChrome,

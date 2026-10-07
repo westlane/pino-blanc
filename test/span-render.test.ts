@@ -32,7 +32,9 @@ describe("resolveSpanHex", () => {
 
   it("error line uses one foreground color for the whole row", () => {
     const spans = formatStandardSpans("error", "demo", "failed");
-    const line = renderAnsi(spans, theme, tint, "error", true, {});
+    const line = renderAnsi(spans, theme, tint, "error", true, {
+      ansiMode: "truecolor",
+    });
     const codes = [...line.matchAll(/\u001B\[38;2;\d+;\d+;\d+m/g)].map((m) => m[0]);
     expect(codes.length).toBeGreaterThan(1);
     expect(new Set(codes).size).toBe(1);

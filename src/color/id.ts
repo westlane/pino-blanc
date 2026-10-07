@@ -1,4 +1,4 @@
-import spec from "../../spec/const.json" with { type: "json" };
+import { spec } from "../layout/layout.data.js";
 
 export function hashString(input: string): number {
   let hash = 0;

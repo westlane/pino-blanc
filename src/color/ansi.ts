@@ -1,5 +1,4 @@
-import type { AnsiMode } from "../types.js";
-import { resolveAnsiMode } from "./gate.js";
+import type { ResolvedAnsiPalette } from "../types.js";
 
 export const ANSI_RESET = "\u001B[0m";
 
@@ -61,18 +60,17 @@ function rgbToBasicFg(r: number, g: number, b: number): number {
 export function hexToAnsiFg(
   hex: string,
   bold = false,
-  mode: AnsiMode = "truecolor",
+  palette: ResolvedAnsiPalette = "truecolor",
 ): string {
   const rgb = parseRgb(hex);
   if (!rgb) {
     return "";
   }
   const weight = bold ? "1;" : "";
-  const resolved = resolveAnsiMode({ ansiMode: mode });
-  if (resolved === "16") {
+  if (palette === "16") {
     return `\u001B[${weight}${rgbToBasicFg(rgb.r, rgb.g, rgb.b)}m`;
   }
-  if (resolved === "256") {
+  if (palette === "256") {
     const idx = rgbToAnsi256(rgb.r, rgb.g, rgb.b);
     return `\u001B[${weight}38;5;${idx}m`;
   }
@@ -82,18 +80,17 @@ export function hexToAnsiFg(
 export function hexToAnsiBg(
   hex: string,
   bold = false,
-  mode: AnsiMode = "truecolor",
+  palette: ResolvedAnsiPalette = "truecolor",
 ): string {
   const rgb = parseRgb(hex);
   if (!rgb) {
     return "";
   }
   const weight = bold ? "1;" : "";
-  const resolved = resolveAnsiMode({ ansiMode: mode });
-  if (resolved === "16") {
+  if (palette === "16") {
     return `\u001B[${weight}47m`;
   }
-  if (resolved === "256") {
+  if (palette === "256") {
     const idx = rgbToAnsi256(rgb.r, rgb.g, rgb.b);
     return `\u001B[${weight}48;5;${idx}m`;
   }
@@ -103,12 +100,12 @@ export function hexToAnsiBg(
 export function wrapAnsi(
   text: string,
   hex: string | undefined,
-  mode: AnsiMode = "truecolor",
+  palette: ResolvedAnsiPalette = "truecolor",
 ): string {
   if (!hex) {
     return text;
   }
-  const open = hexToAnsiFg(hex, false, mode);
+  const open = hexToAnsiFg(hex, false, palette);
   if (!open) {
     return text;
   }
@@ -120,10 +117,10 @@ export function wrapAnsiChrome(
   background: string,
   foreground: string,
   bold = false,
-  mode: AnsiMode = "truecolor",
+  palette: ResolvedAnsiPalette = "truecolor",
 ): string {
-  const bg = hexToAnsiBg(background, bold, mode);
-  const fg = hexToAnsiFg(foreground, bold, mode);
+  const bg = hexToAnsiBg(background, bold, palette);
+  const fg = hexToAnsiFg(foreground, bold, palette);
   if (!bg || !fg) {
     return text;
   }

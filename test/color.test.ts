@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { colorFromId } from "../src/color/id.js";
-import { resolveTheme, createTintResolver } from "../src/color/theme.js";
-import { solarizedDark } from "../themes/solarized-dark.js";
+import { createTintResolver, resolveTheme } from "../src/color/theme.js";
 
 describe("color", () => {
   it("colorFromId is stable", () => {
-    const ramp = solarizedDark.tintRamp;
+    const ramp = resolveTheme("solarized-dark").tintRamp;
     expect(colorFromId("watcher", ramp)).toBe(colorFromId("watcher", ramp));
   });
 
