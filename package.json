@@ -1,0 +1,68 @@
+{
+  "name": "@westlane/pino-blanc",
+  "version": "0.1.0",
+  "description": "Pino logger with themed pretty output (Node + browser)",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/westlane/pino-blanc.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "pino",
+    "ndjson",
+    "logger",
+    "pretty",
+    "ansi"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js"
+    },
+    "./pretty": {
+      "types": "./dist/node/transport/pretty.d.ts",
+      "import": "./dist/node/transport/pretty.js"
+    }
+  },
+  "files": [
+    "dist",
+    "spec",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "yarn lint && yarn typecheck && yarn test && yarn build",
+    "prepublishOnly": "yarn check",
+    "prepare": "husky"
+  },
+  "peerDependencies": {
+    "pino": "^9.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.15.0",
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "pino": "^9.7.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0",
+    "vitest": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
