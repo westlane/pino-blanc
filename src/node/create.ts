@@ -3,6 +3,16 @@ import type { BlancLogger, CreateLoggerOptions } from "../types.js";
 import { toPinoLevel } from "./levels.js";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import buildPrettyStream from "./transport/pretty.js";
+
+function optionsNeedMainThread(options: CreateLoggerOptions): boolean {
+  return Boolean(
+    options.colorTransform ||
+      options.tint ||
+      options.columns ||
+      options.themeOverrides,
+  );
+}
 
 function prettyTargetPath(): string {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -63,14 +73,17 @@ export function createLogger(
   const level = toPinoLevel(
     options.level ? String(options.level) : "debug",
   );
-  const usePlain = Boolean(options.plainStdout);
-  const transport = pino.transport({
-    target: prettyTargetPath(),
-    options: {
-      options,
-      columns: options.columns,
-    },
-  });
+  const formatCtx = {
+    options,
+    columns: options.columns,
+  };
+
+  const destination = optionsNeedMainThread(options)
+    ? buildPrettyStream(formatCtx)
+    : pino.transport({
+        target: prettyTargetPath(),
+        options: formatCtx,
+      });
 
   const logger = pino(
     {
@@ -78,15 +91,7 @@ export function createLogger(
       base: { module },
       timestamp: pino.stdTimeFunctions.isoTime,
     },
-    usePlain
-      ? pino.transport({
-          target: prettyTargetPath(),
-          options: {
-            options: { ...options, plainStdout: true },
-            columns: options.columns,
-          },
-        })
-      : transport,
+    destination,
   );
 
   return wrapPino(logger, options);

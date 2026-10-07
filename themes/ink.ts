@@ -1,4 +1,4 @@
-import type { LogTheme } from "../../types.js";
+import type { LogTheme } from "../src/types.js";
 
 export const ink: LogTheme = {
   id: "ink",

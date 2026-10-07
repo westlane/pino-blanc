@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { colorFromId } from "../src/color/id.js";
 import { resolveTheme, createTintResolver } from "../src/color/theme.js";
-import { solarizedDark } from "../src/color/themes/solarized-dark.js";
+import { solarizedDark } from "../themes/solarized-dark.js";
 
 describe("color", () => {
   it("colorFromId is stable", () => {

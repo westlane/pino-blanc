@@ -20,20 +20,21 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     },
     "./browser": {
-      "types": "./dist/browser.d.ts",
-      "import": "./dist/browser.js"
+      "types": "./dist/src/browser.d.ts",
+      "import": "./dist/src/browser.js"
     },
     "./pretty": {
-      "types": "./dist/node/transport/pretty.d.ts",
-      "import": "./dist/node/transport/pretty.js"
+      "types": "./dist/src/node/transport/pretty.d.ts",
+      "import": "./dist/src/node/transport/pretty.js"
     }
   },
   "files": [
     "dist",
+    "themes",
     "spec",
     "README.md",
     "LICENSE"

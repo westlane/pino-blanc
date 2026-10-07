@@ -1,8 +1,8 @@
 import type { ColorTransform, LogTheme, LogThemeId, TintResolver } from "../types.js";
 import { colorFromId } from "./id.js";
-import { ink } from "./themes/ink.js";
-import { solarizedDark } from "./themes/solarized-dark.js";
-import { solarizedLight } from "./themes/solarized-light.js";
+import { ink } from "../../themes/ink.js";
+import { solarizedDark } from "../../themes/solarized-dark.js";
+import { solarizedLight } from "../../themes/solarized-light.js";
 import { resolveThemeIdFromEnv } from "./gate.js";
 
 const BUILT_IN: Record<string, LogTheme> = {
