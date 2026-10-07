@@ -1,14 +1,12 @@
-import { spec } from "./layout.data.js";
+import { GRID_DEFAULTS } from "./grid-defaults.js";
 import { displayWidth } from "./width.js";
 import type { EventColumnSpec, LogSpan } from "../types.js";
 
-const eventSpec = spec.event;
-
 export function defaultEventColumnSpec(): EventColumnSpec {
   return {
-    emojiWidth: eventSpec.emojiWidth,
-    eventNameWidth: eventSpec.eventNameWidth,
-    identityToContentGap: eventSpec.identityToContentGap,
+    emojiWidth: GRID_DEFAULTS.emoji,
+    eventNameWidth: GRID_DEFAULTS.event,
+    identityToContentGap: "  ",
     showEmoji: true,
   };
 }
@@ -75,7 +73,7 @@ export function formatFixedWidthColumn(text: string, max: number): string {
 /** Event name column — truncates long names; does not pad short names. */
 export function formatEventNameColumn(
   name: string,
-  width = eventSpec.eventNameWidth,
+  width: number = GRID_DEFAULTS.event,
 ): string {
   if (!name) {
     return name;
@@ -90,7 +88,7 @@ export function formatEventNameColumn(
 /** Pad short event names to column width (pretty alignment). */
 export function padEventNameColumn(
   name: string,
-  width = eventSpec.eventNameWidth,
+  width: number = GRID_DEFAULTS.event,
 ): string {
   const formatted = formatEventNameColumn(name, width);
   const eventWidth = displayWidth(formatted);
@@ -104,10 +102,7 @@ export function padEventNameColumn(
  * Fixed-width emoji slot: leading space + emoji + pad + trailing space.
  * Empty emoji → blank column of `width` spaces.
  */
-export function formatEmojiColumn(
-  emoji: string | undefined,
-  width = eventSpec.emojiWidth,
-): string {
+export function formatEmojiColumn(emoji: string | undefined, width: number = GRID_DEFAULTS.emoji): string {
   const trimmed = emoji?.trim();
   if (!trimmed) {
     return " ".repeat(width);
@@ -171,7 +166,7 @@ export function eventRow2TailSpans(overrides?: EventColumnSpec): LogSpan[] {
   const spans: LogSpan[] = [];
   if (showEmoji) {
     spans.push({
-      text: " ".repeat(emojiWidth ?? eventSpec.emojiWidth),
+      text: " ".repeat(emojiWidth ?? GRID_DEFAULTS.emoji),
       role: "emoji",
     });
   }

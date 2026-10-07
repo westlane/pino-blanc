@@ -41,7 +41,7 @@ describe("log layout template", () => {
       }),
     );
     const noSlot = spansToPlain(
-      formatLayoutSpans("%level% %message% %module:right%", {
+      formatLayoutSpans("%level% %message% %module%", {
         level: "info",
         module: "api",
         message: "x",

@@ -1,48 +1,47 @@
-import { spec } from "./layout.data.js";
 import { formatEmojiColumn } from "./event-columns.js";
+import {
+  LAYOUT_FIELD_RE,
+  parseFieldModifiers,
+  resolveLayoutField,
+  type FieldAlign,
+} from "./field-token.js";
+import { GRID_DEFAULTS } from "./grid-defaults.js";
 import { padEndDisplay, padStartDisplay } from "./pad.js";
 import type { LogLayoutField, LogSpan, LogLevelName } from "../types.js";
 
 export { CLASSIC_LOG_LAYOUT, DEFAULT_LOG_LAYOUT } from "./presets.js";
 
-const FIELD_RE = /%([a-z]+)(?::(left|right))?%/g;
-
 export type LayoutRowContext = {
   level: LogLevelName;
   module: string;
   message: string;
-  /** Fills `%emoji%` when present; blank column when omitted. */
   emoji?: string;
 };
 
 type LayoutPart =
   | { kind: "literal"; text: string }
-  | { kind: "field"; field: LogLayoutField; align: "left" | "right" };
-
-/** `%event%` is an alias for `%message%` (same column width and padding). */
-function resolveLayoutField(token: string): LogLayoutField {
-  if (token === "event") {
-    return "message";
-  }
-  if (token === "level" || token === "module" || token === "message" || token === "emoji") {
-    return token;
-  }
-  throw new Error(`Unknown log layout field %${token}%`);
-}
+  | {
+      kind: "field";
+      field: LogLayoutField;
+      align: FieldAlign;
+      width?: number;
+    };
 
 export function parseLogLayout(template: string): LayoutPart[] {
   const parts: LayoutPart[] = [];
   let cursor = 0;
-  for (const match of template.matchAll(FIELD_RE)) {
+  for (const match of template.matchAll(LAYOUT_FIELD_RE)) {
     const index = match.index ?? 0;
     if (index > cursor) {
       parts.push({ kind: "literal", text: template.slice(cursor, index) });
     }
     const field = resolveLayoutField(match[1]);
+    const mods = parseFieldModifiers(match[1], match[2]);
     parts.push({
       kind: "field",
       field,
-      align: match[2] === "right" ? "right" : "left",
+      align: field === "module" ? mods.align : mods.align === "auto" ? "left" : mods.align,
+      width: mods.width,
     });
     cursor = index + match[0].length;
   }
@@ -59,38 +58,73 @@ function padMessageColumn(parts: LayoutPart[]): boolean {
   return messageAt >= 0 && moduleAt > messageAt;
 }
 
+function columnWidth(field: LogLayoutField, part: Extract<LayoutPart, { kind: "field" }>): number {
+  if (part.width !== undefined) {
+    return part.width;
+  }
+  switch (field) {
+    case "level":
+      return GRID_DEFAULTS.level;
+    case "module":
+      return GRID_DEFAULTS.module;
+    case "message":
+      return GRID_DEFAULTS.message;
+    case "emoji":
+      return GRID_DEFAULTS.emoji;
+    default: {
+      const never: never = field;
+      throw new Error(`Unhandled layout field: ${never}`);
+    }
+  }
+}
+
+export function resolveModuleAlign(
+  parts: LayoutPart[],
+  part: Extract<LayoutPart, { kind: "field" }>,
+): "left" | "right" {
+  if (part.align === "right" || part.align === "left") {
+    return part.align;
+  }
+  const fields = parts.filter(
+    (p): p is Extract<LayoutPart, { kind: "field" }> => p.kind === "field",
+  );
+  const last = fields[fields.length - 1];
+  return last?.field === "module" ? "right" : "left";
+}
+
 function fieldSpan(
-  field: LogLayoutField,
-  align: "left" | "right",
+  part: Extract<LayoutPart, { kind: "field" }>,
   ctx: LayoutRowContext,
   padMessage: boolean,
+  parts: LayoutPart[],
 ): LogSpan {
-  switch (field) {
+  switch (part.field) {
     case "level": {
-      const text = padEndDisplay(ctx.level.toUpperCase(), spec.levelWidth);
+      const text = padEndDisplay(ctx.level.toUpperCase(), columnWidth("level", part));
       return { text, role: "level" };
     }
     case "module": {
       const mod = `[${ctx.module}]`;
+      const resolved =
+        part.align === "auto" ? resolveModuleAlign(parts, part) : part.align;
+      const w = columnWidth("module", part);
       const text =
-        align === "right"
-          ? padStartDisplay(mod, spec.moduleWidth)
-          : padEndDisplay(mod, spec.moduleWidth);
+        resolved === "right" ? padStartDisplay(mod, w) : padEndDisplay(mod, w);
       return { text, role: "module", tintKey: ctx.module };
     }
     case "message": {
-      const width = padMessage ? spec.messageWidth : 0;
+      const width = padMessage ? columnWidth("message", part) : 0;
       const text = width > 0 ? padEndDisplay(ctx.message, width) : ctx.message;
       return { text, role: "message" };
     }
     case "emoji": {
       return {
-        text: formatEmojiColumn(ctx.emoji),
+        text: formatEmojiColumn(ctx.emoji, columnWidth("emoji", part)),
         role: "emoji",
       };
     }
     default: {
-      const never: never = field;
+      const never: never = part.field;
       throw new Error(`Unhandled layout field: ${never}`);
     }
   }
@@ -110,7 +144,7 @@ export function formatLayoutSpans(
       }
       continue;
     }
-    spans.push(fieldSpan(part.field, part.align, ctx, padMessage));
+    spans.push(fieldSpan(part, ctx, padMessage, parts));
   }
   return spans;
 }

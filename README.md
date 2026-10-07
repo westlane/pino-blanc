@@ -74,7 +74,7 @@ Edit [config/layout.yml](config/layout.yml), then `yarn build`.
 | **`module-first`** | Same text lines | Level → `[module]` → message (no emoji column). |
 | **`identity-meta`** | `log.event()` only | Two rows: identity chip + event name, then JSON under the name. Set `eventLayout: "identity-meta"`. |
 
-Tokens: `%level%`, `%emoji%`, `%message%` / `%event%`, `%module%` (`:left` / `:right`), `%identity%`, `%meta%`.
+Tokens: `%field%`, `%field:width%`, `%field:width:right%` — e.g. `%level:6%`, `%message:34%`, `%module:18%`. `%module%` right-aligns when last. `%event:N%` = event name column. `%identity%`, `%meta%`. Fallback widths: `src/layout/grid-defaults.ts`. `columns` in YAML is only box drawing + `hashShift`.
 
 ```ts
 createLogger("api"); // YAML `default` → module-right

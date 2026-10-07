@@ -1,4 +1,4 @@
-import { spec } from "./layout.data.js";
+import { GRID_DEFAULTS } from "./grid-defaults.js";
 import { chipSpan } from "./chip.js";
 import { padEndDisplay } from "./pad.js";
 import { applySymbol, splitPrefix } from "./symbol.js";
@@ -22,7 +22,7 @@ export const EVENT_IDENTITY_META_KEYS = [
 ] as const;
 
 function resolveIdentityWidth(width?: number): number {
-  return width ?? spec.event.identityWidth;
+  return width ?? GRID_DEFAULTS.identity;
 }
 
 export type ResolvedEventIdentity = {

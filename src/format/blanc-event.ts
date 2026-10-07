@@ -3,7 +3,7 @@ import { padEventNameColumn, eventRow2TailSpans, resolveEmojiFromMeta } from "..
 import { formatEventLayoutSpans } from "../layout/event-template.js";
 import { formatStandardSpans } from "../layout/line.js";
 import { padEndDisplay } from "../layout/pad.js";
-import { spec } from "../layout/layout.data.js";
+import { GRID_DEFAULTS } from "../layout/grid-defaults.js";
 import {
   BLANC_CONTROL_META_KEYS,
   isBlancEventRecord,
@@ -37,7 +37,7 @@ export function formatBlancEventSpans(
 
   const eventMessage = padEndDisplay(
     padEventNameColumn(message),
-    spec.messageWidth,
+    GRID_DEFAULTS.message,
   );
   const spans = formatStandardSpans(
     "info",

@@ -2,32 +2,36 @@ import { jsonMetaSpans } from "../format/json-meta.js";
 import { BLANC_CONTROL_META_KEYS, stripPinoBindings } from "../record.js";
 import type { LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 import { padEventNameColumn, resolveEmojiFromMeta } from "./event-columns.js";
+import { LAYOUT_FIELD_RE, parseFieldModifiers } from "./field-token.js";
 import { EVENT_IDENTITY_META_KEYS, identityColumnSpan } from "./identity-meta.js";
 import { formatLayoutSpans, type LayoutRowContext } from "./template.js";
 
-const EVENT_LAYOUT_FIELD_RE = /%([a-z]+)(?::(left|right|blank))?%/g;
-
 type EventLayoutPart =
   | { kind: "literal"; text: string }
-  | { kind: "identity" }
+  | { kind: "identity"; width?: number }
   | { kind: "meta" }
-  | { kind: "field"; field: string };
+  | { kind: "field"; token: string };
 
 function parseEventLayoutRow(template: string): EventLayoutPart[] {
   const parts: EventLayoutPart[] = [];
   let cursor = 0;
-  for (const match of template.matchAll(EVENT_LAYOUT_FIELD_RE)) {
+  for (const match of template.matchAll(LAYOUT_FIELD_RE)) {
     const index = match.index ?? 0;
     if (index > cursor) {
       parts.push({ kind: "literal", text: template.slice(cursor, index) });
     }
-    const token = match[1];
-    if (token === "identity") {
-      parts.push({ kind: "identity" });
-    } else if (token === "meta") {
+    const name = match[1];
+    const clause = match[2];
+    if (name === "identity") {
+      parts.push({ kind: "identity", width: parseFieldModifiers(name, clause).width });
+    } else if (name === "meta") {
       parts.push({ kind: "meta" });
     } else {
-      parts.push({ kind: "field", field: token === "event" ? "message" : token });
+      const token = clause ? `${name}:${clause}` : name;
+      parts.push({
+        kind: "field",
+        token: name === "event" ? token.replace(/^event/, "message") : token,
+      });
     }
     cursor = index + match[0].length;
   }
@@ -51,7 +55,7 @@ export function splitEventLayoutTemplate(template: string): {
 }
 
 export function eventLayoutUsesIdentity(template: string): boolean {
-  return /%identity%/.test(template);
+  return /%identity/.test(template);
 }
 
 function eventPayload(record: PinoLogRecord): Record<string, unknown> | undefined {
@@ -96,7 +100,9 @@ function formatEventRow(
       continue;
     }
     if (part.kind === "identity") {
-      spans.push(identityColumnSpan(record, row, symbolMap, identityWidth));
+      spans.push(
+        identityColumnSpan(record, row, symbolMap, identityWidth ?? part.width),
+      );
       continue;
     }
     if (part.kind === "meta") {
@@ -105,12 +111,7 @@ function formatEventRow(
       }
       continue;
     }
-    const align =
-      part.field === "module" && template.includes("%module:right%")
-        ? ":right"
-        : "";
-    const token = `%${part.field}${align}%`;
-    spans.push(...formatLayoutSpans(token, ctx));
+    spans.push(...formatLayoutSpans(`%${part.token}%`, ctx));
   }
   return spans;
 }

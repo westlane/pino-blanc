@@ -4,22 +4,13 @@ import type { LayoutData } from "../types/layout.js";
 export const layoutData: LayoutData = {
   "default": "module-right",
   "text": {
-    "module-right": "%level% %emoji%  %message% %module:right%",
-    "module-first": "%level% %module% %message%"
+    "module-right": "%level:6% %emoji:4%  %message:34% %module:18%",
+    "module-first": "%level:6% %module:18% %message%"
   },
   "event": {
-    "identity-meta": "%identity% %emoji%  %event%\n%identity% %emoji%  %meta%"
+    "identity-meta": "%identity:28% %emoji:4%  %event:28%\n%identity:28% %emoji:4%  %meta%"
   },
   "columns": {
-    "levelWidth": 6,
-    "moduleWidth": 18,
-    "messageWidth": 34,
-    "event": {
-      "emojiWidth": 4,
-      "eventNameWidth": 28,
-      "identityWidth": 28,
-      "identityToContentGap": "  "
-    },
     "box": {
       "width": 80,
       "minInner": 20,

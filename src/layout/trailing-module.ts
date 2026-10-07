@@ -1,5 +1,5 @@
 import { resolveLayoutTemplate } from "./presets.js";
-import { spec } from "./layout.data.js";
+import { GRID_DEFAULTS } from "./grid-defaults.js";
 import type { LogSpan } from "../types.js";
 import { formatLayoutSpans } from "./template.js";
 import { displayWidth } from "./width.js";
@@ -44,7 +44,7 @@ export function alignBodyBeforeTrailingModule(
   moduleSpan: LogSpan,
 ): LogSpan[] {
   const bodyW = spansPlainWidth(bodySpans);
-  const pad = Math.max(0, spec.messageWidth - bodyW);
+  const pad = Math.max(0, GRID_DEFAULTS.message - bodyW);
   return [
     ...leadSpans,
     ...bodySpans,
