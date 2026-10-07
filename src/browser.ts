@@ -1,13 +1,19 @@
-export { createBrowserLogger as createLogger } from "./browser/create.js";
+export {
+  createBrowserLogger,
+  createBrowserLogger as createLogger,
+} from "./browser/create.js";
 export type {
   BlancLogger,
-  ColorTransform,
+  ChipChrome,
+  Colorize,
+  Redact,
   ColumnDecorator,
   CreateLoggerOptions,
   LogLevelName,
   LogSpan,
   LogTheme,
   LogThemeId,
+  SymbolMap,
   TintResolver,
 } from "./types.js";
 export { colorFromId } from "./color/id.js";

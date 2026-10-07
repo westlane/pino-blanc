@@ -9,7 +9,7 @@ describe("color", () => {
     expect(colorFromId("watcher", ramp)).toBe(colorFromId("watcher", ramp));
   });
 
-  it("colorTransform overrides", () => {
+  it("colorize overrides", () => {
     const theme = resolveTheme("solarized-dark");
     const tint = createTintResolver(theme, (id, hex) =>
       id === "special" ? "#ff00ff" : hex,

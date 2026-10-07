@@ -1,6 +1,13 @@
 {
   "levelWidth": 6,
   "moduleWidth": 18,
+  "messageWidth": 34,
+  "event": {
+    "emojiWidth": 4,
+    "eventNameWidth": 28,
+    "identityWidth": 28,
+    "identityToContentGap": "  "
+  },
   "box": {
     "width": 80,
     "minInner": 20,

@@ -35,6 +35,7 @@
   "files": [
     "dist",
     "themes",
+    "layouts",
     "spec",
     "README.md",
     "LICENSE"
@@ -45,9 +46,16 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "demo:themes": "yarn build && node scripts/demo-themes.mjs",
+    "demo:solarized": "yarn build && PINO_BLANC_DEMO=solarized node scripts/demo-themes.mjs",
+    "demo:live": "yarn build && yarn verify:ansi && PINO_BLANC_DEMO_FORCE_COLOR=1 node scripts/demo-live-ndjson.mjs",
+    "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
     "check": "yarn lint && yarn typecheck && yarn test && yarn build",
     "prepublishOnly": "yarn check",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "pino": "^9.14.0"
   },
   "peerDependencies": {
     "pino": "^9.0.0"

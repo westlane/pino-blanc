@@ -1,42 +1,57 @@
-import { formatStandardSpans } from "../layout/line.js";
+import { resolvePrettyColor } from "../color/gate.js";
+import { applyConsoleOutputHygiene } from "../format/console-output.js";
+import { resolvePinoLogLine } from "../format/from-record.js";
 import { createTintResolver, resolveTheme } from "../color/theme.js";
 import { renderAnsi } from "../render/ansi.js";
 import { stripAnsiForPlainOutput } from "../render/plain.js";
-import type { ColumnDecorator, CreateLoggerOptions } from "../types.js";
+import type { ColumnDecorator, CreateLoggerOptions, PinoLogRecord } from "../types.js";
 import { levelFromPinoNumber } from "./levels.js";
+
 export type FormatContext = {
   options: CreateLoggerOptions;
   columns?: ColumnDecorator;
 };
 
 export function formatPinoLogLine(
-  input: {
-    level: number;
-    msg?: string;
-    module?: string;
-    time?: number;
-    [key: string]: unknown;
-  },
+  input: PinoLogRecord,
   ctx: FormatContext,
   plain = false,
 ): string {
+  const resolved = resolvePinoLogLine(input, ctx.options, ctx.columns);
+  if (resolved.mode === "empty") {
+    return "";
+  }
+
+  if (resolved.mode === "line") {
+    let line = resolved.line;
+    if (!plain) {
+      line = applyConsoleOutputHygiene(line, input, ctx.options);
+    } else {
+      line = stripAnsiForPlainOutput(line);
+    }
+    return line;
+  }
+
   const theme = resolveTheme(ctx.options.theme, ctx.options.themeOverrides);
   const tint = createTintResolver(
     theme,
-    ctx.options.colorTransform,
+    ctx.options.colorize,
     ctx.options.tint,
   );
-  const level = levelFromPinoNumber(input.level);
-  const module = String(input.module ?? "app");
-  const message = String(input.msg ?? "");
-  let spans = formatStandardSpans(level, module, message);
-  if (ctx.columns) {
-    spans = ctx.columns.decorate(spans, {
-      level,
-      module,
-      meta: input,
-    });
+  const levelName = levelFromPinoNumber(input.level);
+  const useColor = resolvePrettyColor(ctx.options, plain);
+  let colored = renderAnsi(
+    resolved.spans,
+    theme,
+    tint,
+    levelName,
+    useColor,
+    ctx.options,
+  );
+  if (useColor) {
+    colored = applyConsoleOutputHygiene(colored, input, ctx.options);
+  } else {
+    colored = stripAnsiForPlainOutput(colored);
   }
-  const colored = renderAnsi(spans, theme, tint, level, !plain);
-  return plain ? stripAnsiForPlainOutput(colored) : colored;
+  return colored;
 }

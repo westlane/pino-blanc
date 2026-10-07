@@ -1,4 +1,5 @@
 import pino from "pino";
+import { BLANC_EVENT_KEY } from "../record.js";
 import type { BlancLogger, CreateLoggerOptions } from "../types.js";
 import { toPinoLevel } from "./levels.js";
 import { fileURLToPath } from "node:url";
@@ -7,9 +8,14 @@ import buildPrettyStream from "./transport/pretty.js";
 
 function optionsNeedMainThread(options: CreateLoggerOptions): boolean {
   return Boolean(
-    options.colorTransform ||
+    options.syncPretty ||
+      options.colorize ||
       options.tint ||
       options.columns ||
+      options.formatRecord ||
+      options.consoleLeadingNewline ||
+      options.consoleColorReset === "triple" ||
+      (options.symbolMap && Object.keys(options.symbolMap).length > 0) ||
       options.themeOverrides,
   );
 }
@@ -19,6 +25,26 @@ function prettyTargetPath(): string {
   return join(here, "transport", "pretty.js");
 }
 
+/** Worker `process.env` — stdout is not a TTY in the thread; honor FORCE_COLOR. */
+function prettyTransportWorkerEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  if (env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0") {
+    delete env.NO_COLOR;
+  }
+  return env;
+}
+
+function applyRedact(
+  options: CreateLoggerOptions,
+  fields?: object,
+): Record<string, unknown> {
+  const base =
+    fields && typeof fields === "object" && !Array.isArray(fields)
+      ? { ...(fields as Record<string, unknown>) }
+      : {};
+  return options.redact ? options.redact(base) : base;
+}
+
 function wrapPino(
   logger: pino.Logger,
   options: CreateLoggerOptions,
@@ -26,9 +52,9 @@ function wrapPino(
   const logAt = (
     level: string,
     msg: string,
-    meta?: object,
+    fields?: object,
   ): void => {
-    const bindings = meta ?? {};
+    const bindings = applyRedact(options, fields);
     switch (level) {
       case "trace":
         logger.trace(bindings, msg);
@@ -56,13 +82,14 @@ function wrapPino(
       const mod = bindings.module;
       return wrapPino(logger.child({ module: mod }), options);
     },
-    trace: (m, meta) => logAt("trace", m, meta),
-    debug: (m, meta) => logAt("debug", m, meta),
-    info: (m, meta) => logAt("info", m, meta),
-    warn: (m, meta) => logAt("warn", m, meta),
-    error: (m, meta) => logAt("error", m, meta),
-    fatal: (m, meta) => logAt("fatal", m, meta),
-    event: (m, meta) => logAt("info", m, { ...meta, noirEvent: true }),
+    trace: (m, fields) => logAt("trace", m, fields),
+    debug: (m, fields) => logAt("debug", m, fields),
+    info: (m, fields) => logAt("info", m, fields),
+    warn: (m, fields) => logAt("warn", m, fields),
+    error: (m, fields) => logAt("error", m, fields),
+    fatal: (m, fields) => logAt("fatal", m, fields),
+    event: (m, fields) =>
+      logAt("info", m, { ...applyRedact(options, fields), [BLANC_EVENT_KEY]: true }),
   };
 }
 
@@ -70,20 +97,28 @@ export function createLogger(
   module = "app",
   options: CreateLoggerOptions = {},
 ): BlancLogger {
+  const resolvedOptions: CreateLoggerOptions = {
+    ...options,
+    forceColor:
+      options.forceColor ??
+      (process.env.PINO_BLANC_FORCE_COLOR === "0" ? false : true),
+  };
   const level = toPinoLevel(
-    options.level ? String(options.level) : "debug",
+    resolvedOptions.level ? String(resolvedOptions.level) : "debug",
   );
   const formatCtx = {
-    options,
-    columns: options.columns,
+    options: resolvedOptions,
+    columns: resolvedOptions.columns,
   };
 
-  const destination = optionsNeedMainThread(options)
+  const destination = optionsNeedMainThread(resolvedOptions)
     ? buildPrettyStream(formatCtx)
     : pino.transport({
         target: prettyTargetPath(),
         options: formatCtx,
-      });
+        worker: { env: prettyTransportWorkerEnv() },
+        ...(resolvedOptions.prettyTransportSync ? { sync: true } : {}),
+      } as pino.TransportSingleOptions<typeof formatCtx> & { sync?: boolean });
 
   const logger = pino(
     {
@@ -94,7 +129,7 @@ export function createLogger(
     destination,
   );
 
-  return wrapPino(logger, options);
+  return wrapPino(logger, resolvedOptions);
 }
 
 export { parseLevelName } from "../parse-level.js";

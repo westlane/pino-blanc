@@ -1,6 +1,7 @@
-import type { ColorTransform, LogTheme, LogThemeId, TintResolver } from "../types.js";
+import type { Colorize, LogTheme, LogThemeId, TintResolver } from "../types.js";
 import { colorFromId } from "./id.js";
-import { ink } from "../../themes/ink.js";
+import { gruvboxDark } from "../../themes/gruvbox-dark.js";
+import { gruvboxLight } from "../../themes/gruvbox-light.js";
 import { solarizedDark } from "../../themes/solarized-dark.js";
 import { solarizedLight } from "../../themes/solarized-light.js";
 import { resolveThemeIdFromEnv } from "./gate.js";
@@ -8,7 +9,8 @@ import { resolveThemeIdFromEnv } from "./gate.js";
 const BUILT_IN: Record<string, LogTheme> = {
   "solarized-dark": solarizedDark,
   "solarized-light": solarizedLight,
-  ink,
+  "gruvbox-dark": gruvboxDark,
+  "gruvbox-light": gruvboxLight,
 };
 
 export function resolveTheme(
@@ -38,7 +40,7 @@ export function resolveTheme(
 
 export function createTintResolver(
   theme: LogTheme,
-  colorTransform?: ColorTransform,
+  colorize?: Colorize,
   custom?: TintResolver,
 ): TintResolver {
   return {
@@ -50,7 +52,7 @@ export function createTintResolver(
         }
       }
       const base = colorFromId(tintKey, theme.tintRamp);
-      return colorTransform ? colorTransform(tintKey, base) : base;
+      return colorize ? colorize(tintKey, base) : base;
     },
   };
 }

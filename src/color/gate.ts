@@ -1,3 +1,38 @@
+export type PrettyColorOptions = {
+  forceColor?: boolean;
+  plainStdout?: boolean;
+};
+
+/** Whether pretty formatters emit ANSI (independent of NDJSON `plainStdout`). */
+export function resolvePrettyColor(
+  options: PrettyColorOptions = {},
+  plainTransport = false,
+): boolean {
+  if (plainTransport || options.plainStdout) {
+    return false;
+  }
+  if (process.env.PINO_BLANC_PLAIN === "1") {
+    return false;
+  }
+  if (options.forceColor === false) {
+    return false;
+  }
+  if (process.env.PINO_BLANC_FORCE_COLOR === "0") {
+    return false;
+  }
+  if (options.forceColor === true) {
+    return true;
+  }
+  if (process.env.PINO_BLANC_FORCE_COLOR === "1") {
+    return true;
+  }
+  if (supportsColors()) {
+    return true;
+  }
+  // Pretty logger: ANSI by default (IDE terminals often set NO_COLOR / non-TTY).
+  return true;
+}
+
 export function supportsColors(env: NodeJS.ProcessEnv = process.env): boolean {
   if (env.NO_COLOR !== undefined && env.NO_COLOR !== "") {
     return false;
@@ -8,7 +43,7 @@ export function supportsColors(env: NodeJS.ProcessEnv = process.env): boolean {
   if (env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0") {
     return true;
   }
-  if (!process.stdout.isTTY) {
+  if (!process.stdout?.isTTY) {
     return false;
   }
   const term = env.TERM ?? "";

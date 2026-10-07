@@ -1,3 +1,4 @@
 {
-  "standardPlain": "INFO   [api]              hello world"
+  "defaultPlain": "INFO         hello world                                     [api]",
+  "classicPlain": "INFO   [api]              hello world"
 }

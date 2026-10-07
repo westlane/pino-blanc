@@ -1,8 +1,27 @@
-import { formatStandardSpans } from "../layout/line.js";
+import { resolvePinoLogLine } from "../format/from-record.js";
 import { createTintResolver, resolveTheme } from "../color/theme.js";
 import { renderCss } from "../render/css.js";
-import type { BlancLogger, CreateLoggerOptions } from "../types.js";
+import { BLANC_EVENT_KEY } from "../record.js";
+import type { BlancLogger, CreateLoggerOptions, LogLevelName } from "../types.js";
 import { parseLevelName } from "../parse-level.js";
+function toPinoLevelNumber(level: LogLevelName): number {
+  switch (level) {
+    case "trace":
+      return 10;
+    case "debug":
+      return 20;
+    case "info":
+      return 30;
+    case "warn":
+      return 40;
+    case "error":
+      return 50;
+    case "fatal":
+      return 60;
+    default:
+      return 30;
+  }
+}
 
 function consoleMethod(level: string): "log" | "info" | "warn" | "error" | "debug" {
   switch (level) {
@@ -26,22 +45,42 @@ export function createBrowserLogger(
   const theme = resolveTheme(options.theme, options.themeOverrides);
   const tint = createTintResolver(
     theme,
-    options.colorTransform,
+    options.colorize,
     options.tint,
   );
 
-  const emit = (level: string, msg: string, meta?: object): void => {
+  const applyRedact = (fields?: object): Record<string, unknown> => {
+    const base =
+      fields && typeof fields === "object" && !Array.isArray(fields)
+        ? { ...(fields as Record<string, unknown>) }
+        : {};
+    return options.redact ? options.redact(base) : base;
+  };
+
+  const emit = (level: string, msg: string, fields?: object): void => {
     const levelName = parseLevelName(level);
-    let spans = formatStandardSpans(levelName, module, msg);
-    if (options.columns) {
-      spans = options.columns.decorate(spans, {
-        level: levelName,
-        module,
-        meta,
-      });
-    }
-    const { text, styles } = renderCss(spans, theme, tint, levelName);
+    const record = {
+      level: toPinoLevelNumber(levelName),
+      msg,
+      module,
+      ...applyRedact(fields),
+    };
+    const resolved = resolvePinoLogLine(record, options);
     const method = consoleMethod(levelName);
+    if (resolved.mode === "empty") {
+      return;
+    }
+    if (resolved.mode === "line") {
+      console[method](resolved.line);
+      return;
+    }
+    const { text, styles } = renderCss(
+      resolved.spans,
+      theme,
+      tint,
+      levelName,
+      options,
+    );
     console[method](text, ...styles);
   };
 
@@ -54,13 +93,17 @@ export function createBrowserLogger(
     child(bindings) {
       return createBrowserLogger(bindings.module, options);
     },
-    trace: (m, meta) => emit("trace", m, meta),
-    debug: (m, meta) => emit("debug", m, meta),
-    info: (m, meta) => emit("info", m, meta),
-    warn: (m, meta) => emit("warn", m, meta),
-    error: (m, meta) => emit("error", m, meta),
-    fatal: (m, meta) => emit("fatal", m, meta),
-    event: (m, meta) => emit("info", m, meta),
+    trace: (m, fields) => emit("trace", m, fields),
+    debug: (m, fields) => emit("debug", m, fields),
+    info: (m, fields) => emit("info", m, fields),
+    warn: (m, fields) => emit("warn", m, fields),
+    error: (m, fields) => emit("error", m, fields),
+    fatal: (m, fields) => emit("fatal", m, fields),
+    event: (m, fields) =>
+      emit("info", m, {
+        ...applyRedact(fields),
+        [BLANC_EVENT_KEY]: true,
+      } as object),
   };
 
   return api;

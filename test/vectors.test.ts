@@ -12,8 +12,15 @@ describe("vectors", () => {
       join(root, "../spec/vectors/line.json"),
       "utf8",
     );
-    const expected = JSON.parse(raw).standardPlain as string;
-    const actual = spansToPlain(formatStandardSpans("info", "api", "hello world"));
-    expect(actual).toBe(expected);
+    const vectors = JSON.parse(raw) as {
+      defaultPlain: string;
+      classicPlain: string;
+    };
+    expect(
+      spansToPlain(formatStandardSpans("info", "api", "hello world")),
+    ).toBe(vectors.defaultPlain);
+    expect(
+      spansToPlain(formatStandardSpans("info", "api", "hello world", "classic")),
+    ).toBe(vectors.classicPlain);
   });
 });

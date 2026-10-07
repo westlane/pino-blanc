@@ -1,0 +1,41 @@
+/** NDJSON / bindings flag set by `BlancLogger.event()` for custom pretty layout. */
+export const BLANC_EVENT_KEY = "blancEvent";
+
+export function isBlancEventRecord(
+  record: Record<string, unknown> | undefined | null,
+): boolean {
+  if (!record) {
+    return false;
+  }
+  return record[BLANC_EVENT_KEY] === true;
+}
+
+/** Default pino binding keys to omit when treating the record as user meta. */
+export const PINO_BINDING_KEYS = [
+  BLANC_EVENT_KEY,
+  "level",
+  "time",
+  "module",
+  "msg",
+  "pid",
+  "hostname",
+  "v",
+  "name",
+] as const;
+
+export function stripPinoBindings(
+  record: Record<string, unknown> | undefined,
+  extraKeys: string[] = [],
+): Record<string, unknown> | undefined {
+  if (!record || typeof record !== "object") {
+    return record;
+  }
+  const omit = new Set<string>([...PINO_BINDING_KEYS, ...extraKeys]);
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (!omit.has(key)) {
+      out[key] = value;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}

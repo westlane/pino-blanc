@@ -22,7 +22,7 @@ jobs:
     if: github.ref == 'refs/heads/prod'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,15 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: corepack enable
       - run: yarn install --immutable
+      - run: node scripts/check-version-ahead.mjs
       - run: yarn build
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Tag release
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "v${VERSION}"
+          git push origin "v${VERSION}"

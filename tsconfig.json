@@ -16,6 +16,6 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "themes/**/*.ts"],
+  "include": ["src/**/*.ts", "themes/**/*.ts", "layouts/**/*.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }
