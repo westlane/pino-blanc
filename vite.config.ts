@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig, mergeConfig } from "vite";
+import { mergeConfig } from "vite";
 import example from "./examples/browser-frameworks/vite.config.ts";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
