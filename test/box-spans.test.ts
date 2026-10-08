@@ -54,9 +54,9 @@ describe("box spans", () => {
     const plain = stripAnsiForPlainOutput(line);
     expect(plain).toContain("pino-blanc v1.0.0 - info level");
     expect(plain).toContain("@lucky-aphid");
-    // box.complex: pad + title + pad + subtitle + pad
+    // box.complex: pad + title + pad + pad + subtitle + pad
     const barLines = plain.split("\n").filter((row) => row.length === 48);
-    expect(barLines.length).toBe(5);
+    expect(barLines.length).toBe(6);
     expect(barLines.some((row) => row.includes("pino-blanc"))).toBe(true);
     expect(barLines.some((row) => row.includes("@lucky-aphid"))).toBe(true);
     if (rendered.mode === "ansi") {
@@ -64,19 +64,19 @@ describe("box spans", () => {
     }
   });
 
-  it("two-content banner keeps first section white (app), later bands theme box", () => {
+  it("two-content banner keeps first section white (app), color pads above subtitle", () => {
     const spans = bannerLogSpans({ title: "levels", subtitle: "all" });
     const bars = spans.filter((s) => s.role === "banner" || s.role === "box");
-    expect(bars.length).toBe(5);
-    // pad + title + pad → white app chrome; subtitle + pad → theme box
+    expect(bars.length).toBe(6);
+    // pad + title → white; pads above subtitle + subtitle + pad → theme box
     expect(bars[0]?.role).toBe("banner");
     expect(bars[0]?.bannerChrome).toBe("app");
     expect(bars[1]?.role).toBe("banner");
     expect(bars[1]?.bannerChrome).toBe("app");
-    expect(bars[2]?.role).toBe("banner");
-    expect(bars[2]?.bannerChrome).toBe("app");
+    expect(bars[2]?.role).toBe("box");
     expect(bars[3]?.role).toBe("box");
     expect(bars[4]?.role).toBe("box");
+    expect(bars[5]?.role).toBe("box");
   });
 
   it("single-content banner stays theme box color on every band", () => {

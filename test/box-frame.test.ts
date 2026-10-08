@@ -35,7 +35,7 @@ describe("box presets", () => {
   it("defaults to box.default; complex fills version and subtitle", () => {
     expect(resolveBoxLayout().bands).toHaveLength(3);
     expect(resolveBoxLayout("default").bands).toHaveLength(3);
-    expect(resolveBoxLayout("complex").bands).toHaveLength(5);
+    expect(resolveBoxLayout("complex").bands).toHaveLength(6);
 
     const simple = formatBoxBandLines({ title: "rally" }, "default");
     expect(simple.titleLine).toBe("rally");

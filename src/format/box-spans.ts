@@ -130,7 +130,7 @@ function pushBoxRow(spans: LogSpan[], row: LogSpan): void {
  *
  * Hyphen-only `[----…]` bands are padding rows (empty bars). Content bands
  * fill `%title%` / `%version%` / `%lv%` / `%subtitle%`. First content section
- * uses app chrome; later content uses identity chrome.
+ * (and leading pads) use app chrome (white); later pads + content use identity chrome.
  */
 export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
   const boxLayout = inferBoxLayout(input);
