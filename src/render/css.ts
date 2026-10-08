@@ -1,4 +1,9 @@
-import { boxChromeColors, chromeColors } from "../color/chrome.js";
+import {
+  boxChromeColors,
+  chromeColors,
+  readableForeground,
+  SURFACE_WHITE_HEX,
+} from "../color/chrome.js";
 import { hexToCssChrome, hexToCssFg } from "../color/css.js";
 import { splitPrefix } from "../layout/symbol.js";
 import type { ChipChrome, CreateLoggerOptions, LogSpan, LogTheme, TintResolver } from "../types.js";
@@ -28,8 +33,11 @@ function pushChipSpan(span: LogSpan, ctx: SpanRenderContext, payload: CssConsole
   const chrome: ChipChrome = span.chrome ?? "inverted";
   const map = ctx.options.symbolMap;
 
+  const trimmedEnd = span.text.trimEnd();
+  const trailingPad = span.text.slice(trimmedEnd.length);
+
   if (chrome === "prefix") {
-    const split = splitPrefix(span.text, map);
+    const split = splitPrefix(trimmedEnd, map);
     if (split) {
       const glyphColors = chromeColors(identity, "prefix", ctx.theme);
       const bodyColors = chromeColors(identity, "inverted", ctx.theme);
@@ -43,6 +51,39 @@ function pushChipSpan(span: LogSpan, ctx: SpanRenderContext, payload: CssConsole
         hexToCssChrome(bodyColors.background, bodyColors.foreground),
         payload,
       );
+      if (trailingPad) {
+        pushCssPart(
+          trailingPad,
+          hexToCssChrome(bodyColors.background, bodyColors.background),
+          payload,
+        );
+      }
+      return;
+    }
+  }
+
+  if (chrome === "fill") {
+    const split = splitPrefix(trimmedEnd, map);
+    if (split) {
+      const bodyColors = chromeColors(identity, "fill", ctx.theme);
+      const glyphFg = readableForeground(SURFACE_WHITE_HEX, identity);
+      pushCssPart(
+        split.glyph,
+        hexToCssChrome(SURFACE_WHITE_HEX, glyphFg),
+        payload,
+      );
+      pushCssPart(
+        split.body,
+        hexToCssChrome(bodyColors.background, bodyColors.foreground),
+        payload,
+      );
+      if (trailingPad) {
+        pushCssPart(
+          trailingPad,
+          hexToCssChrome(bodyColors.background, bodyColors.background),
+          payload,
+        );
+      }
       return;
     }
   }

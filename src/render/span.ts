@@ -1,4 +1,8 @@
-import { chromeColors } from "../color/chrome.js";
+import {
+  chromeColors,
+  readableForeground,
+  SURFACE_WHITE_HEX,
+} from "../color/chrome.js";
 import { levelHex, roleHex } from "../color/theme.js";
 import { splitPrefix } from "../layout/symbol.js";
 import type {
@@ -15,6 +19,13 @@ export type SpanRenderContext = {
   level: string;
   options: CreateLoggerOptions;
 };
+
+export type ChipPaint = (
+  text: string,
+  background: string,
+  foreground: string,
+  bold?: boolean,
+) => string;
 
 export function resolveIdentityHex(
   span: LogSpan,
@@ -56,15 +67,32 @@ export function resolveSpanHex(
   return roleHex(ctx.theme, span.role);
 }
 
+/** Column trailing spaces keep the chip background (invisible pad). */
+function paintWithColumnPad(
+  text: string,
+  background: string,
+  foreground: string,
+  paint: ChipPaint,
+  bold?: boolean,
+): string {
+  const trimmedEnd = text.trimEnd();
+  const trailingPad = text.slice(trimmedEnd.length);
+  const main = paint(trimmedEnd, background, foreground, bold);
+  if (!trailingPad) {
+    return main;
+  }
+  return `${main}${paint(trailingPad, background, background)}`;
+}
+
+/**
+ * Identity chip paint — event-column semantics:
+ * - `prefix`: saturated glyph box + saturated body (actors)
+ * - `fill`: white glyph box + 25% tinted body (resource `/` `_` subjects)
+ */
 export function renderChipParts(
   span: LogSpan,
   ctx: SpanRenderContext,
-  paint: (
-    text: string,
-    background: string,
-    foreground: string,
-    bold?: boolean,
-  ) => string,
+  paint: ChipPaint,
 ): string {
   const identity = resolveIdentityHex(span, ctx.tint);
   if (!identity) {
@@ -72,7 +100,6 @@ export function renderChipParts(
   }
   const chrome: ChipChrome = span.chrome ?? "inverted";
   const map = ctx.options.symbolMap;
-
   const trimmedEnd = span.text.trimEnd();
   const trailingPad = span.text.slice(trimmedEnd.length);
 
@@ -81,12 +108,47 @@ export function renderChipParts(
     if (split) {
       const glyphColors = chromeColors(identity, "prefix", ctx.theme);
       const bodyColors = chromeColors(identity, "inverted", ctx.theme);
-      const glyph = paint(split.glyph, glyphColors.background, glyphColors.foreground, true);
-      const body = paint(split.body, bodyColors.background, bodyColors.foreground);
-      return `${glyph}${body}${trailingPad}`;
+      const glyph = paint(
+        split.glyph,
+        glyphColors.background,
+        glyphColors.foreground,
+        true,
+      );
+      const body = paint(
+        split.body,
+        bodyColors.background,
+        bodyColors.foreground,
+      );
+      const pad = trailingPad
+        ? paint(trailingPad, bodyColors.background, bodyColors.background)
+        : "";
+      return `${glyph}${body}${pad}`;
+    }
+  }
+
+  if (chrome === "fill") {
+    const split = splitPrefix(trimmedEnd, map);
+    if (split) {
+      const bodyColors = chromeColors(identity, "fill", ctx.theme);
+      const glyphFg = readableForeground(SURFACE_WHITE_HEX, identity);
+      const glyph = paint(split.glyph, SURFACE_WHITE_HEX, glyphFg);
+      const body = paint(
+        split.body,
+        bodyColors.background,
+        bodyColors.foreground,
+      );
+      const pad = trailingPad
+        ? paint(trailingPad, bodyColors.background, bodyColors.background)
+        : "";
+      return `${glyph}${body}${pad}`;
     }
   }
 
   const colors = chromeColors(identity, chrome, ctx.theme);
-  return `${paint(trimmedEnd, colors.background, colors.foreground)}${trailingPad}`;
+  return paintWithColumnPad(
+    span.text,
+    colors.background,
+    colors.foreground,
+    paint,
+  );
 }
