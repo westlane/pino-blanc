@@ -60,7 +60,7 @@ Env: `PINO_BLANC_THEME=solarized-light`
 
 **Demo:** `yarn demo:themes` (all palettes) or `yarn demo:solarized` (Solarized dark + light with tint-ramp modules, rich events, layouts, and multi-DID banners). `PINO_BLANC_DEMO=gruvbox` limits to Gruvbox pair.
 
-**Live NDJSON:** `yarn demo:live` — simulates WebSocket-style `log.event` ticks through the worker transport, an inline NDJSON→pretty `Writable`, and a shell-style `producer | pretty` pipe. Frame ticks use `_liveReplace: true` so each tick rewrites one terminal block (CSI up + erase) instead of stacking scrollback; a following non-live event (e.g. `ws.batch_done`) commits the last frame. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`, `PINO_BLANC_LIVE_MODE=transport|peer|createLogger|all` (`peer` = inline `Writable`; `createLogger` =  in-process pretty). Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
+**Live NDJSON:** `yarn demo:live` — simulates WebSocket-style `log.event` ticks through the worker transport, an inline NDJSON→pretty `Writable`, and a shell-style `producer | pretty` pipe. Frame ticks use `_liveReplace: true` so each tick rewrites one terminal block (CSI up + erase) instead of stacking scrollback; a following non-live event (e.g. `ws.batch_done`) commits the last frame. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`, `PINO_BLANC_LIVE_MODE=transport|peer|createLogger|all` (`peer` = inline `Writable`; `createLogger` = in-process pretty). Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
 
 Line layout and column widths: edit [config/layout.yml](config/layout.yml), then `yarn build`. Palettes: [themes/](themes/) — credits in [themes/README.md](themes/README.md).
 
@@ -95,11 +95,11 @@ log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port:
 
 ## Extensions
 
-- `colorize(id, defaultHex)` — app-specific tint (e.g. DID)
+- `colorize(id, defaultHex)` — app-specific tint (e.g. DID → hex)
 - `redact(fields)` — app PII policy; runs on log fields before each write
 - `formatRecord` / `defineFormatRecord()` — full-line pretty override per NDJSON record
 - `consolePrettyDelivery` — MCP-style hosts: emit side channel, return `false` to skip stdout
-- `buildBoxSpans` / `renderBoxBlock` — layout.yml `box` presets (padding bands + title/subtitle; uses `box.complex`)
+- `buildBoxSpans` / `renderBoxBlock` — layout.yml `box` presets (padding bands + title/subtitle; `box.complex` for title + subtitle)
 - `renderBannerLine` — `box.default` section headers (padded bars)
 - `stripPinoBindings`, `isBlancEventRecord`, `consoleLeadingNewlineUnless` — record helpers
 - `_liveReplace: true` on a record — pretty transport overwrites the previous live block in-place (high-frequency ticks / WS frames)

@@ -123,16 +123,16 @@ export type CreateLoggerOptions = {
    * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset id or raw template.
    */
   eventLayout?: string;
-  /** Fixed display width for `%identity%` in `eventLayout` (: 24). */
+  /** Fixed display width for `%identity%` in `eventLayout`. */
   eventIdentityWidth?: number;
   colorize?: Colorize;
-  /** Transform log fields before write (e.g. field-name PII policy). */
+  /** Transform log fields before write (e.g. PII redaction). */
   redact?: Redact;
   tint?: TintResolver;
   columns?: ColumnDecorator;
   /** Replace or extend default level/module/message spans for a pino record. */
   formatRecord?: FormatRecord;
-  /** Leading newline before each pretty line (e.g. console rhythm). */
+  /** Leading newline before each pretty line (console rhythm). */
   consoleLeadingNewline?: ConsoleLeadingNewline;
   /** Append background/foreground reset after each line (chip rows). */
   consoleColorReset?: ConsoleColorReset;

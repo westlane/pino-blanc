@@ -73,7 +73,7 @@ function themesToRun() {
   return ALL_THEMES;
 }
 
-/**  DID tint — defaults to theme `tintRamp` (full Solarized accent set). */
+/** DID tint — defaults to theme `tintRamp` (full Solarized accent set). */
 function didColorTransform(themeId) {
   const theme = resolveTheme(themeId);
   return (id, defaultHex) => {

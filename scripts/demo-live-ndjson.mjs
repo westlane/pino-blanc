@@ -164,7 +164,7 @@ async function runTransportMode() {
   await sleep(200);
 }
 
-/** `createLogger` in-process pretty ( `consoleLeadingNewline`). */
+/** `createLogger` in-process pretty (`consoleLeadingNewline`). */
 async function runPeerMode() {
   const log = createLogger("ndjson-peer", {
     ...blancOpts,
