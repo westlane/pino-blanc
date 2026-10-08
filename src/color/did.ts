@@ -2,7 +2,7 @@ import type { Colorize } from "../types.js";
 
 /**
  * Deterministic mid-range hex from a string seed (identity palette).
- * Same algorithm as `common DID color hashing` `generateColorFromString`.
+ * Stable hashing suitable for DID / identity tint keys (`generateColorFromString`).
  */
 export function generateColorFromString(str: string): string {
   const normalized = str.toLowerCase();

@@ -96,7 +96,7 @@ function themesToRun() {
   return ALL_THEMES;
 }
 
-/** Kind → log prefix glyph (kind-based). */
+/** Kind → log prefix glyph. */
 const IDENTITY_SYMBOL_MAP = {
   host: "/",
   user: "@",
