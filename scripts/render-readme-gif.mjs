@@ -1,6 +1,6 @@
 /**
  * Render docs/features.gif — wine-shop visit story across themes
- * (levels, layouts, identity chips, live progress, live JSON, boxes).
+ * (levels, live progress, live JSON, events, identity chips, boxes).
  *
  * Usage (from package root, after build):
  *   yarn demo:gif
@@ -76,23 +76,23 @@ function readGrapheme(text, index) {
 }
 
 /** Banner rows appear quickly before log lines. */
-const DELAY_BANNER_MS = 90;
+const DELAY_BANNER_MS = 70;
 /** Randomized delay range for log lines after the banner. */
-const DELAY_LINE_MIN_MS = 120;
-const DELAY_LINE_MAX_MS = 720;
+const DELAY_LINE_MIN_MS = 95;
+const DELAY_LINE_MAX_MS = 560;
 /**
  * Pause when the last line of a printout lands on screen
  * (so the full frame can be read before the next scene).
  */
-const DELAY_LAST_LINE_MS = 5000;
+const DELAY_LAST_LINE_MS = 4000;
 /** Full-block scenes (boxes) — appear at once, then hold. */
-const DELAY_INSTANT_MS = 5000;
+const DELAY_INSTANT_MS = 4000;
 /** Live rewrite tick cadence (progress / JSON) — long enough to read. */
-const DELAY_LIVE_TICK_MS = 850;
+const DELAY_LIVE_TICK_MS = 650;
 /** Extra beat on the last live tick before the commit line. */
-const DELAY_LIVE_HOLD_MS = 1400;
+const DELAY_LIVE_HOLD_MS = 1100;
 /** Brief beat between themes. */
-const DELAY_THEME_GAP_MS = 400;
+const DELAY_THEME_GAP_MS = 300;
 
 function randomLineDelayMs() {
   const span = DELAY_LINE_MAX_MS - DELAY_LINE_MIN_MS;
@@ -101,7 +101,7 @@ function randomLineDelayMs() {
 
 /**
  * Showcase scenes — max variety in a short loop:
- * levels, emoji, events, identity chips, live progress, live JSON, boxes.
+ * levels → live progress → live JSON → events → identity → boxes.
  */
 const SHOWCASE = [
   {
@@ -111,30 +111,6 @@ const SHOWCASE = [
     level: "info",
     reveal: "line",
     capture: "levels",
-  },
-  {
-    themeId: "catppuccin-latte",
-    kind: "emoji",
-    subtitle: "emoji layout",
-    level: "debug",
-    reveal: "line",
-    capture: "emoji",
-  },
-  {
-    themeId: "nord",
-    kind: "events",
-    subtitle: "events",
-    level: "info",
-    reveal: "line",
-    capture: "events",
-  },
-  {
-    themeId: "gruvbox-dark",
-    kind: "visit",
-    subtitle: "checkout",
-    level: "verbose",
-    reveal: "line",
-    capture: "identity",
   },
   {
     themeId: "solarized-dark",
@@ -151,6 +127,22 @@ const SHOWCASE = [
     level: "info",
     reveal: "live",
     capture: "liveJson",
+  },
+  {
+    themeId: "nord",
+    kind: "events",
+    subtitle: "events",
+    level: "info",
+    reveal: "line",
+    capture: "events",
+  },
+  {
+    themeId: "gruvbox-dark",
+    kind: "visit",
+    subtitle: "checkout",
+    level: "verbose",
+    reveal: "line",
+    capture: "identity",
   },
   {
     themeId: "solarized-light",
@@ -510,22 +502,6 @@ function captureLevels(themeId) {
   });
 }
 
-/** Text `complex` layout with `%mj%` emoji column. */
-function captureEmoji(themeId) {
-  return capture(() => {
-    const log = createLogger("shop", {
-      ...loggerOptions,
-      theme: themeId,
-      layout: "complex",
-    });
-    log.info("doors open", { _emoji: "🚪", hour: 10 });
-    log.info("pouring taste", { _emoji: "🍷", pours: 3 });
-    log.debug("stock low", { _emoji: "📦", sku: "PN-19", left: 2 });
-    log.info("bag ready", { _emoji: "🛍️", bottles: 2, gift: true });
-    log.info("cheers", { _emoji: "🥂", guest: "Ada" });
-  });
-}
-
 /** Default event layout: emoji + event name + meta (no identity chips). */
 function captureEvents(themeId) {
   return capture(() => {
@@ -733,8 +709,6 @@ function captureFor(kind, themeId) {
   switch (kind) {
     case "levels":
       return captureLevels(themeId);
-    case "emoji":
-      return captureEmoji(themeId);
     case "events":
       return captureEvents(themeId);
     case "identity":

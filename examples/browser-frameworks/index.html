@@ -39,18 +39,18 @@
         background: var(--page-bg);
         color: var(--page-fg);
       }
-      /* Approximate solarized-dark chrome so the shell does not flash light→dark. */
+      /* Approximate gruvbox-dark chrome (default Vanilla tab) to avoid light→dark FOUC. */
       @media (prefers-color-scheme: dark) {
         :root {
-          --page-bg: #00151a;
-          --page-fg: #eee8d5;
-          --page-fg-muted: #93a1a1;
-          --tablist-bg: #00232c;
-          --tab-idle-fg: #eee8d5;
-          --tab-hover-bg: #1a404a;
-          --tab-hover-fg: #fdf6e3;
-          --focus-ring: #268bd2;
-          --header-bg: #1a404a;
+          --page-bg: #141414;
+          --page-fg: #ebdbb2;
+          --page-fg-muted: #a89984;
+          --tablist-bg: #212121;
+          --tab-idle-fg: #ebdbb2;
+          --tab-hover-bg: #3c3c3c;
+          --tab-hover-fg: #fbf1c7;
+          --focus-ring: #fe8019;
+          --header-bg: #3c3c3c;
           --card-shadow:
             0 1px 2px rgba(0, 0, 0, 0.2),
             0 10px 28px rgba(0, 0, 0, 0.35),
@@ -287,7 +287,7 @@
           role="tab"
           data-tab="vanilla"
           aria-selected="true"
-          style="--tab-bg: #002b36; --tab-fg: #eee8d5"
+          style="--tab-bg: #282828; --tab-fg: #ebdbb2"
         >
           Vanilla
         </button>
@@ -317,7 +317,7 @@
           data-tab="svelte"
           aria-selected="false"
           tabindex="-1"
-          style="--tab-bg: #282828; --tab-fg: #ebdbb2"
+          style="--tab-bg: #002b36; --tab-fg: #eee8d5"
         >
           Svelte
         </button>

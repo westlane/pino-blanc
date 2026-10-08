@@ -3,10 +3,10 @@ import type { DemoTabId } from "./tabs";
 
 /** One built-in palette per framework tab (showcases variety in the demo). */
 export const DEMO_TAB_THEMES: Record<DemoTabId, string> = {
-  vanilla: "solarized-dark",
+  vanilla: "gruvbox-dark",
   react: "dracula",
   vue: "nord",
-  svelte: "gruvbox-dark",
+  svelte: "solarized-dark",
 };
 
 /**
