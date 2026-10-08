@@ -1,3 +1,5 @@
+import { setDemoSidebarTab } from "./demo-tab-chrome";
+
 export type DemoTabId = "vanilla" | "react" | "vue" | "svelte";
 
 const TAB_HASH: Record<DemoTabId, string> = {
@@ -29,6 +31,14 @@ export function parseTabFromHash(): DemoTabId | null {
 
 export type DemoTabActivate = (id: DemoTabId) => void;
 
+/** Matches `@container demo-main (max-width: 40rem)` in index.html */
+const COMPACT_TABLIST_MAX_PX = 40 * 16;
+
+function syncTablistOrientation(tablist: HTMLElement, main: HTMLElement | null): void {
+  const compact = (main?.clientWidth ?? window.innerWidth) <= COMPACT_TABLIST_MAX_PX;
+  tablist.setAttribute("aria-orientation", compact ? "horizontal" : "vertical");
+}
+
 export function initDemoTabs(options: {
   defaultTab?: DemoTabId;
   onActivate?: DemoTabActivate;
@@ -39,6 +49,7 @@ export function initDemoTabs(options: {
     return;
   }
 
+  const main = document.querySelector<HTMLElement>(".demo-main");
   const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"][data-tab]')];
   const panels = [...document.querySelectorAll<HTMLElement>('[role="tabpanel"][data-panel]')];
 
@@ -52,6 +63,7 @@ export function initDemoTabs(options: {
       const active = panel.dataset.panel === id;
       panel.hidden = !active;
     }
+    setDemoSidebarTab(id);
   };
 
   const resolveTab = (): DemoTabId => parseTabFromHash() ?? defaultTab;
@@ -79,6 +91,18 @@ export function initDemoTabs(options: {
   window.addEventListener("hashchange", () => {
     activate(resolveTab());
   });
+
+  syncTablistOrientation(tablist, main);
+  if (main && typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(() => {
+      syncTablistOrientation(tablist, main);
+    });
+    ro.observe(main);
+  } else {
+    window.addEventListener("resize", () => {
+      syncTablistOrientation(tablist, main);
+    });
+  }
 
   const initialHash = parseTabFromHash();
   if (initialHash) {

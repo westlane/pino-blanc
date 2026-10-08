@@ -44,7 +44,7 @@ export function applyLogHostStyle(host: HTMLElement, options: CreateLoggerOption
     "overflow-x: hidden",
     "overflow-y: auto",
     "overscroll-behavior: contain",
-    "border-radius: 12px",
+    "border-radius: 0",
   ].join("; ");
 }
 

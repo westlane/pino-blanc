@@ -2,7 +2,8 @@ import { createLogger } from "@westlane/pino-blanc/browser";
 import { emitDemoLog, type DemoLogContext } from "./demo-log";
 import { demoLoggerOptionsForAllTabs, demoLoggerOptionsForTab } from "./demo-logger-options";
 import { applyLogHostStyle, createLogPreview } from "./demo-preview";
-import { initDemoTabs, type DemoTabId } from "./tabs";
+import { initDemoTabChrome } from "./demo-tab-chrome";
+import { initDemoTabs, parseTabFromHash, type DemoTabId } from "./tabs";
 
 const loggerOptionsByTab = demoLoggerOptionsForAllTabs();
 
@@ -38,7 +39,13 @@ const logContext: DemoLogContext = {
   },
 };
 
+const initialTab = parseTabFromHash() ?? "vanilla";
+
+initDemoTabChrome(initialTab);
+
 initDemoTabs({
-  defaultTab: "vanilla",
+  defaultTab: initialTab,
   onActivate: (id) => emitDemoLog(id, logContext),
 });
+
+document.documentElement.classList.add("demo-ready");
