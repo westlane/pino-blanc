@@ -154,6 +154,22 @@ if (html) {
 }
 ```
 
+## Release (npm)
+
+Releases are **tag-driven from `main`** (no `prod` branch):
+
+1. Merge work to **`main`** via PR from **`dev`**.
+2. On **`main`**, set `package.json` `version`, run `yarn badges`, commit.
+3. Tag and push (tag must match version, e.g. `0.1.0` → `v0.1.0`):
+
+```bash
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin main
+git push origin v0.1.0
+```
+
+Pushing `v*` runs [publish](.github/workflows/publish.yml) (needs `NPM_TOKEN` in repo secrets). PRs that bump `version` on `main` are checked by [release-gate](.github/workflows/release-gate.yml).
+
 ## License
 
 MIT

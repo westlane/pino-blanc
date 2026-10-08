@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-const RELEASE_BRANCHES = new Set(["dev", "main", "prod"]);
+const RELEASE_BRANCHES = new Set(["dev", "main"]);
 
 export function readBranchFromVersionSvg(badgesDir) {
   const versionPath = path.join(badgesDir, "version.svg");
@@ -26,7 +26,7 @@ function gitCurrentBranch(root) {
 }
 
 /**
- * Label for docs/badges/version.svg (dev / main / prod on long-lived branches).
+ * Label for docs/badges/version.svg (dev / main on long-lived branches).
  * Topic branches keep the label already committed in version.svg (e.g. promote PRs).
  */
 export function resolveBadgeBranch(root) {
