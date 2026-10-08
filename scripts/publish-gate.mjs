@@ -1,8 +1,8 @@
 /**
- * Decide whether a prod push should npm-publish.
+ * Decide whether a release tag push should npm-publish.
  *
  * Publishes only when all are true:
- * - package.json version changed in this push (vs github.event.before)
+ * - push is a `v*` tag matching package.json version (tag-driven releases from main)
  * - local version is greater than the registry (or package is unpublished)
  * - NODE_AUTH_TOKEN is set (never printed)
  *
@@ -12,17 +12,6 @@ import { appendFileSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 const soft = process.argv.includes("--soft");
-
-function readPkgVersion(source) {
-  const raw =
-    source === "worktree"
-      ? readFileSync("package.json", "utf8")
-      : execSync(`git show ${source}:package.json`, {
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "ignore"],
-        });
-  return JSON.parse(raw).version;
-}
 
 function compare(a, b) {
   const pa = a.split(".").map((n) => Number.parseInt(n, 10));
@@ -43,6 +32,11 @@ function writeOutput(key, value) {
   appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
 }
 
+function tagVersionFromRef(ref) {
+  const match = /^refs\/tags\/v(.+)$/.exec(ref);
+  return match?.[1] ?? null;
+}
+
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const local = pkg.version;
 const name = pkg.name;
@@ -61,30 +55,21 @@ try {
 
 const ahead = compare(local, published) > 0;
 
-const beforeSha = (process.env.GITHUB_EVENT_BEFORE ?? "").trim();
-const zeroSha = /^0+$/.test(beforeSha);
+const ref = process.env.GITHUB_REF ?? "";
+const tagVersion = tagVersionFromRef(ref);
+
 let versionChanged = false;
-if (!beforeSha || zeroSha) {
-  // First push of the branch: only treat as a release intent if unpublished.
-  versionChanged = !onRegistry;
-} else {
-  try {
-    const previous = readPkgVersion(beforeSha);
-    versionChanged = previous !== local;
-  } catch {
-    // Force-push / shallow history: fall back to "did package.json change?"
-    try {
-      const changed = execSync(`git diff --name-only ${beforeSha} HEAD`, {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "ignore"],
-      })
-        .split("\n")
-        .includes("package.json");
-      versionChanged = changed;
-    } catch {
-      versionChanged = false;
-    }
+if (tagVersion) {
+  if (tagVersion !== local) {
+    console.error(
+      `Tag v${tagVersion} does not match package.json version ${local}`,
+    );
+    process.exit(1);
   }
+  versionChanged = true;
+} else {
+  console.log("skip: publish workflow expects a v* tag push (tag-driven releases from main)");
+  process.exit(0);
 }
 
 const hasToken = Boolean(process.env.NODE_AUTH_TOKEN?.trim());
@@ -93,13 +78,6 @@ const shouldPublish = ahead && versionChanged && hasToken;
 writeOutput("ahead", String(ahead));
 writeOutput("version_changed", String(versionChanged));
 writeOutput("publish", String(shouldPublish));
-
-if (!versionChanged) {
-  console.log(
-    `skip: package.json version unchanged at ${local} (docs/prod sync is safe before first npm release)`,
-  );
-  process.exit(0);
-}
 
 if (!ahead) {
   const msg = `package.json version ${local} is not greater than npm ${name}@${published}`;
@@ -113,7 +91,7 @@ if (!ahead) {
 
 if (!hasToken) {
   console.log(
-    "skip: version bump is ready to publish, but NPM_TOKEN is not configured as a repository Actions secret",
+    "skip: release tag is valid, but NPM_TOKEN is not configured as a repository Actions secret",
   );
   process.exit(0);
 }

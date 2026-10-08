@@ -154,6 +154,12 @@ if (html) {
 }
 ```
 
+## Install
+
+```bash
+npm install @westlane/pino-blanc
+```
+
 ## License
 
 MIT
