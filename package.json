@@ -35,11 +35,6 @@
   ],
   "exports": {
     ".": {
-      "development": {
-        "browser": "./src/browser.ts",
-        "import": "./src/index.ts",
-        "default": "./src/index.ts"
-      },
       "types": "./dist/src/index.d.ts",
       "browser": {
         "types": "./dist/src/browser.d.ts",
@@ -50,27 +45,22 @@
       "default": "./dist/src/index.js"
     },
     "./browser": {
-      "development": "./src/browser.ts",
       "types": "./dist/src/browser.d.ts",
       "import": "./dist/src/browser.js"
     },
     "./pretty": {
-      "development": "./src/node/transport/pretty.ts",
       "types": "./dist/src/node/transport/pretty.d.ts",
       "import": "./dist/src/node/transport/pretty.js"
     },
     "./react": {
-      "development": "./src/react/index.ts",
       "types": "./dist/src/react/index.d.ts",
       "import": "./dist/src/react/index.js"
     },
     "./vue": {
-      "development": "./src/vue/index.ts",
       "types": "./dist/src/vue/index.d.ts",
       "import": "./dist/src/vue/index.js"
     },
     "./svelte": {
-      "development": "./src/svelte/index.ts",
       "types": "./dist/src/svelte/index.d.ts",
       "import": "./dist/src/svelte/index.js"
     }
