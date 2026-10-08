@@ -10,6 +10,8 @@ const pkgRoot = path.resolve(exampleRoot, "../..");
 
 export default defineConfig({
   root: exampleRoot,
+  /** Relative asset URLs so `docs/demo` works on GitHub Pages or any static host. */
+  base: "./",
   plugins: [
     svelte(),
     vue(),
@@ -40,7 +42,15 @@ export default defineConfig({
       },
     ],
   },
+  build: {
+    outDir: path.join(pkgRoot, "docs/demo"),
+    emptyOutDir: true,
+  },
   server: {
+    port: 5179,
+    strictPort: true,
+  },
+  preview: {
     port: 5179,
     strictPort: true,
   },

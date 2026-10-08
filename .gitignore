@@ -9,6 +9,7 @@ node_modules/
 !.yarn/versions
 dist/
 examples/**/dist/
+docs/demo/
 *.log
 .DS_Store
 .yarn/*

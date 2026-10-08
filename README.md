@@ -143,11 +143,11 @@ log.info({ port: 3030 }, "ready");
 
 ### Try adapters in the browser
 
+You can also demo the logger in the browser [here](https://westlane.github.io/pino-blanc/#vue).
+
 ```bash
 yarn demo:browser
 ```
-
-Open **[http://localhost:5179](http://localhost:5179)** (if you see port **5173**, stop the server and run the command again — the demo must load `examples/browser-frameworks/vite.config.ts` so Svelte is compiled). Use DevTools **Console** and click each framework button for themed output.
 
 ## License
 

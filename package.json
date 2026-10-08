@@ -102,6 +102,8 @@
     "demo:live": "yarn verify:ansi && PINO_BLANC_DEMO_FORCE_COLOR=1 node scripts/demo-live-ndjson.mjs",
     "demo:gif": "yarn build && node scripts/render-readme-gif.mjs",
     "demo:browser": "vite --config examples/browser-frameworks/vite.config.ts",
+    "demo:browser:build": "vite build --config examples/browser-frameworks/vite.config.ts",
+    "demo:browser:preview": "vite preview --config examples/browser-frameworks/vite.config.ts",
     "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
     "check": "yarn lint && yarn typecheck && yarn test && yarn build",
     "prepublishOnly": "yarn check",
