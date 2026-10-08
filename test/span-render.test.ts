@@ -30,6 +30,20 @@ describe("resolveSpanHex", () => {
     expect(resolveSpanHex(message!, ctx)).toBe(theme.roles?.message);
   });
 
+  it("info module tags skip warn/error/fatal ramp colors", () => {
+    // "cellar" hashes onto solarized error red (#dc322f) without avoidance.
+    const spans = formatStandardSpans("info", "cellar", "packing");
+    const ctx = { theme, tint, level: "info", options: {} };
+    const module = spans.find((s) => s.role === "module");
+    const hex = resolveSpanHex(module!, ctx);
+    expect(hex?.toLowerCase()).not.toBe(theme.levels.error.toLowerCase());
+    expect(hex?.toLowerCase()).not.toBe(theme.levels.warn.toLowerCase());
+    expect(hex?.toLowerCase()).not.toBe(theme.levels.fatal.toLowerCase());
+    expect(tint.resolve("cellar")?.toLowerCase()).toBe(
+      theme.levels.error.toLowerCase(),
+    );
+  });
+
   it("error line uses one foreground color for the whole row", () => {
     const spans = formatStandardSpans("error", "demo", "failed");
     const line = renderAnsi(spans, theme, tint, "error", true, {

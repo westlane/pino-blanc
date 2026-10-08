@@ -4,13 +4,25 @@ import {
   didColorize,
   generateColorFromString,
 } from "../src/color/did.js";
-import { colorFromId } from "../src/color/id.js";
+import { colorFromId, colorFromIdAvoiding } from "../src/color/id.js";
 import { createTintResolver, resolveTheme } from "../src/color/theme.js";
 
 describe("color", () => {
   it("colorFromId is stable", () => {
     const ramp = resolveTheme("solarized-dark").tintRamp;
     expect(colorFromId("watcher", ramp)).toBe(colorFromId("watcher", ramp));
+  });
+
+  it("colorFromIdAvoiding skips reserved ramp swatches", () => {
+    const theme = resolveTheme("solarized-dark");
+    const ramp = theme.tintRamp;
+    const avoid = new Set([theme.levels.error, theme.levels.warn, theme.levels.fatal]);
+    expect(colorFromId("cellar", ramp).toLowerCase()).toBe(
+      theme.levels.error.toLowerCase(),
+    );
+    const avoided = colorFromIdAvoiding("cellar", ramp, avoid);
+    expect(avoid.has(avoided)).toBe(false);
+    expect(avoided.toLowerCase()).not.toBe(theme.levels.error.toLowerCase());
   });
 
   it("colorize overrides", () => {
