@@ -24,4 +24,4 @@ jobs:
       - run: yarn run check
       # Branch-relative README badges (docs/badges/*.svg) must match this run.
       - name: Verify README badges are current
-        run: git diff --exit-code -- docs/badges/
+        run: node scripts/verify-readme-badges.mjs

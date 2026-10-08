@@ -4,34 +4,14 @@
  * Each git branch commits its own SVGs, so viewing /tree/dev vs /tree/main
  * shows that branch's version + test count without hardcoding branch= in README.
  */
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveBadgeBranch } from "./badge-branch.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const badgesDir = path.join(root, "docs", "badges");
 const reportPath = path.join(badgesDir, "vitest-report.json");
-
-function resolveBranch() {
-  // pull_request: GITHUB_REF_NAME is e.g. "1/merge"; head branch is in GITHUB_HEAD_REF.
-  const headRef = process.env.GITHUB_HEAD_REF?.trim();
-  if (headRef) {
-    return headRef;
-  }
-  const fromCi = process.env.GITHUB_REF_NAME?.trim();
-  if (fromCi && !fromCi.includes("/")) {
-    return fromCi;
-  }
-  try {
-    return execSync("git branch --show-current", {
-      cwd: root,
-      encoding: "utf8",
-    }).trim() || "dev";
-  } catch {
-    return "dev";
-  }
-}
 
 function escapeXml(text) {
   return String(text)
@@ -97,7 +77,7 @@ function writeBadge(name, label, message, color) {
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
-const branch = resolveBranch();
+const branch = resolveBadgeBranch(root);
 const { total, passed, failed } = readTestCounts();
 
 const versionChanged = writeBadge(
