@@ -104,11 +104,6 @@ export function initDemoTabs(options: {
     });
   }
 
-  const initialHash = parseTabFromHash();
-  if (initialHash) {
-    selectUi(initialHash);
-    options.onActivate?.(initialHash);
-  } else {
-    selectUi(defaultTab);
-  }
+  // Always emit the initial tab burst (hash or default) so the preview isn't empty.
+  activate(resolveTab());
 }

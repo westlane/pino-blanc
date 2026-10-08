@@ -4,12 +4,10 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 
 ### Features
 
-
 | 🎨 Pre-built color schemes | 📐 Custom spacing and padding     |
 | -------------------------- | --------------------------------- |
 | ▦ Templates and columns    | ⚡ Progress bars and live-printing |
 | 😎 Inline Emojis           | 🪧 Banner layouts                 |
-
 
 ## Preview
 
@@ -17,7 +15,7 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 
 <p align="center">
   <a href="https://westlane.github.io/pino-blanc/">
-    <img src="https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo — Open in browser" />
+    <img src="https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo" />
   </a>
 </p>
 
@@ -30,8 +28,6 @@ yarn add @westlane/pino-blanc
 ![version](docs/badges/version.svg) ![tests](docs/badges/tests.svg)
 
 ## Usage
-
-
 
 ### Browser
 
@@ -55,8 +51,6 @@ if (html) {
 }
 ```
 
-
-
 ### Node
 
 ```ts
@@ -66,8 +60,6 @@ const log = createLogger("server", { theme: "solarized-dark" });
 log.info("ready", { port: 3030 });
 
 ```
-
-
 
 ### React
 
@@ -85,8 +77,6 @@ const log = useLogger("Checkout");
 log.info("mounted");
 ```
 
-
-
 ### Vue
 
 ```ts
@@ -100,8 +90,6 @@ createApp(App).use(pbPlugin, { logger: log }).mount("#app");
 const log = useLogger("Checkout");
 ```
 
-
-
 ### Svelte
 
 ```ts
@@ -114,8 +102,6 @@ setPB(log);
 // in a child component
 const log = getLogger("Checkout");
 ```
-
-
 
 ### Multi-Transport
 
@@ -145,9 +131,9 @@ const log = pino(
 log.info({ port: 3030 }, "ready");
 ```
 
-
-
 ### Try adapters in the browser
+
+The [live demo](https://westlane.github.io/pino-blanc/) opens with a log burst for the active framework tab (Vanilla, React, Vue, or Svelte). Each tab has a dark/light theme pair and a scheme toggle.
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
