@@ -114,7 +114,7 @@
     "demo:browser:build": "vite build --config examples/browser-frameworks/vite.config.ts",
     "demo:browser:preview": "vite preview --config examples/browser-frameworks/vite.config.ts",
     "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
-    "check": "yarn lint && yarn typecheck && yarn test && yarn build",
+    "check": "yarn lint && yarn typecheck && yarn test && node scripts/verify-readme-badges.mjs && yarn build",
     "prepublishOnly": "yarn check",
     "prepare": "husky"
   },
