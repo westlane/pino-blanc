@@ -1,4 +1,4 @@
-export type SymbolMap = Record<string, string>;
+import type { SymbolMap } from "../types.js";
 
 export function glyphSet(map: SymbolMap | undefined): Set<string> {
   if (!map) {

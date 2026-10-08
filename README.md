@@ -4,24 +4,23 @@
 
 A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.
 
-### Features
 
-| 🎨 Pre-built color schemes | 📐 Custom spacing and padding     |
+| Features                   |                                   |
 | -------------------------- | --------------------------------- |
+| 🎨 Pre-built color schemes | 📐 Custom spacing and padding     |
 | ▦ Templates and columns    | ⚡ Progress bars and live-printing |
-| 😎 Inline Emojis           | 🪧 Banner layouts                 |
+| 😎 Emojis inline           | 🪧 Banner layouts                 |
 
-## Preview
-
-![pino-blanc features](docs/features.gif)
-
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
 ## Install
 
 ```bash
 yarn add @westlane/pino-blanc
 ```
+
+![pino-blanc features](docs/features.gif)
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
 ## Usage
 
@@ -67,14 +66,14 @@ const log = useLogger("Checkout");
 ### Svelte
 
 ```ts
-import { createLogger, setPB, getLogger } from "@westlane/pino-blanc/svelte";
+import { createLogger, setPB, useLogger } from "@westlane/pino-blanc/svelte";
 
 const log = createLogger("app", { theme: "dracula-dark" });
 // root layout / App.svelte
 setPB(log);
 
 // in a child component
-const log = getLogger("Checkout");
+const log = useLogger("Checkout");
 ```
 
 ### Try adapters in the browser
@@ -85,6 +84,17 @@ Or run locally:
 
 ```bash
 yarn demo:browser
+```
+
+### Try on Node (Express, Koa, Hapi)
+
+```bash
+yarn demo:node http      # node:http + pino-http
+yarn demo:node express   # express + pino-http
+yarn demo:node koa       # koa-pino-logger
+yarn demo:node hapi      # hapi-pino
+
+curl http://127.0.0.1:3040/health
 ```
 
 ## Advanced
@@ -120,14 +130,19 @@ log.info({ port: 3030 }, "ready");
 ### Browser
 
 ```ts
-import { createLogger, formatRecordHtml, htmlLogHostStyle } from "@westlane/pino-blanc/browser";
+import {
+  createLogger,
+  formatRecordHtml,
+  htmlLogHostStyle,
+  resolveTheme,
+} from "@westlane/pino-blanc/browser";
 
 const log = createLogger("app", { theme: "solarized-dark" });
-log.verbose("ready", { hello: "world" });
+log.info("ready", { hello: "world" });
 
 // On-page sink (same colors and column spacing as console %c)
 const panel = document.getElementById("logs")!;
-panel.style.cssText = htmlLogHostStyle(/* theme */ resolveTheme("solarized-dark"));
+panel.style.cssText = htmlLogHostStyle(resolveTheme("solarized-dark"));
 const html = formatRecordHtml(
   { level: 30, msg: "ready", module: "app", hello: "world" },
   { theme: "solarized-dark" },

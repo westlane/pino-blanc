@@ -1,6 +1,5 @@
 import { applySymbol } from "./symbol.js";
-import type { ChipChrome, LogSpan } from "../types.js";
-import type { SymbolMap } from "./symbol.js";
+import type { ChipChrome, LogSpan, SymbolMap } from "../types.js";
 import { padEndDisplay } from "./pad.js";
 
 export type ChipSpanInput = {

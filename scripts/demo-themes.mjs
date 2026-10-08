@@ -8,7 +8,7 @@ const entry = join(root, "dist/src/index.js");
 if (!existsSync(entry)) {
   console.error(
     "pino-blanc: run from the package root after build:\n" +
-      "  cd path/to/pino-blanc && yarn demo:themes\n",
+      "  cd path/to/pino-blanc && yarn demo\n",
   );
   process.exit(1);
 }
@@ -48,7 +48,6 @@ const ALL_THEMES = [
 ];
 
 const fromEnv = process.env.PINO_BLANC_THEME?.trim();
-const demoMode = process.env.PINO_BLANC_DEMO?.trim() || "all";
 
 if (fromEnv && !ALL_THEMES.includes(fromEnv)) {
   console.error(
@@ -57,43 +56,8 @@ if (fromEnv && !ALL_THEMES.includes(fromEnv)) {
   process.exit(1);
 }
 
-const DEMO_MODES = [
-  "all",
-  "solarized",
-  "gruvbox",
-  "tokyo-night",
-  "dracula",
-  "catppuccin",
-  "identity",
-];
-
-if (!DEMO_MODES.includes(demoMode)) {
-  console.error(
-    `Unknown PINO_BLANC_DEMO="${demoMode}". Use: ${DEMO_MODES.join(", ")}`,
-  );
-  process.exit(1);
-}
-
 function themesToRun() {
-  if (fromEnv) {
-    return [fromEnv];
-  }
-  if (demoMode === "solarized" || demoMode === "identity") {
-    return ["solarized-dark", "solarized-light"];
-  }
-  if (demoMode === "gruvbox") {
-    return ["gruvbox-dark", "gruvbox-light"];
-  }
-  if (demoMode === "tokyo-night") {
-    return ["tokyo-night-dark", "tokyo-night-light"];
-  }
-  if (demoMode === "dracula") {
-    return ["dracula-dark", "dracula-light"];
-  }
-  if (demoMode === "catppuccin") {
-    return ["catppuccin-dark", "catppuccin-light"];
-  }
-  return ALL_THEMES;
+  return fromEnv ? [fromEnv] : ALL_THEMES;
 }
 
 /** Kind to log prefix glyph. */
@@ -320,15 +284,8 @@ function runBoxes(themeId, { extended = false } = {}) {
 
 function runThemeBlock(themeId) {
   const isSolarized = themeId.startsWith("solarized-");
-  const identityOnly = demoMode === "identity";
   writeBox("pino-blanc", themeId, themeId);
   const log = createLogger("demo", { ...loggerOptions, theme: themeId });
-
-  if (identityOnly) {
-    runIdentityEvents(themeId);
-    runBoxes(themeId, { extended: true });
-    return;
-  }
 
   runStandardLevels(log, themeId);
   runEvents(log, themeId);
