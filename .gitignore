@@ -10,6 +10,7 @@ node_modules/
 dist/
 examples/**/dist/
 docs/demo/
+docs/badges/vitest-report.json
 *.log
 .DS_Store
 .yarn/*

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="20" role="img" aria-label="tests: 105 passed">
+  <title>tests: 105 passed</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="138" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="53" height="20" fill="#555"/>
+    <rect x="53" width="85" height="20" fill="#4c1"/>
+    <rect width="138" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+    <text x="265" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">tests</text>
+    <text x="265" y="150" transform="scale(.1)">tests</text>
+    <text x="955" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">105 passed</text>
+    <text x="955" y="150" transform="scale(.1)">105 passed</text>
+  </g>
+</svg>

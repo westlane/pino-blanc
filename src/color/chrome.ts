@@ -157,8 +157,14 @@ const THEME_SURFACE_BY_ID: Record<string, string> = {
   "solarized-light": "#fdf6e3",
   "gruvbox-dark": "#282828",
   "gruvbox-light": "#fbf1c7",
+  "tokyo-night-dark": "#1a1b26",
+  "tokyo-night-light": "#e6e7ed",
+  "dracula-dark": "#282a36",
+  "dracula-light": "#fffbeb",
+  "catppuccin-dark": "#1e1e2e",
+  "catppuccin-light": "#eff1f5",
+  // Aliases
   dracula: "#282a36",
-  nord: "#2e3440",
   "catppuccin-mocha": "#1e1e2e",
   "catppuccin-latte": "#eff1f5",
 };

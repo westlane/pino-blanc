@@ -19,7 +19,7 @@ describe("svelte adapter (README flow)", () => {
 
   it("setPB + getLogger scopes module and logs to console", () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    const root = createBrowserLogger("app", { theme: "dracula" });
+    const root = createBrowserLogger("app", { theme: "dracula-dark" });
     const childSpy = vi.spyOn(root, "child");
 
     setPB(root);

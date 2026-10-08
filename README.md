@@ -15,13 +15,19 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 
 ![pino-blanc features](docs/features.gif)
 
+<p align="center">
+  <a href="https://westlane.github.io/pino-blanc/">
+    <img src="https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo — Open in browser" />
+  </a>
+</p>
+
 ## Install
 
 ```bash
 yarn add @westlane/pino-blanc
 ```
 
-![staging](https://img.shields.io/github/package-json/v/westlane/pino-blanc/main?label=staging) ![tests](https://img.shields.io/github/actions/workflow/status/westlane/pino-blanc/ci.yml?branch=main&label=tests)
+![version](docs/badges/version.svg) ![tests](docs/badges/tests.svg)
 
 ## Usage
 
@@ -87,7 +93,7 @@ log.info("mounted");
 import { createApp } from "vue";
 import { createLogger, pbPlugin, useLogger } from "@westlane/pino-blanc/vue";
 
-const log = createLogger("app", { theme: "nord" });
+const log = createLogger("app", { theme: "tokyo-night-dark" });
 createApp(App).use(pbPlugin, { logger: log }).mount("#app");
 
 // in setup()
@@ -101,7 +107,7 @@ const log = useLogger("Checkout");
 ```ts
 import { createLogger, setPB, getLogger } from "@westlane/pino-blanc/svelte";
 
-const log = createLogger("app", { theme: "dracula" });
+const log = createLogger("app", { theme: "dracula-dark" });
 // root layout / App.svelte
 setPB(log);
 
@@ -143,7 +149,9 @@ log.info({ port: 3030 }, "ready");
 
 ### Try adapters in the browser
 
-You can also demo the logger in the browser [here](https://westlane.github.io/pino-blanc/#vue).
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
+
+Or run locally:
 
 ```bash
 yarn demo:browser

@@ -20,7 +20,7 @@ function LogButton({ label }: { label: string }) {
 describe("react adapter (README flow)", () => {
   it("PBProvider + useLogger scopes module and logs to console", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    const root = createLogger("app", { theme: "nord" });
+    const root = createLogger("app", { theme: "tokyo-night-dark" });
     const childSpy = vi.spyOn(root, "child");
 
     render(

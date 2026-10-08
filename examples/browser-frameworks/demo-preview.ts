@@ -9,6 +9,17 @@ import {
   type PinoLogRecord,
 } from "@westlane/pino-blanc/browser";
 
+const previewRecords = new WeakMap<HTMLElement, PinoLogRecord[]>();
+
+function recordsFor(panel: HTMLElement): PinoLogRecord[] {
+  let list = previewRecords.get(panel);
+  if (!list) {
+    list = [];
+    previewRecords.set(panel, list);
+  }
+  return list;
+}
+
 function toPinoLevelNumber(level: LogLevelName): number {
   switch (level) {
     case "trace":
@@ -30,11 +41,15 @@ function toPinoLevelNumber(level: LogLevelName): number {
 
 export function applyLogHostStyle(host: HTMLElement, options: CreateLoggerOptions): void {
   const theme = resolveTheme(options.theme, options.themeOverrides);
+  const base = htmlLogHostStyle(theme);
+  // Panel chrome (fill/border) lives on `.demo-frame` / `.demo-tablist` via
+  // `--glass-panel` so sidebar and log stay identical in both schemes.
+  const hostStyle = base.replace(/background:\s*[^;]+/, "background: transparent");
   host.style.cssText = [
-    htmlLogHostStyle(theme),
+    hostStyle,
     "font-size: 11px",
     "line-height: 1.25",
-    "padding: 0.45rem 0.65rem",
+    "padding: 1.8rem 0.65rem 0.45rem",
     "box-sizing: border-box",
     "width: 100%",
     "max-width: 100%",
@@ -45,10 +60,14 @@ export function applyLogHostStyle(host: HTMLElement, options: CreateLoggerOption
     "overflow-y: auto",
     "overscroll-behavior: contain",
     "border-radius: 0",
+    "border: none",
+    "box-shadow: none",
+    "backdrop-filter: none",
+    "-webkit-backdrop-filter: none",
   ].join("; ");
 }
 
-export function appendRecordHtml(
+function paintRecordLine(
   panel: HTMLElement,
   record: PinoLogRecord,
   options: CreateLoggerOptions,
@@ -61,7 +80,36 @@ export function appendRecordHtml(
   line.className = "pb-log-line";
   line.innerHTML = html;
   panel.appendChild(line);
+}
+
+export function appendRecordHtml(
+  panel: HTMLElement,
+  record: PinoLogRecord,
+  options: CreateLoggerOptions,
+): void {
+  recordsFor(panel).push(record);
+  paintRecordLine(panel, record, options);
   panel.scrollTop = panel.scrollHeight;
+}
+
+/**
+ * Re-paint stored lines with the current theme — same events, new colors.
+ * Used on light/dark toggle so we don't emit a fresh burst.
+ */
+export function restyleLogPreview(
+  panel: HTMLElement,
+  options: CreateLoggerOptions,
+): void {
+  const records = recordsFor(panel);
+  const stickBottom =
+    panel.scrollHeight - panel.scrollTop - panel.clientHeight < 24;
+  panel.replaceChildren();
+  for (const record of records) {
+    paintRecordLine(panel, record, options);
+  }
+  if (stickBottom) {
+    panel.scrollTop = panel.scrollHeight;
+  }
 }
 
 export type LogPreview = (
@@ -73,7 +121,7 @@ export type LogPreview = (
 
 export function createLogPreview(
   panel: HTMLElement,
-  options: CreateLoggerOptions,
+  getOptions: () => CreateLoggerOptions,
 ): LogPreview {
   return (level, module, msg, fields) => {
     const record: PinoLogRecord = {
@@ -84,8 +132,13 @@ export function createLogPreview(
         ? (fields as Record<string, unknown>)
         : {}),
     };
-    appendRecordHtml(panel, record, options);
+    appendRecordHtml(panel, record, getOptions());
   };
+}
+
+export function clearLogPreview(panel: HTMLElement): void {
+  previewRecords.set(panel, []);
+  panel.replaceChildren();
 }
 
 export function logAndPreview(

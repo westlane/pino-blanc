@@ -1,8 +1,8 @@
-/** Dracula OSS palette — Zeno Rocha & contributors. See themes/README.md */
+/** Dracula (classic) — Zeno Rocha & contributors. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
-export const dracula: LogTheme = {
-  id: "dracula",
+export const draculaDark: LogTheme = {
+  id: "dracula-dark",
   background: "dark",
   levels: {
     trace: "#6272a4",

@@ -9,7 +9,7 @@ import {
 describe("vue adapter (README flow)", () => {
   it("pbPlugin + useLogger scopes module and logs to console", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    const root = createLogger("app", { theme: "nord" });
+    const root = createLogger("app", { theme: "tokyo-night-dark" });
     const childSpy = vi.spyOn(root, "child");
 
     const Comp = defineComponent({

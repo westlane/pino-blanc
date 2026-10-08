@@ -1,13 +1,24 @@
-import type { CreateLoggerOptions } from "@westlane/pino-blanc/browser";
+import type { CreateLoggerOptions, LogThemeId } from "@westlane/pino-blanc/browser";
+import { resolveDemoColorScheme, type DemoColorScheme } from "./demo-scheme";
 import type { DemoTabId } from "./tabs";
 
-/** One built-in palette per framework tab (showcases variety in the demo). */
-export const DEMO_TAB_THEMES: Record<DemoTabId, string> = {
-  vanilla: "gruvbox-dark",
-  react: "dracula",
-  vue: "nord",
-  svelte: "solarized-dark",
+/** Dark/light palette pair per framework tab. */
+export const DEMO_TAB_THEMES: Record<
+  DemoTabId,
+  { dark: LogThemeId; light: LogThemeId }
+> = {
+  vanilla: { dark: "dracula-dark", light: "dracula-light" },
+  react: { dark: "solarized-dark", light: "solarized-light" },
+  vue: { dark: "catppuccin-dark", light: "catppuccin-light" },
+  svelte: { dark: "tokyo-night-dark", light: "tokyo-night-light" },
 };
+
+export function demoThemeForTab(
+  tab: DemoTabId,
+  scheme: DemoColorScheme = resolveDemoColorScheme(),
+): LogThemeId {
+  return DEMO_TAB_THEMES[tab][scheme];
+}
 
 /**
  * One layout family per tab — never mix level/module lines with emoji events
@@ -16,19 +27,6 @@ export const DEMO_TAB_THEMES: Record<DemoTabId, string> = {
 function demoLayoutForTab(tab: DemoTabId): CreateLoggerOptions {
   switch (tab) {
     case "vanilla":
-      return {
-        layout: "%lv:5% %md:10% %ms:20% %mt%",
-      };
-    case "react":
-      return {
-        // Bare %ev% (no :N) so names are not ellipsized; no identity column.
-        eventLayout: "%mj% %ev% %mt%",
-      };
-    case "vue":
-      return {
-        layout: "complex",
-      };
-    case "svelte":
       return {
         // Identity chip + stacked meta — samples supply `_identity*`.
         eventLayout: "complex",
@@ -41,6 +39,19 @@ function demoLayoutForTab(tab: DemoTabId): CreateLoggerOptions {
           note: "~",
         },
       };
+    case "react":
+      return {
+        // Fixed event column so JSON meta lines up after the name.
+        eventLayout: "%mj% %ev:18% %mt%",
+      };
+    case "vue":
+      return {
+        layout: "complex",
+      };
+    case "svelte":
+      return {
+        layout: "%lv:5% %md:10% %ms:20% %mt%",
+      };
     default: {
       const _never: never = tab;
       return _never;
@@ -48,18 +59,23 @@ function demoLayoutForTab(tab: DemoTabId): CreateLoggerOptions {
   }
 }
 
-export function demoLoggerOptionsForTab(tab: DemoTabId): CreateLoggerOptions {
+export function demoLoggerOptionsForTab(
+  tab: DemoTabId,
+  scheme: DemoColorScheme = resolveDemoColorScheme(),
+): CreateLoggerOptions {
   return {
     ...demoLayoutForTab(tab),
-    theme: DEMO_TAB_THEMES[tab],
+    theme: demoThemeForTab(tab, scheme),
   };
 }
 
-export function demoLoggerOptionsForAllTabs(): Record<DemoTabId, CreateLoggerOptions> {
+export function demoLoggerOptionsForAllTabs(
+  scheme: DemoColorScheme = resolveDemoColorScheme(),
+): Record<DemoTabId, CreateLoggerOptions> {
   return {
-    vanilla: demoLoggerOptionsForTab("vanilla"),
-    react: demoLoggerOptionsForTab("react"),
-    vue: demoLoggerOptionsForTab("vue"),
-    svelte: demoLoggerOptionsForTab("svelte"),
+    vanilla: demoLoggerOptionsForTab("vanilla", scheme),
+    react: demoLoggerOptionsForTab("react", scheme),
+    vue: demoLoggerOptionsForTab("vue", scheme),
+    svelte: demoLoggerOptionsForTab("svelte", scheme),
   };
 }

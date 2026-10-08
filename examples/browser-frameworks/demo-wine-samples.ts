@@ -49,10 +49,10 @@ const SHOP_MODULES = ["shop", "cart", "till", "cellar", "visit"] as const;
 type DemoSampleMode = "lines" | "emoji-lines" | "events";
 
 const TAB_SAMPLE_MODE: Record<DemoTabId, DemoSampleMode> = {
-  vanilla: "lines",
+  vanilla: "events",
   react: "events",
   vue: "emoji-lines",
-  svelte: "events",
+  svelte: "lines",
 };
 
 const demoChance = new Chance();

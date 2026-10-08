@@ -45,9 +45,17 @@ export type LogThemeId =
   | "solarized-light"
   | "gruvbox-dark"
   | "gruvbox-light"
-  | "nord"
+  | "tokyo-night-dark"
+  | "tokyo-night-light"
+  | "dracula-dark"
+  | "dracula-light"
+  | "catppuccin-dark"
+  | "catppuccin-light"
+  /** @deprecated Prefer `dracula-dark`. */
   | "dracula"
+  /** @deprecated Prefer `catppuccin-dark` (Mocha). */
   | "catppuccin-mocha"
+  /** @deprecated Prefer `catppuccin-light` (Latte). */
   | "catppuccin-latte";
 
 export type LogTheme = {

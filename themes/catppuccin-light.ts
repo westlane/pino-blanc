@@ -1,8 +1,8 @@
-/** Catppuccin Latte — Catppuccin Org. See themes/README.md */
+/** Catppuccin Latte (light) — Catppuccin Org. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
-export const catppuccinLatte: LogTheme = {
-  id: "catppuccin-latte",
+export const catppuccinLight: LogTheme = {
+  id: "catppuccin-light",
   background: "light",
   levels: {
     trace: "#9ca0b0",

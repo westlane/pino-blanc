@@ -75,24 +75,22 @@ function readGrapheme(text, index) {
   return text[index] ?? "";
 }
 
-/** Banner rows appear quickly before log lines. */
-const DELAY_BANNER_MS = 70;
 /** Randomized delay range for log lines after the banner. */
-const DELAY_LINE_MIN_MS = 95;
-const DELAY_LINE_MAX_MS = 560;
+const DELAY_LINE_MIN_MS = 55;
+const DELAY_LINE_MAX_MS = 280;
 /**
  * Pause when the last line of a printout lands on screen
  * (so the full frame can be read before the next scene).
  */
-const DELAY_LAST_LINE_MS = 4000;
+const DELAY_LAST_LINE_MS = 1800;
 /** Full-block scenes (boxes) — appear at once, then hold. */
-const DELAY_INSTANT_MS = 4000;
-/** Live rewrite tick cadence (progress / JSON) — long enough to read. */
-const DELAY_LIVE_TICK_MS = 650;
+const DELAY_INSTANT_MS = 1800;
+/** Live rewrite tick cadence (progress / JSON). */
+const DELAY_LIVE_TICK_MS = 280;
 /** Extra beat on the last live tick before the commit line. */
-const DELAY_LIVE_HOLD_MS = 1100;
+const DELAY_LIVE_HOLD_MS = 480;
 /** Brief beat between themes. */
-const DELAY_THEME_GAP_MS = 300;
+const DELAY_THEME_GAP_MS = 160;
 
 function randomLineDelayMs() {
   const span = DELAY_LINE_MAX_MS - DELAY_LINE_MIN_MS;
@@ -105,7 +103,7 @@ function randomLineDelayMs() {
  */
 const SHOWCASE = [
   {
-    themeId: "dracula",
+    themeId: "dracula-dark",
     kind: "levels",
     subtitle: "shop floor",
     level: "info",
@@ -121,7 +119,7 @@ const SHOWCASE = [
     capture: "progress",
   },
   {
-    themeId: "catppuccin-mocha",
+    themeId: "catppuccin-dark",
     kind: "live",
     subtitle: "live json",
     level: "info",
@@ -129,7 +127,7 @@ const SHOWCASE = [
     capture: "liveJson",
   },
   {
-    themeId: "nord",
+    themeId: "tokyo-night-dark",
     kind: "events",
     subtitle: "events",
     level: "info",
@@ -672,21 +670,32 @@ function captureProgressLive(themeId) {
   return { ticks, done };
 }
 
-/** Live JSON field rewrites — changing seq/bytes (no progress bar). */
+/**
+ * Live JSON field rewrites — status + seq + bytes must change enough that
+ * GIF quantization still shows motion (tiny digit flips often look static).
+ */
 function captureLiveJsonLive(themeId) {
-  const steps = [0, 1, 2, 3, 4, 5, 6, 7];
-  const ticks = steps.map((i) =>
+  const steps = [
+    { status: "dial", seq: 1, bytes: 64 },
+    { status: "hello", seq: 2, bytes: 256 },
+    { status: "auth", seq: 3, bytes: 1024 },
+    { status: "sync", seq: 4, bytes: 4096 },
+    { status: "ready", seq: 5, bytes: 8192 },
+  ];
+  // Tight event column so meta stays on-screen and the rewrite is obvious.
+  const eventLayout = "%mj% %ev:10% %mt%";
+  const ticks = steps.map((step) =>
     captureOne(() => {
       const log = createLogger("peer", {
         ...loggerOptions,
         theme: themeId,
-        eventLayout: "default",
+        eventLayout,
       });
       log.event("ws.frame", {
         _emoji: "📨",
-        seq: i + 1,
-        bytes: 64 + i * 24,
-        path: "/ws/",
+        status: step.status,
+        seq: step.seq,
+        bytes: step.bytes,
       });
     }),
   );
@@ -694,12 +703,12 @@ function captureLiveJsonLive(themeId) {
     const log = createLogger("peer", {
       ...loggerOptions,
       theme: themeId,
-      eventLayout: "default",
+      eventLayout,
     });
     log.event("ws.batch_done", {
       _emoji: "✅",
       frames: steps.length,
-      bytes: 64 + (steps.length - 1) * 24,
+      bytes: steps[steps.length - 1].bytes,
     });
   });
   return { ticks, done };
@@ -799,9 +808,8 @@ function framesFromScenes(scenes) {
       frames.push({ screen: cloneScreen(screen), delay: DELAY_INSTANT_MS });
     } else if (scene.reveal === "live") {
       // Rebuild banner + tick each frame so JSON/progress rewrites read clearly.
+      // Skip banner-only frames — first frame already includes the first tick.
       const head = `${scene.bannerLines.join("\n")}\n\n`;
-      screen.write(head);
-      frames.push({ screen: cloneScreen(screen), delay: DELAY_BANNER_MS });
 
       for (let i = 0; i < scene.ticks.length; i += 1) {
         screen.clear();
@@ -819,12 +827,10 @@ function framesFromScenes(scenes) {
       screen.write(`${head}${lastTick}${scene.done}`);
       frames.push({ screen: cloneScreen(screen), delay: DELAY_LAST_LINE_MS });
     } else {
-      // Banner/box header appears all at once, then log lines type out.
+      // Banner stays with the first log line — no banner-only frames.
       const bannerLines = scene.lines.slice(0, scene.bannerCount);
       const bodyLines = scene.lines.slice(scene.bannerCount);
       let acc = `${bannerLines.join("\n")}\n`;
-      screen.write(acc);
-      frames.push({ screen: cloneScreen(screen), delay: DELAY_BANNER_MS });
 
       for (let i = 0; i < bodyLines.length; i += 1) {
         acc += `${bodyLines[i]}\n`;
@@ -847,18 +853,33 @@ function framesFromScenes(scenes) {
 }
 
 function encodeGif(frames) {
-  const first = renderFrame(frames[0].screen);
-  const { width, height } = first;
+  const rendered = frames.map((frame) => renderFrame(frame.screen));
+  const { width, height } = rendered[0];
+  // Sample pixels across the loop for one global palette (smaller file).
+  const sampleStride = Math.max(1, Math.floor(rendered.length / 12));
+  const sampleBytes = [];
+  for (let i = 0; i < rendered.length; i += sampleStride) {
+    sampleBytes.push(rendered[i].data);
+  }
+  // Always include the last frame (often a light theme / box scene).
+  sampleBytes.push(rendered[rendered.length - 1].data);
+  const sample = new Uint8Array(
+    sampleBytes.reduce((n, d) => n + d.length, 0),
+  );
+  let offset = 0;
+  for (const data of sampleBytes) {
+    sample.set(data, offset);
+    offset += data.length;
+  }
+  const palette = quantize(sample, 256);
   const gif = GIFEncoder();
 
   for (let i = 0; i < frames.length; i += 1) {
     const frame = frames[i];
-    const { data } = renderFrame(frame.screen);
-    const palette = quantize(data, 256);
-    const index = applyPalette(data, palette);
+    const index = applyPalette(rendered[i].data, palette);
     // gifenc expects delay in milliseconds (it divides by 10 for GIF centiseconds).
     gif.writeFrame(index, width, height, {
-      palette,
+      palette: i === 0 ? palette : undefined,
       delay: Math.max(20, frame.delay),
       ...(i === 0 ? { repeat: 0 } : {}),
     });
