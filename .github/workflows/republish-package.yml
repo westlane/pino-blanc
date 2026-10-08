@@ -39,12 +39,19 @@ jobs:
 
       - run: yarn install --immutable
 
-      - name: Remove existing GitHub Packages version (if any)
-        run: |
-          npm unpublish "@westlane/pino-blanc@${{ inputs.version }}" \
-            --registry https://npm.pkg.github.com --force || true
+      - name: Delete existing GitHub Packages version
         env:
-          NODE_AUTH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ver="${{ inputs.version }}"
+          id="$(gh api user/packages/npm/pino-blanc/versions --jq ".[] | select(.name==\"$ver\") | .id" | head -1)"
+          if [ -n "$id" ]; then
+            gh api -X DELETE "user/packages/npm/pino-blanc/versions/${id}"
+            echo "Deleted @westlane/pino-blanc@${ver} (id ${id})"
+          else
+            echo "No published version ${ver}; continuing"
+          fi
 
       - run: yarn run check
       - run: yarn build
