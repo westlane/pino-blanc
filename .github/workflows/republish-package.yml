@@ -25,6 +25,20 @@ jobs:
             exit 1
           fi
 
+      - name: Enable Corepack (Yarn 4)
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+          registry-url: https://npm.pkg.github.com
+          scope: "@westlane"
+
+      - run: yarn install --immutable
+
       - name: Delete existing GitHub Packages version
         env:
           GH_TOKEN: ${{ github.token }}
@@ -39,19 +53,6 @@ jobs:
             echo "No published version ${ver}; continuing"
           fi
 
-      - name: Enable Corepack (Yarn 4)
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: yarn
-          registry-url: https://npm.pkg.github.com
-          scope: "@westlane"
-
-      - run: yarn install --immutable
       - run: yarn run check
       - run: yarn build
 

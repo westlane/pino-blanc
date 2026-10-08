@@ -16,4 +16,21 @@ describe("browser", () => {
   it("createLogger is an alias of createBrowserLogger", () => {
     expect(createLogger).toBe(createBrowserLogger);
   });
+
+  it("createBrowserLogger works when globalThis.process is missing", () => {
+    const g = globalThis as { process?: unknown };
+    const prev = g.process;
+    try {
+      delete g.process;
+      const spy = vi.spyOn(console, "info").mockImplementation(() => {});
+      const log = createBrowserLogger("no-process");
+      log.info("ok");
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    } finally {
+      if (prev !== undefined) {
+        g.process = prev;
+      }
+    }
+  });
 });

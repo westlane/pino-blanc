@@ -1,6 +1,6 @@
 {
   "name": "@westlane/pino-blanc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.",
   "type": "module",
   "packageManager": "yarn@4.9.2",
@@ -35,11 +35,6 @@
   ],
   "exports": {
     ".": {
-      "development": {
-        "browser": "./src/browser.ts",
-        "import": "./src/index.ts",
-        "default": "./src/index.ts"
-      },
       "types": "./dist/src/index.d.ts",
       "browser": {
         "types": "./dist/src/browser.d.ts",
@@ -50,27 +45,27 @@
       "default": "./dist/src/index.js"
     },
     "./browser": {
-      "development": "./src/browser.ts",
       "types": "./dist/src/browser.d.ts",
       "import": "./dist/src/browser.js"
     },
+    "./color": {
+      "types": "./dist/src/color/did.d.ts",
+      "import": "./dist/src/color/did.js",
+      "default": "./dist/src/color/did.js"
+    },
     "./pretty": {
-      "development": "./src/node/transport/pretty.ts",
       "types": "./dist/src/node/transport/pretty.d.ts",
       "import": "./dist/src/node/transport/pretty.js"
     },
     "./react": {
-      "development": "./src/react/index.ts",
       "types": "./dist/src/react/index.d.ts",
       "import": "./dist/src/react/index.js"
     },
     "./vue": {
-      "development": "./src/vue/index.ts",
       "types": "./dist/src/vue/index.d.ts",
       "import": "./dist/src/vue/index.js"
     },
     "./svelte": {
-      "development": "./src/svelte/index.ts",
       "types": "./dist/src/svelte/index.d.ts",
       "import": "./dist/src/svelte/index.js"
     }

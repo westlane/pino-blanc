@@ -13,7 +13,8 @@ export type PrettyColorOptions = {
  * this package's dist (which cannot resolve that import from outside
  * the consumer's node_modules).
  */
-function readEnv(): NodeJS.ProcessEnv {
+/** @internal Shared by theme + ANSI gates; safe when `globalThis.process` is missing (browser). */
+export function readEnv(): NodeJS.ProcessEnv {
   const proc = (globalThis as { process?: { env?: NodeJS.ProcessEnv } })
     .process;
   return proc?.env ?? ({} as NodeJS.ProcessEnv);
