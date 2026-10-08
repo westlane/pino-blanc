@@ -14,8 +14,13 @@ const badgesDir = path.join(root, "docs", "badges");
 const reportPath = path.join(badgesDir, "vitest-report.json");
 
 function resolveBranch() {
+  // pull_request: GITHUB_REF_NAME is e.g. "1/merge"; head branch is in GITHUB_HEAD_REF.
+  const headRef = process.env.GITHUB_HEAD_REF?.trim();
+  if (headRef) {
+    return headRef;
+  }
   const fromCi = process.env.GITHUB_REF_NAME?.trim();
-  if (fromCi) {
+  if (fromCi && !fromCi.includes("/")) {
     return fromCi;
   }
   try {
