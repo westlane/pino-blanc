@@ -151,7 +151,23 @@ export function readableForeground(
   return fg;
 }
 
+/** Canonical editor/terminal background per built-in theme id. */
+const THEME_SURFACE_BY_ID: Record<string, string> = {
+  "solarized-dark": "#002b36",
+  "solarized-light": "#fdf6e3",
+  "gruvbox-dark": "#282828",
+  "gruvbox-light": "#fbf1c7",
+  dracula: "#282a36",
+  nord: "#2e3440",
+  "catppuccin-mocha": "#1e1e2e",
+  "catppuccin-latte": "#eff1f5",
+};
+
 export function themeSurfaceHex(theme: LogTheme): string {
+  const mapped = THEME_SURFACE_BY_ID[theme.id];
+  if (mapped) {
+    return mapped;
+  }
   if (theme.background === "light") {
     return "#fdf6e3";
   }
