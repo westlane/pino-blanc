@@ -1,6 +1,6 @@
 {
   "name": "@westlane/pino-blanc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.",
   "type": "module",
   "packageManager": "yarn@4.9.2",
@@ -47,6 +47,11 @@
     "./browser": {
       "types": "./dist/src/browser.d.ts",
       "import": "./dist/src/browser.js"
+    },
+    "./color": {
+      "types": "./dist/src/color/did.d.ts",
+      "import": "./dist/src/color/did.js",
+      "default": "./dist/src/color/did.js"
     },
     "./pretty": {
       "types": "./dist/src/node/transport/pretty.d.ts",
