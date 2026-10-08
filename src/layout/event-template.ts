@@ -2,7 +2,7 @@ import { jsonMetaSpans } from "../format/json-meta.js";
 import { PB_CONTROL_META_KEYS, stripPinoBindings } from "../record.js";
 import type { LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 import { expandPadBrackets } from "./pad-brackets.js";
-import { padEventNameColumn, resolveEmojiFromMeta } from "./event-columns.js";
+import { resolveEmojiFromMeta } from "./event-columns.js";
 import {
   LAYOUT_FIELD_RE,
   canonicalizeFieldToken,
@@ -98,7 +98,9 @@ function layoutContext(
   row: 1 | 2,
   module: string,
 ): LayoutRowContext {
-  const message = row === 1 ? padEventNameColumn(String(record.msg ?? "")) : "";
+  // Leave width/pad to the template (`%ev:N%` / pad-brackets). Pre-padding here
+  // forced a blank column before meta even when the layout asked for natural width.
+  const message = row === 1 ? String(record.msg ?? "") : "";
   return {
     level: "info",
     module,
