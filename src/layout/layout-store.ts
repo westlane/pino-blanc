@@ -1,69 +1,44 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { layoutData as bakedLayoutData } from "./layout.data.js";
-import { parseLayoutYaml } from "./parse-layout.js";
 import type { LayoutData } from "../types/layout.js";
 
-type Cache = { mtimeMs: number; path: string; data: LayoutData };
+type LayoutLoader = () => LayoutData;
 
-let cache: Cache | null = null;
+let liveLoader: LayoutLoader | null = null;
+let cacheClearHook: (() => void) | null = null;
 
-function isNode(): boolean {
-  return typeof process !== "undefined" && Boolean(process.versions?.node);
+/**
+ * Node registers a yml mtime loader (see `layout-store.node.ts`).
+ * Browser / unregistered → baked `layout.data.ts` snapshot.
+ */
+export function setLayoutDataLoader(loader: LayoutLoader | null): void {
+  liveLoader = loader;
 }
 
-/** Walk up from this module looking for `config/layout.yml`. */
-function findLayoutYmlPath(): string | null {
-  const env = process.env.PINO_BLANC_LAYOUT?.trim();
-  if (env) {
-    return path.resolve(env);
-  }
-  let dir = path.dirname(fileURLToPath(import.meta.url));
-  for (let i = 0; i < 8; i += 1) {
-    const candidate = path.join(dir, "config", "layout.yml");
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-    const parent = path.dirname(dir);
-    if (parent === dir) {
-      break;
-    }
-    dir = parent;
-  }
-  return null;
+/** Node registers mtime-cache reset for tests. */
+export function setLayoutCacheClearHook(hook: (() => void) | null): void {
+  cacheClearHook = hook;
 }
 
 /**
- * Active layout data. On Node, reloads `config/layout.yml` when its mtime changes
- * (no rebuild). Browser / missing file → baked `layout.data.ts` snapshot.
+ * Active layout data. On Node (after {@link installNodeLayoutLoader}), reloads
+ * `config/layout.yml` when its mtime changes. Browser → baked snapshot.
  */
 export function getLayoutData(): LayoutData {
-  if (!isNode()) {
-    return bakedLayoutData;
-  }
-  try {
-    const ymlPath = findLayoutYmlPath();
-    if (!ymlPath) {
+  if (liveLoader) {
+    try {
+      return liveLoader();
+    } catch {
       return bakedLayoutData;
     }
-    const mtimeMs = fs.statSync(ymlPath).mtimeMs;
-    if (cache && cache.path === ymlPath && cache.mtimeMs === mtimeMs) {
-      return cache.data;
-    }
-    const data = parseLayoutYaml(fs.readFileSync(ymlPath, "utf8"));
-    cache = { mtimeMs, path: ymlPath, data };
-    return data;
-  } catch {
-    return bakedLayoutData;
   }
+  return bakedLayoutData;
 }
 
 export function getTintMultiplier(): number {
   return getLayoutData().tint.multiplier;
 }
 
-/** Test helper — drop the mtime cache. */
+/** Test helper — drop the node mtime cache (loader stays installed). */
 export function clearLayoutCache(): void {
-  cache = null;
+  cacheClearHook?.();
 }

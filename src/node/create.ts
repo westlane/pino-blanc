@@ -5,6 +5,7 @@ import { toPinoLevel } from "./levels.js";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import buildPrettyStream from "./transport/pretty.js";
+import "../layout/layout-store.node.js";
 
 function optionsNeedMainThread(options: CreateLoggerOptions): boolean {
   return Boolean(

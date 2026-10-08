@@ -27,7 +27,10 @@ export function renderBoxBlock(
   );
   const level = "info";
 
-  if (typeof process !== "undefined" && process.versions?.node) {
+  const nodeVersions = (
+    globalThis as { process?: { versions?: { node?: string } } }
+  ).process?.versions?.node;
+  if (nodeVersions) {
     if (!resolvePrettyColor(options)) {
       return { mode: "plain", line: renderPlain(spans) };
     }

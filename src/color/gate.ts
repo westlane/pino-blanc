@@ -8,13 +8,32 @@ export type PrettyColorOptions = {
 };
 
 /**
+ * Read process.env without a bare `process` identifier so browser Vite
+ * builds do not inject `vite-plugin-node-polyfills/shims/process` into
+ * this package's dist (which cannot resolve that import from outside
+ * the consumer's node_modules).
+ */
+function readEnv(): NodeJS.ProcessEnv {
+  const proc = (globalThis as { process?: { env?: NodeJS.ProcessEnv } })
+    .process;
+  return proc?.env ?? ({} as NodeJS.ProcessEnv);
+}
+
+function stdoutIsTTY(): boolean {
+  const proc = (
+    globalThis as { process?: { stdout?: { isTTY?: boolean } } }
+  ).process;
+  return Boolean(proc?.stdout?.isTTY);
+}
+
+/**
  * Pick palette. Default `auto` → truecolor (same as identity chrome).
  * Opt into 256/16 via `PINO_BLANC_ANSI` or `ansiMode` when the terminal cannot.
  */
 export function resolveAnsiMode(
   options: Pick<PrettyColorOptions, "ansiMode"> = {},
 ): ResolvedAnsiPalette {
-  const fromEnv = process.env.PINO_BLANC_ANSI?.trim().toLowerCase();
+  const fromEnv = readEnv().PINO_BLANC_ANSI?.trim().toLowerCase();
   if (fromEnv === "truecolor" || fromEnv === "24bit") {
     return "truecolor";
   }
@@ -36,32 +55,33 @@ export function resolvePrettyColor(
   options: PrettyColorOptions = {},
   plainTransport = false,
 ): boolean {
+  const env = readEnv();
   if (plainTransport || options.plainStdout) {
     return false;
   }
-  if (process.env.PINO_BLANC_PLAIN === "1") {
+  if (env.PINO_BLANC_PLAIN === "1") {
     return false;
   }
   if (options.forceColor === false) {
     return false;
   }
-  if (process.env.PINO_BLANC_FORCE_COLOR === "0") {
+  if (env.PINO_BLANC_FORCE_COLOR === "0") {
     return false;
   }
   if (options.forceColor === true) {
     return true;
   }
-  if (process.env.PINO_BLANC_FORCE_COLOR === "1") {
+  if (env.PINO_BLANC_FORCE_COLOR === "1") {
     return true;
   }
-  if (supportsColors()) {
+  if (supportsColors(env)) {
     return true;
   }
   // Pretty logger: ANSI by default (IDE terminals often set NO_COLOR / non-TTY).
   return true;
 }
 
-export function supportsColors(env: NodeJS.ProcessEnv = process.env): boolean {
+export function supportsColors(env: NodeJS.ProcessEnv = readEnv()): boolean {
   if (env.NO_COLOR !== undefined && env.NO_COLOR !== "") {
     return false;
   }
@@ -71,7 +91,7 @@ export function supportsColors(env: NodeJS.ProcessEnv = process.env): boolean {
   if (env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0") {
     return true;
   }
-  if (!process.stdout?.isTTY) {
+  if (!stdoutIsTTY()) {
     return false;
   }
   const term = env.TERM ?? "";
@@ -82,7 +102,7 @@ export function supportsColors(env: NodeJS.ProcessEnv = process.env): boolean {
 }
 
 export function resolveThemeIdFromEnv(
-  env: NodeJS.ProcessEnv = process.env,
+  env: NodeJS.ProcessEnv = readEnv(),
 ): string | undefined {
   const explicit = env.PINO_BLANC_THEME;
   if (explicit) {

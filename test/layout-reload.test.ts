@@ -6,6 +6,7 @@ import {
   clearLayoutCache,
   getLayoutData,
 } from "../src/layout/layout-store.js";
+import "../src/layout/layout-store.node.js";
 import { resolveLayoutTemplate } from "../src/layout/presets.js";
 
 const prevEnv = process.env.PINO_BLANC_LAYOUT;

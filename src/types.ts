@@ -145,7 +145,7 @@ export type CreateLoggerOptions = {
   plainStdout?: boolean | undefined;
   /** Emit ANSI even when `NO_COLOR` / non-TTY (dev terminals, worker pretty thread). */
   forceColor?: boolean | undefined;
-  /** `auto` uses 256-color when `COLORTERM` is not truecolor (Cursor / VS Code). */
+  /** `auto` → truecolor (default); set `PINO_BLANC_ANSI=256` to quantize. */
   ansiMode?: AnsiMode | undefined;
   /** In-process pretty stream (no worker transport); use for tests or custom hooks. */
   syncPretty?: boolean | undefined;
