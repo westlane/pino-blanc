@@ -24,6 +24,13 @@ describe("chrome", () => {
     expect(contrastRatio(faint.foreground, faint.background)).toBeGreaterThan(3);
   });
 
+  it("fill chip tints toward white (not flat #fff)", () => {
+    const accent = "#956cb3";
+    const fill = chromeColors(accent, "fill", solarizedDark);
+    expect(fill.background.toLowerCase()).not.toBe("#ffffff");
+    expect(contrastRatio(fill.foreground, fill.background)).toBeGreaterThan(3);
+  });
+
   it("readableForeground meets contrast on dark surfaces", () => {
     const fg = readableForeground("#002b36", "#073642");
     expect(contrastRatio(fg, "#002b36")).toBeGreaterThan(3);

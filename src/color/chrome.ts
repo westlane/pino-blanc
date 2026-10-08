@@ -209,11 +209,14 @@ export function chromeColors(
         background: surface,
         foreground: readableForeground(surface, identity),
       };
-    case "fill":
+    case "fill": {
+      // Light subject chips: 25% identity hue on white (not flat #fff).
+      const background = chipBackgroundHex(identity, "fill", surface);
       return {
-        background: SURFACE_WHITE_HEX,
-        foreground: readableForeground(SURFACE_WHITE_HEX, identity),
+        background,
+        foreground: readableForeground(background, identity),
       };
+    }
     case "faint": {
       const background = chipBackgroundHex(identity, "faint", surface);
       return {
