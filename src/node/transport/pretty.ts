@@ -8,7 +8,7 @@ import type { FormatContext } from "../format-record.js";
 import { formatPinoLogLine } from "../format-record.js";
 
 export type PrettyTransportOptions = FormatContext & {
-  destination?: NodeJS.WritableStream;
+  destination?: NodeJS.WritableStream | undefined;
 };
 
 function formatNdjsonLine(

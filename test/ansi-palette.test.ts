@@ -3,15 +3,14 @@ import { resolveAnsiMode } from "../src/color/gate.js";
 import { hexToAnsiFg } from "../src/color/ansi.js";
 
 describe("ansi palette", () => {
-  it("defaults to 256 when COLORTERM is unset", () => {
-    const prev = process.env.COLORTERM;
-    delete process.env.COLORTERM;
+  it("defaults to truecolor in auto mode", () => {
+    const prev = process.env.PINO_BLANC_ANSI;
     delete process.env.PINO_BLANC_ANSI;
-    expect(resolveAnsiMode({ ansiMode: "auto" })).toBe("256");
+    expect(resolveAnsiMode({ ansiMode: "auto" })).toBe("truecolor");
     if (prev === undefined) {
-      delete process.env.COLORTERM;
+      delete process.env.PINO_BLANC_ANSI;
     } else {
-      process.env.COLORTERM = prev;
+      process.env.PINO_BLANC_ANSI = prev;
     }
   });
 

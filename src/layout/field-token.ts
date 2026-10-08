@@ -4,8 +4,8 @@ export type FieldAlign = "left" | "right" | "center" | "auto";
 
 export type FieldModifiers = {
   align: FieldAlign;
-  width?: number;
-  minWidth?: number;
+  width?: number | undefined;
+  minWidth?: number | undefined;
 };
 
 /** Short aliases → canonical token names. Long names also accepted. */

@@ -103,12 +103,20 @@ export const LOG_LAYOUT_PRESETS: Record<string, LogLayoutPreset> =
 export const LOG_EVENT_LAYOUT_PRESETS: Record<string, LogLayoutPreset> =
   livePresetMap(eventPresets);
 
+function requireTextPreset(id: string): LogLayoutPreset {
+  const preset = textPresets()[id];
+  if (!preset) {
+    throw new Error(`Missing text layout preset "${id}"`);
+  }
+  return preset;
+}
+
 export function getDefaultLayout(): LogLayoutPreset {
-  return textPresets()[DEFAULT_LAYOUT];
+  return requireTextPreset(DEFAULT_LAYOUT);
 }
 
 export function getComplexLayout(): LogLayoutPreset {
-  return textPresets()[COMPLEX_LAYOUT];
+  return requireTextPreset(COMPLEX_LAYOUT);
 }
 
 /** @deprecated Prefer {@link getDefaultLayout}. */
@@ -193,7 +201,7 @@ export function resolveLayoutTemplate(layout?: string): string {
     return layout;
   }
   const id = resolveTextLayoutId(layout);
-  return textPresets()[id ?? DEFAULT_LAYOUT].template;
+  return requireTextPreset(id ?? DEFAULT_LAYOUT).template;
 }
 
 export function resolveEventLayoutTemplate(eventLayout?: string): string | undefined {

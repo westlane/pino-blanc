@@ -63,13 +63,13 @@ describe("chrome", () => {
     const longPlain = stripAnsiForPlainOutput(long);
     expect(plain).toContain("pino-blanc");
     expect(plain).toContain("live");
-    // box.complex: pad + title + pad + subtitle + pad
+    // box.complex: pad + title + pad + pad + subtitle + pad
     const bars = plain.split("\n").filter((row) => row.length === 48);
     const longBars = longPlain.split("\n").filter((row) => row.length === 48);
-    expect(bars.length).toBe(5);
-    expect(longBars.length).toBe(5);
+    expect(bars.length).toBe(6);
+    expect(longBars.length).toBe(6);
     expect(bars[1]).toContain("pino-blanc");
-    expect(bars[3]).toContain("live");
+    expect(bars[4]).toContain("live");
     expect(longBars[1]?.includes("...")).toBe(true);
     expect(line).toMatch(/48;2;\d+;\d+;\d+/);
   });

@@ -24,29 +24,29 @@ export const SESSION_BANNER_BAR_SIDE_PADDING = BOX_BAR_SIDE_PADDING;
 
 export type BoxSpansInput = {
   /** Box preset id — `default` or `complex`, or any name in layout.yml. */
-  boxLayout?: string;
+  boxLayout?: string | undefined;
   /** App name — fills `%title%`. */
-  title?: string;
+  title?: string | undefined;
   /** Semver (with or without `v`) — fills `%version%`. */
-  version?: string;
+  version?: string | undefined;
   /** Log level name — fills `%lv%`. */
-  level?: string;
+  level?: string | undefined;
   /** Identity / alias — fills `%subtitle%` on complex. */
-  subtitle?: string;
+  subtitle?: string | undefined;
   /**
    * Preformatted title band (legacy). Used when `title`/`version`/`level` omitted.
    */
-  appLine?: string;
+  appLine?: string | undefined;
   /** Preformatted subtitle (legacy). Used when `subtitle` omitted. */
-  aliasLine?: string;
+  aliasLine?: string | undefined;
   /**
    * Optional extra identity row after the preset bands (not in layout.yml).
    */
-  didLine?: string;
-  barWidth?: number;
+  didLine?: string | undefined;
+  barWidth?: number | undefined;
   /** DID or alias key for identity-tinted subtitle bands. */
-  identityTintKey?: string;
-  identityChrome?: ChipChrome;
+  identityTintKey?: string | undefined;
+  identityChrome?: ChipChrome | undefined;
 };
 
 /** @deprecated Prefer {@link BoxSpansInput}. */
@@ -66,11 +66,11 @@ function inferBoxLayout(input: BoxSpansInput): string | undefined {
 }
 
 function resolveBoxFields(input: BoxSpansInput): {
-  title?: string;
-  version?: string;
-  level?: string;
-  subtitle?: string;
-  appLine?: string;
+  title?: string | undefined;
+  version?: string | undefined;
+  level?: string | undefined;
+  subtitle?: string | undefined;
+  appLine?: string | undefined;
 } {
   return {
     title: input.title,

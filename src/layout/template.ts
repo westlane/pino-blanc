@@ -18,10 +18,10 @@ export type LayoutRowContext = {
   level: LogLevelName;
   module: string;
   message: string;
-  emoji?: string;
+  emoji?: string | undefined;
   /** When set, `%id%` / `%identity%` resolve via identity column helpers. */
-  record?: PinoLogRecord;
-  identityWidth?: number;
+  record?: PinoLogRecord | undefined;
+  identityWidth?: number | undefined;
 };
 
 type LayoutPart =
@@ -30,8 +30,8 @@ type LayoutPart =
       kind: "field";
       field: LogLayoutField;
       align: FieldAlign;
-      width?: number;
-      minWidth?: number;
+      width?: number | undefined;
+      minWidth?: number | undefined;
     };
 
 export function parseLogLayout(template: string): LayoutPart[] {
@@ -43,8 +43,9 @@ export function parseLogLayout(template: string): LayoutPart[] {
     if (index > cursor) {
       parts.push({ kind: "literal", text: expanded.slice(cursor, index) });
     }
-    const field = resolveLayoutField(match[1]);
-    const mods = parseFieldModifiers(match[1], match[2]);
+    const rawField = match[1] ?? "";
+    const field = resolveLayoutField(rawField);
+    const mods = parseFieldModifiers(rawField, match[2]);
     parts.push({
       kind: "field",
       field,

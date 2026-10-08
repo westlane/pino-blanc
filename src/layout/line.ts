@@ -10,7 +10,10 @@ import { EVENT_IDENTITY_META_KEYS } from "./identity-meta.js";
 import { resolveLayoutTemplate } from "./presets.js";
 import { formatLayoutSpans } from "./template.js";
 
-function splitTextLayout(template: string): { row1: string; row2?: string } {
+function splitTextLayout(template: string): {
+  row1: string;
+  row2?: string | undefined;
+} {
   const lines = template.split("\n");
   if (lines.length > 2) {
     throw new Error("Text layout supports at most two lines (one newline).");

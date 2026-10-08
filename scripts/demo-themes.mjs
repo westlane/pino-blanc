@@ -15,7 +15,6 @@ if (!existsSync(entry)) {
 
 const {
   buildBoxSpans,
-  colorFromId,
   createLogger,
   hashString,
   renderBannerLine,
@@ -52,9 +51,11 @@ if (fromEnv && !ALL_THEMES.includes(fromEnv)) {
   process.exit(1);
 }
 
-if (!["all", "solarized", "gruvbox"].includes(demoMode)) {
+const DEMO_MODES = ["all", "solarized", "gruvbox", "identity"];
+
+if (!DEMO_MODES.includes(demoMode)) {
   console.error(
-    `Unknown PINO_BLANC_DEMO="${demoMode}". Use: all, solarized, gruvbox`,
+    `Unknown PINO_BLANC_DEMO="${demoMode}". Use: ${DEMO_MODES.join(", ")}`,
   );
   process.exit(1);
 }
@@ -63,7 +64,7 @@ function themesToRun() {
   if (fromEnv) {
     return [fromEnv];
   }
-  if (demoMode === "solarized") {
+  if (demoMode === "solarized" || demoMode === "identity") {
     return ["solarized-dark", "solarized-light"];
   }
   if (demoMode === "gruvbox") {
@@ -72,15 +73,13 @@ function themesToRun() {
   return ALL_THEMES;
 }
 
-function didColorTransform(themeId) {
-  const theme = resolveTheme(themeId);
-  return (id, defaultHex) => {
-    if (id.startsWith("did:")) {
-      return colorFromId(id, theme.tintRamp);
-    }
-    return defaultHex;
-  };
-}
+/** Kind → log prefix glyph (kind-based). */
+const IDENTITY_SYMBOL_MAP = {
+  host: "/",
+  user: "@",
+  locker: "_",
+  agent: "%",
+};
 
 function moduleNameForRampIndex(theme, targetIndex) {
   const len = theme.tintRamp.length;
@@ -174,11 +173,88 @@ function runSolarizedLayouts(themeId) {
   }).info(msg);
 }
 
+/** Event rows with `%id%` chips — host / user / locker + chrome variants. */
+function runIdentityEvents(themeId) {
+  writeBox("identity", "event.complex", themeId);
+  const log = createLogger("identity", {
+    ...loggerOptions,
+    theme: themeId,
+    eventLayout: "complex",
+    symbolMap: IDENTITY_SYMBOL_MAP,
+  });
+
+  const hostDid =
+    "did:host:z7r8oppFnzGRygj2ZYeqJKs3NpEqgtva8tvAX1j8sFsPWygjqvapBhvor1uJE1kpaWmhBCCsJpqC6SnomTZ7tM3tAy5Yk";
+
+  // Tint keys are full DIDs; seeds chosen so chrome variants read as distinct hues
+  // (host uses the real energetic-domehut DID → #956cb3).
+  const samples = [
+    {
+      event: "host.catalog.discovered",
+      kind: "host",
+      body: "energetic-domehut-y5Yk",
+      did: hostDid,
+      chrome: "inverted",
+      meta: { total: 15, replicas: 15 },
+    },
+    {
+      event: "host.identity.ready",
+      kind: "host",
+      body: "energetic-domehut-y5Yk",
+      did: hostDid,
+      chrome: "inverted",
+      meta: { slug: "energetic-domehut-y5Yk", success: true },
+    },
+    {
+      event: "network.ws.connected",
+      kind: "user",
+      body: "lucky-aphid-2doK",
+      did: "did:user:z6MksbDemoSeedPadForColor5i5",
+      chrome: "faint",
+      meta: { client: "chrome", path: "/ws/" },
+    },
+    {
+      event: "locker.document.loaded",
+      kind: "locker",
+      body: "polished-cusp-nqN",
+      did: "did:locker:z6Mk4ivDemoSeedPadForColorvo1",
+      chrome: "inverted",
+      meta: { bytes: 92_461 },
+    },
+    {
+      event: "locker.replicate.done",
+      kind: "locker",
+      body: "generous-creekbed",
+      did: "did:locker:z6Mk1h9DemoSeedPadForColoracr",
+      chrome: "fill",
+      meta: { bytes: 1_048_576, ok: true },
+    },
+    {
+      event: "agent.task.started",
+      kind: "agent",
+      body: "brisk-copper-bot",
+      did: "did:agent:z6MkbtmDemoSeedPadForColor2ara",
+      chrome: "inverted",
+      meta: { task: "index" },
+    },
+  ];
+
+  for (const sample of samples) {
+    log.event(sample.event, {
+      _emoji: "·",
+      _identityKind: sample.kind,
+      _identityBody: sample.body,
+      _identityTintKey: sample.did,
+      _identityChrome: sample.chrome,
+      ...sample.meta,
+    });
+  }
+}
+
 function runBoxes(themeId, { extended = false } = {}) {
   writeBox("box", "complex", themeId);
   const boxOpts = {
     theme: themeId,
-    colorize: didColorTransform(themeId),
     consoleColorReset: "triple",
   };
 
@@ -221,8 +297,15 @@ function runBoxes(themeId, { extended = false } = {}) {
 
 function runThemeBlock(themeId) {
   const isSolarized = themeId.startsWith("solarized-");
+  const identityOnly = demoMode === "identity";
   writeBox("pino-blanc", themeId, themeId);
   const log = createLogger("demo", { ...loggerOptions, theme: themeId });
+
+  if (identityOnly) {
+    runIdentityEvents(themeId);
+    runBoxes(themeId, { extended: true });
+    return;
+  }
 
   runStandardLevels(log, themeId);
   runEvents(log, themeId);
@@ -230,6 +313,7 @@ function runThemeBlock(themeId) {
     runSolarizedModuleRamp(themeId);
     runSolarizedEvents(log, themeId);
     runSolarizedLayouts(themeId);
+    runIdentityEvents(themeId);
   }
   runBoxes(themeId, { extended: isSolarized });
 }

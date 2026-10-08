@@ -1,11 +1,15 @@
 import { DEFAULT_THEME_ID } from "../defaults.js";
 import type { Colorize, LogTheme, LogThemeId, TintResolver } from "../types.js";
-import { BUILT_IN_THEMES, builtInThemeIds as listBuiltInThemeIds } from "../../themes/index.js";
+import {
+  BUILT_IN_THEMES,
+  builtInThemeIds as listBuiltInThemeIds,
+  solarizedDark,
+} from "../../themes/index.js";
+import { didColorize } from "./did.js";
 import { colorFromId } from "./id.js";
 import { resolveThemeIdFromEnv } from "./gate.js";
 
-const FALLBACK_THEME =
-  BUILT_IN_THEMES[DEFAULT_THEME_ID] ?? BUILT_IN_THEMES["solarized-dark"];
+const FALLBACK_THEME: LogTheme = solarizedDark;
 
 export function resolveTheme(
   theme?: LogThemeId | LogTheme,
@@ -38,6 +42,7 @@ export function createTintResolver(
   colorize?: Colorize,
   custom?: TintResolver,
 ): TintResolver {
+  const resolveColorize = colorize ?? didColorize;
   return {
     resolve(tintKey: string): string | null {
       if (custom) {
@@ -47,7 +52,7 @@ export function createTintResolver(
         }
       }
       const base = colorFromId(tintKey, theme.tintRamp);
-      return colorize ? colorize(tintKey, base) : base;
+      return resolveColorize(tintKey, base);
     },
   };
 }

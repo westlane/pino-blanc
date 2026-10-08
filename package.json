@@ -53,6 +53,7 @@
     "demo": "yarn demo:themes",
     "demo:themes": "yarn build && node scripts/demo-themes.mjs",
     "demo:solarized": "yarn build && PINO_BLANC_DEMO=solarized node scripts/demo-themes.mjs",
+    "demo:identity": "yarn build && PINO_BLANC_DEMO=identity node scripts/demo-themes.mjs",
     "demo:live": "yarn verify:ansi && PINO_BLANC_DEMO_FORCE_COLOR=1 node scripts/demo-live-ndjson.mjs",
     "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
     "check": "yarn lint && yarn typecheck && yarn test && yarn build",

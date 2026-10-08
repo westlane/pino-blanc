@@ -30,14 +30,14 @@ export type LogLayoutField = "level" | "module" | "message" | "emoji" | "identit
 export type LogSpan = {
   text: string;
   role: LogSpanRole;
-  tintKey?: string;
-  chrome?: ChipChrome;
+  tintKey?: string | undefined;
+  chrome?: ChipChrome | undefined;
   /** Opaque kind label; used with symbolMap to build leading glyph. */
-  kind?: string;
+  kind?: string | undefined;
   /** When true, text is emitted as-is (no ANSI/CSS wrapping). */
-  raw?: boolean;
+  raw?: boolean | undefined;
   /** Full-width box row styling (`role: "banner"`). */
-  bannerChrome?: BannerChrome;
+  bannerChrome?: BannerChrome | undefined;
 };
 
 export type LogThemeId =
@@ -50,8 +50,10 @@ export type LogTheme = {
   id: string;
   levels: Partial<Record<LogLevelName, string>>;
   tintRamp: string[];
-  roles?: Partial<Record<"module" | "message" | "meta" | "box" | "accent", string>>;
-  background?: "dark" | "light";
+  roles?:
+    | Partial<Record<"module" | "message" | "meta" | "box" | "accent", string>>
+    | undefined;
+  background?: "dark" | "light" | undefined;
 };
 
 export type Colorize = (id: string, defaultHex: string) => string;
@@ -66,15 +68,15 @@ export type TintResolver = {
 export type ColumnDecorator = {
   decorate: (
     line: LogSpan[],
-    ctx: { level: string; module: string; meta?: unknown },
+    ctx: { level: string; module: string; meta?: unknown | undefined },
   ) => LogSpan[];
 };
 
 export type PinoLogRecord = {
   level: number;
-  msg?: string;
-  module?: string;
-  time?: number;
+  msg?: string | undefined;
+  module?: string | undefined;
+  time?: number | undefined;
   [key: string]: unknown;
 };
 
@@ -97,66 +99,65 @@ export type ConsoleLeadingNewline =
 
 export type ConsoleColorReset = "triple" | "none";
 
-/** ANSI palette for Node pretty output (`auto` → 256 when not truecolor). */
+/** ANSI palette for Node pretty output (`auto` → truecolor). */
 export type AnsiMode = "auto" | "truecolor" | "256" | "16";
 
 export type ResolvedAnsiPalette = "truecolor" | "256" | "16";
 
 export type EventColumnSpec = {
-  emojiWidth?: number;
-  eventNameWidth?: number;
-  identityToContentGap?: string;
-  showEmoji?: boolean;
+  emojiWidth?: number | undefined;
+  eventNameWidth?: number | undefined;
+  identityToContentGap?: string | undefined;
+  showEmoji?: boolean | undefined;
 };
 
 export type CreateLoggerOptions = {
-  level?: LogLevelName | string;
-  theme?: LogThemeId | LogTheme;
-  themeOverrides?: Partial<LogTheme>;
+  level?: LogLevelName | string | undefined;
+  theme?: LogThemeId | LogTheme | undefined;
+  themeOverrides?: Partial<LogTheme> | undefined;
   /**
    * Text preset id (`default`, `complex`, …) or a `%level%` / `%module%` / `%message%` template.
    * See `config/layout.yml` — `text.default` when omitted.
    */
-  layout?: string;
+  layout?: string | undefined;
   /**
    * Event-only layout (`log.event` / `blancEvent`). May include a newline for row 2
    * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset id or raw template.
    */
-  eventLayout?: string;
+  eventLayout?: string | undefined;
   /** Fixed display width for `%identity%` in `eventLayout`. */
-  eventIdentityWidth?: number;
-  colorize?: Colorize;
+  eventIdentityWidth?: number | undefined;
+  colorize?: Colorize | undefined;
   /** Transform log fields before write (e.g. PII redaction). */
-  redact?: Redact;
-  tint?: TintResolver;
-  columns?: ColumnDecorator;
+  redact?: Redact | undefined;
+  tint?: TintResolver | undefined;
+  columns?: ColumnDecorator | undefined;
   /** Replace or extend default level/module/message spans for a pino record. */
-  formatRecord?: FormatRecord;
+  formatRecord?: FormatRecord | undefined;
   /** Leading newline before each pretty line (console rhythm). */
-  consoleLeadingNewline?: ConsoleLeadingNewline;
+  consoleLeadingNewline?: ConsoleLeadingNewline | undefined;
   /** Append background/foreground reset after each line (chip rows). */
-  consoleColorReset?: ConsoleColorReset;
+  consoleColorReset?: ConsoleColorReset | undefined;
   /** Opaque kind → leading glyph (e.g. host → `/`). */
-  symbolMap?: SymbolMap;
+  symbolMap?: SymbolMap | undefined;
   /** Optional fixed columns on custom event rows (emoji slot, event name width). */
-  eventColumns?: EventColumnSpec;
-  plainStdout?: boolean;
+  eventColumns?: EventColumnSpec | undefined;
+  plainStdout?: boolean | undefined;
   /** Emit ANSI even when `NO_COLOR` / non-TTY (dev terminals, worker pretty thread). */
-  forceColor?: boolean;
+  forceColor?: boolean | undefined;
   /** `auto` uses 256-color when `COLORTERM` is not truecolor (Cursor / VS Code). */
-  ansiMode?: AnsiMode;
+  ansiMode?: AnsiMode | undefined;
   /** In-process pretty stream (no worker transport); use for tests or custom hooks. */
-  syncPretty?: boolean;
+  syncPretty?: boolean | undefined;
   /** When using the worker pretty transport, flush each log synchronously (live NDJSON). */
-  prettyTransportSync?: boolean;
+  prettyTransportSync?: boolean | undefined;
   /**
    * Node pretty transport: after a line is formatted, return false to skip stdout
    * (e.g. MCP-primary hosts that still emit via a side channel).
    */
-  consolePrettyDelivery?: (
-    line: string,
-    record: PinoLogRecord,
-  ) => boolean;
+  consolePrettyDelivery?:
+    | ((line: string, record: PinoLogRecord) => boolean)
+    | undefined;
 };
 
 export type BlancLogger = {

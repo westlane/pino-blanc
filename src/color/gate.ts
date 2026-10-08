@@ -2,12 +2,15 @@ import { COLORFGBG_THEME_IDS } from "../defaults.js";
 import type { AnsiMode, ResolvedAnsiPalette } from "../types.js";
 
 export type PrettyColorOptions = {
-  forceColor?: boolean;
-  plainStdout?: boolean;
-  ansiMode?: AnsiMode;
+  forceColor?: boolean | undefined;
+  plainStdout?: boolean | undefined;
+  ansiMode?: AnsiMode | undefined;
 };
 
-/** Pick palette: Cursor/VS Code often lacks COLORTERM → default 256, not 24-bit. */
+/**
+ * Pick palette. Default `auto` → truecolor (same as identity chrome).
+ * Opt into 256/16 via `PINO_BLANC_ANSI` or `ansiMode` when the terminal cannot.
+ */
 export function resolveAnsiMode(
   options: Pick<PrettyColorOptions, "ansiMode"> = {},
 ): ResolvedAnsiPalette {
@@ -25,11 +28,7 @@ export function resolveAnsiMode(
   if (mode === "truecolor" || mode === "256" || mode === "16") {
     return mode;
   }
-  const ct = process.env.COLORTERM ?? "";
-  if (ct === "truecolor" || ct === "24bit") {
-    return "truecolor";
-  }
-  return "256";
+  return "truecolor";
 }
 
 /** Whether pretty formatters emit ANSI (independent of NDJSON `plainStdout`). */

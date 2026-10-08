@@ -9,7 +9,7 @@ import { levelFromPinoNumber } from "./levels.js";
 
 export type FormatContext = {
   options: CreateLoggerOptions;
-  columns?: ColumnDecorator;
+  columns?: ColumnDecorator | undefined;
 };
 
 export function formatPinoLogLine(

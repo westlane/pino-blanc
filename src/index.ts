@@ -3,6 +3,12 @@ export { levelFromPinoNumber } from "./node/levels.js";
 export { formatBoxLine } from "./layout/box.js";
 export { colorFromId, hashString } from "./color/id.js";
 export {
+  colorFromDid,
+  didColorize,
+  didColorSeed,
+  generateColorFromString,
+} from "./color/did.js";
+export {
   resolveAnsiMode,
   resolvePrettyColor,
   supportsColors,

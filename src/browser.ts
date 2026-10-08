@@ -17,4 +17,10 @@ export type {
   TintResolver,
 } from "./types.js";
 export { colorFromId } from "./color/id.js";
-export { resolveTheme } from "./color/theme.js";
+export {
+  colorFromDid,
+  didColorize,
+  didColorSeed,
+  generateColorFromString,
+} from "./color/did.js";
+export { resolveTheme, createTintResolver } from "./color/theme.js";

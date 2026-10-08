@@ -4,11 +4,11 @@ import type { SymbolMap } from "./symbol.js";
 import { padEndDisplay } from "./pad.js";
 
 export type ChipSpanInput = {
-  text?: string;
-  kind?: string;
-  body?: string;
+  text?: string | undefined;
+  kind?: string | undefined;
+  body?: string | undefined;
   tintKey: string;
-  chrome?: ChipChrome;
+  chrome?: ChipChrome | undefined;
 };
 
 export function chipSpan(
@@ -29,11 +29,12 @@ export function chipSpan(
 }
 
 export function leadingColumn(spans: LogSpan[], width: number): LogSpan[] {
-  if (spans.length === 0) {
+  const first = spans[0];
+  if (!first) {
     return spans;
   }
-  const [first, ...rest] = spans;
-  const padded = {
+  const rest = spans.slice(1);
+  const padded: LogSpan = {
     ...first,
     text: padEndDisplay(first.text, width),
   };

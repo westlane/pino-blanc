@@ -15,7 +15,7 @@ import { formatLayoutSpans, type LayoutRowContext } from "./template.js";
 
 type EventLayoutPart =
   | { kind: "literal"; text: string }
-  | { kind: "identity"; width?: number }
+  | { kind: "identity"; width?: number | undefined }
   | { kind: "meta" }
   | { kind: "field"; token: string };
 
@@ -28,8 +28,9 @@ function parseEventLayoutRow(template: string): EventLayoutPart[] {
     if (index > cursor) {
       parts.push({ kind: "literal", text: expanded.slice(cursor, index) });
     }
-    const name = canonicalizeFieldToken(match[1]);
-    const mods = parseFieldModifiers(match[1], match[2]);
+    const rawField = match[1] ?? "";
+    const name = canonicalizeFieldToken(rawField);
+    const mods = parseFieldModifiers(rawField, match[2]);
     if (name === "identity") {
       parts.push({ kind: "identity", width: mods.width });
     } else if (name === "meta") {
@@ -57,7 +58,7 @@ function parseEventLayoutRow(template: string): EventLayoutPart[] {
 
 export function splitEventLayoutTemplate(template: string): {
   row1: string;
-  row2?: string;
+  row2?: string | undefined;
 } {
   const lines = template.split("\n");
   if (lines.length > 2) {
@@ -152,7 +153,11 @@ function formatEventRow(
 export function formatEventLayoutSpans(
   template: string,
   record: PinoLogRecord,
-  ctx: { module: string; symbolMap?: SymbolMap; identityWidth?: number },
+  ctx: {
+    module: string;
+    symbolMap?: SymbolMap | undefined;
+    identityWidth?: number | undefined;
+  },
 ): LogSpan[] {
   const { row1, row2 } = splitEventLayoutTemplate(template);
   const spans = formatEventRow(

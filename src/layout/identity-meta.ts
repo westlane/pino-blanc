@@ -31,7 +31,7 @@ export type ResolvedEventIdentity = {
   display: string;
   tintKey: string;
   chrome: ChipChrome;
-  kind?: string;
+  kind?: string | undefined;
 };
 
 function readChrome(value: unknown): ChipChrome | undefined {

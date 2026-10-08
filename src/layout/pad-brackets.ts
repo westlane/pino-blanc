@@ -6,7 +6,7 @@ export type ParsedBracketSlot =
       kind: "field";
       token: string;
       width: number;
-      minWidth?: number;
+      minWidth?: number | undefined;
       align: BracketAlign;
     };
 
@@ -39,7 +39,7 @@ export function parseBracketSlot(inner: string): ParsedBracketSlot {
     return { kind: "pad", width };
   }
 
-  const token = fieldMatch[1];
+  const token = fieldMatch[1] ?? "";
   const before = inner.slice(0, fieldMatch.index);
   const after = inner.slice(fieldMatch.index + fieldMatch[0].length);
 
@@ -92,10 +92,11 @@ export function parseBracketSlot(inner: string): ParsedBracketSlot {
 function expandSlot(inner: string): string {
   const fieldMatch = CELL_FIELD_RE.exec(inner);
   // Meta is not a fixed-width cell — keep leading pad, then bare %mt%/%meta%.
-  if (fieldMatch && /^(mt|meta)$/.test(fieldMatch[1])) {
+  const fieldName = fieldMatch?.[1];
+  if (fieldMatch && fieldName && /^(mt|meta)$/.test(fieldName)) {
     const prefix = inner.slice(0, fieldMatch.index);
     const pad = prefix.replace(/-/g, " ");
-    return `${pad}%${fieldMatch[1]}%`;
+    return `${pad}%${fieldName}%`;
   }
 
   const slot = parseBracketSlot(inner);

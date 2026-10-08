@@ -54,7 +54,7 @@ function rgbToBasicFg(r: number, g: number, b: number): number {
   if (r > 200 && g > 200) {
     return 33;
   }
-  return BASIC_FG[(r + g + b) % BASIC_FG.length];
+  return BASIC_FG[(r + g + b) % BASIC_FG.length] ?? 37;
 }
 
 export function hexToAnsiFg(

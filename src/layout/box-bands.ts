@@ -1,10 +1,10 @@
 import { resolveBoxLayout } from "./box-presets.js";
 
 export type BoxBandFields = {
-  title?: string;
-  version?: string;
-  level?: string;
-  subtitle?: string;
+  title?: string | undefined;
+  version?: string | undefined;
+  level?: string | undefined;
+  subtitle?: string | undefined;
 };
 
 type BoxToken =

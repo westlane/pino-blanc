@@ -9,10 +9,10 @@ export function formatBlancEventSpans(
   record: PinoLogRecord,
   ctx: {
     module: string;
-    layout?: string;
-    eventLayout?: string;
-    symbolMap?: SymbolMap;
-    eventIdentityWidth?: number;
+    layout?: string | undefined;
+    eventLayout?: string | undefined;
+    symbolMap?: SymbolMap | undefined;
+    eventIdentityWidth?: number | undefined;
   },
 ): LogSpan[] {
   const eventTemplate = resolveEventLayoutTemplate(ctx.eventLayout);

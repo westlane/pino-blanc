@@ -8,11 +8,11 @@ import type { CreateLoggerOptions, LogSpan, LogTheme, LogThemeId } from "../type
 export type BannerFields = {
   title: string;
   /** When set, uses `box.complex` (title + subtitle bands). */
-  subtitle?: string;
-  version?: string;
-  level?: string;
+  subtitle?: string | undefined;
+  version?: string | undefined;
+  level?: string | undefined;
   /** Override layout.yml box preset (`default` / `complex`). */
-  boxLayout?: string;
+  boxLayout?: string | undefined;
 };
 
 function normalizeBannerFields(

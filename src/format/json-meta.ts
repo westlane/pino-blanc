@@ -39,6 +39,9 @@ export function jsonMetaSpans(value: Record<string, unknown>): LogSpan[] {
   let i = 0;
   while (i < raw.length) {
     const ch = raw[i];
+    if (ch === undefined) {
+      break;
+    }
     if (ch === '"') {
       const { text, end } = readJsonString(raw, i);
       const isKey = raw[end] === ":";

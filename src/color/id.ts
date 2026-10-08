@@ -15,5 +15,5 @@ export function colorFromId(id: string, ramp: string[]): string {
     return "#ffffff";
   }
   const idx = hashString(id.toLowerCase()) % ramp.length;
-  return ramp[idx] ?? ramp[0];
+  return ramp[idx] ?? ramp[0] ?? "#ffffff";
 }
