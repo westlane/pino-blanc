@@ -1,10 +1,12 @@
 /**
- * Decide whether a release tag push should npm-publish.
+ * Decide whether a release tag push should publish to the configured registry.
  *
  * Publishes only when all are true:
  * - push is a `v*` tag matching package.json version (tag-driven releases from main)
  * - local version is greater than the registry (or package is unpublished)
- * - NODE_AUTH_TOKEN is set (never printed)
+ * - NODE_AUTH_TOKEN is set (never printed; GITHUB_TOKEN in Actions)
+ *
+ * Registry: PUBLISH_REGISTRY, else package.json publishConfig.registry, else NPM_CONFIG_REGISTRY.
  *
  * Writes GitHub Actions outputs: ahead, version_changed, publish
  */
@@ -40,13 +42,22 @@ function tagVersionFromRef(ref) {
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const local = pkg.version;
 const name = pkg.name;
+const registry =
+  process.env.PUBLISH_REGISTRY?.trim() ||
+  pkg.publishConfig?.registry?.trim() ||
+  process.env.NPM_CONFIG_REGISTRY?.trim() ||
+  "https://registry.npmjs.org";
 
 let published = "0.0.0";
 let onRegistry = false;
 try {
-  published = execSync(`npm view ${name} version`, {
+  published = execSync(`npm view ${name} version --registry=${registry}`, {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
+    env: {
+      ...process.env,
+      NODE_AUTH_TOKEN: process.env.NODE_AUTH_TOKEN ?? "",
+    },
   }).trim();
   onRegistry = true;
 } catch {
@@ -80,7 +91,7 @@ writeOutput("version_changed", String(versionChanged));
 writeOutput("publish", String(shouldPublish));
 
 if (!ahead) {
-  const msg = `package.json version ${local} is not greater than npm ${name}@${published}`;
+  const msg = `package.json version ${local} is not greater than ${name}@${published} on ${registry}`;
   if (soft) {
     console.log(`skip: ${msg}`);
     process.exit(0);
@@ -91,9 +102,10 @@ if (!ahead) {
 
 if (!hasToken) {
   console.log(
-    "skip: release tag is valid, but NPM_TOKEN is not configured as a repository Actions secret",
+    "skip: release tag is valid, but NODE_AUTH_TOKEN is not set (use GITHUB_TOKEN in Actions)",
   );
   process.exit(0);
 }
 
-console.log(`publish: ${name}@${local} (registry ${onRegistry ? published : "unpublished"})`);
+const registryState = onRegistry ? `${published} on ${registry}` : `unpublished on ${registry}`;
+console.log(`publish: ${name}@${local} (${registryState})`);
