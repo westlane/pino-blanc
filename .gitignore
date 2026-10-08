@@ -13,9 +13,3 @@ docs/demo/
 docs/badges/vitest-report.json
 *.log
 .DS_Store
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
