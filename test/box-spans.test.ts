@@ -64,16 +64,17 @@ describe("box spans", () => {
     }
   });
 
-  it("two-content banner keeps first section white (app), color pads above subtitle", () => {
+  it("two-content banner: white title block, color pad above subtitle", () => {
     const spans = bannerLogSpans({ title: "levels", subtitle: "all" });
     const bars = spans.filter((s) => s.role === "banner" || s.role === "box");
     expect(bars.length).toBe(6);
-    // pad + title → white; pads above subtitle + subtitle + pad → theme box
+    // pad + title + closer pad → white; pad above subtitle + subtitle + pad → color
     expect(bars[0]?.role).toBe("banner");
     expect(bars[0]?.bannerChrome).toBe("app");
     expect(bars[1]?.role).toBe("banner");
     expect(bars[1]?.bannerChrome).toBe("app");
-    expect(bars[2]?.role).toBe("box");
+    expect(bars[2]?.role).toBe("banner");
+    expect(bars[2]?.bannerChrome).toBe("app");
     expect(bars[3]?.role).toBe("box");
     expect(bars[4]?.role).toBe("box");
     expect(bars[5]?.role).toBe("box");

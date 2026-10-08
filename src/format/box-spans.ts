@@ -130,7 +130,8 @@ function pushBoxRow(spans: LogSpan[], row: LogSpan): void {
  *
  * Hyphen-only `[----…]` bands are padding rows (empty bars). Content bands
  * fill `%title%` / `%version%` / `%lv%` / `%subtitle%`. First content section
- * (and leading pads) use app chrome (white); later pads + content use identity chrome.
+ * uses app chrome (white) with one closer pad beneath; further pads (above
+ * subtitle) + later content use identity chrome.
  */
 export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
   const boxLayout = inferBoxLayout(input);
@@ -150,12 +151,23 @@ export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
   const spans: LogSpan[] = [{ text: "\n", role: "message" }];
 
   let contentOrdinal = 0;
+  /** One white closer pad under the first content row; further pads use color. */
+  let closedFirstSection = false;
   for (const band of preset.bands) {
     const padding = isBoxPaddingBand(band);
-    // First content section (and its leading pads) stay white (`app`).
-    // Pads after the first content — including the band above subtitle — use color.
-    const chrome: ChipChrome | "app" =
-      contentOrdinal === 0 ? "app" : identityChrome;
+    let chrome: ChipChrome | "app";
+    if (padding) {
+      if (contentOrdinal === 0) {
+        chrome = "app";
+      } else if (contentOrdinal === 1 && !closedFirstSection) {
+        chrome = "app";
+        closedFirstSection = true;
+      } else {
+        chrome = identityChrome;
+      }
+    } else {
+      chrome = contentOrdinal === 0 ? "app" : identityChrome;
+    }
 
     let text = "";
     if (!padding) {
