@@ -1,6 +1,6 @@
 # pino-blanc
 
-![version](docs/badges/version.svg) ![tests](docs/badges/tests.svg)
+![version](https://raw.githubusercontent.com/westlane/pino-blanc/main/docs/badges/version.svg) ![tests](https://raw.githubusercontent.com/westlane/pino-blanc/main/docs/badges/tests.svg)
 
 A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.
 
@@ -18,7 +18,7 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 yarn add @westlane/pino-blanc
 ```
 
-![pino-blanc features](docs/features.gif)
+![pino-blanc features](https://raw.githubusercontent.com/westlane/pino-blanc/main/docs/features.gif)
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
