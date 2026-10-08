@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Writes branch-relative README badges under docs/badges/.
- * Each git branch commits its own SVGs, so viewing /tree/dev vs /tree/main
- * shows that branch's version + test count without hardcoding branch= in README.
+ * README points at main-hosted SVGs; labels are branch-agnostic so dev→main merges stay green.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveBadgeBranch } from "./badge-branch.mjs";
+
+const VERSION_BADGE_LABEL = "version";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const badgesDir = path.join(root, "docs", "badges");
@@ -77,12 +77,11 @@ function writeBadge(name, label, message, color) {
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
-const branch = resolveBadgeBranch(root);
 const { total, passed, failed } = readTestCounts();
 
 const versionChanged = writeBadge(
   "version",
-  branch,
+  VERSION_BADGE_LABEL,
   String(pkg.version ?? "0.0.0"),
   "#007ec6",
 );
@@ -98,10 +97,10 @@ const testsChanged = writeBadge(
 
 if (versionChanged || testsChanged) {
   console.log(
-    `Updated docs/badges (${branch} ${pkg.version}, tests ${testsMessage})`,
+    `Updated docs/badges (${pkg.version}, tests ${testsMessage})`,
   );
 } else {
   console.log(
-    `docs/badges up to date (${branch} ${pkg.version}, tests ${testsMessage})`,
+    `docs/badges up to date (${pkg.version}, tests ${testsMessage})`,
   );
 }
