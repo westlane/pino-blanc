@@ -3,6 +3,7 @@ import {
   readableForeground,
   SURFACE_WHITE_HEX,
 } from "../color/chrome.js";
+import { colorFromIdAvoiding } from "../color/id.js";
 import { levelHex, roleHex } from "../color/theme.js";
 import { splitPrefix } from "../layout/symbol.js";
 import type {
@@ -39,12 +40,50 @@ export function resolveIdentityHex(
 
 const ROW_LEVEL_EMPHASIS = new Set(["warn", "error"]);
 
+/** Level hues reserved for alerts — never use these for module `[tags]`. */
+const MODULE_TAG_RESERVED_LEVELS = ["warn", "error", "fatal"] as const;
+
 function rowEmphasisHex(ctx: SpanRenderContext): string | undefined {
   const level = ctx.level.trim().toLowerCase();
   if (!ROW_LEVEL_EMPHASIS.has(level)) {
     return undefined;
   }
   return levelHex(ctx.theme, level);
+}
+
+function alertLevelHexes(theme: LogTheme): Set<string> {
+  const out = new Set<string>();
+  for (const level of MODULE_TAG_RESERVED_LEVELS) {
+    const hex = levelHex(theme, level);
+    if (hex) {
+      out.add(hex.toLowerCase());
+    }
+  }
+  return out;
+}
+
+function isAlertLevelHex(theme: LogTheme, hex: string): boolean {
+  return alertLevelHexes(theme).has(hex.toLowerCase());
+}
+
+/** Per-module tint, skipping warn/error/fatal reds so tags ≠ alerts. */
+function resolveModuleTagHex(
+  tintKey: string,
+  ctx: SpanRenderContext,
+): string | undefined {
+  const resolved = ctx.tint.resolve(tintKey);
+  if (resolved && !isAlertLevelHex(ctx.theme, resolved)) {
+    return resolved;
+  }
+  const avoided = colorFromIdAvoiding(
+    tintKey,
+    ctx.theme.tintRamp ?? [],
+    alertLevelHexes(ctx.theme),
+  );
+  if (!isAlertLevelHex(ctx.theme, avoided)) {
+    return avoided;
+  }
+  return roleHex(ctx.theme, "module");
 }
 
 export function resolveSpanHex(
@@ -59,6 +98,9 @@ export function resolveSpanHex(
     return emphasis;
   }
   if (span.tintKey) {
+    if (span.role === "module") {
+      return resolveModuleTagHex(span.tintKey, ctx);
+    }
     return ctx.tint.resolve(span.tintKey) ?? undefined;
   }
   if (span.role === "level") {

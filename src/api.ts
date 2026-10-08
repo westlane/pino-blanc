@@ -22,6 +22,15 @@ export { resolveTheme, createTintResolver, levelHex, roleHex } from "./color/the
 export { renderAnsi } from "./render/ansi.js";
 export { renderCss } from "./render/css.js";
 export {
+  collectStyledParts,
+  escapeHtml,
+  formatRecordHtml,
+  htmlLogHostStyle,
+  renderHtml,
+  renderHtmlParts,
+  type StyledPart,
+} from "./render/html.js";
+export {
   blendHexWithBlack,
   blendHexWithWhite,
   boxChromeColors,
