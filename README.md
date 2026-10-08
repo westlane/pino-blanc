@@ -1,5 +1,7 @@
 # pino-blanc
 
+![version](docs/badges/version.svg) ![tests](docs/badges/tests.svg)
+
 A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.
 
 ### Features
@@ -13,11 +15,7 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 
 ![pino-blanc features](docs/features.gif)
 
-<p align="center">
-  <a href="https://westlane.github.io/pino-blanc/">
-    <img src="https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo" />
-  </a>
-</p>
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
 ## Install
 
@@ -25,31 +23,7 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 yarn add @westlane/pino-blanc
 ```
 
-![version](docs/badges/version.svg) ![tests](docs/badges/tests.svg)
-
 ## Usage
-
-### Browser
-
-```ts
-import { createLogger, formatRecordHtml, htmlLogHostStyle } from "@westlane/pino-blanc/browser";
-
-const log = createLogger("app", { theme: "solarized-dark" });
-log.verbose("ready", { hello: "world" });
-
-// On-page sink (same colors and column spacing as console %c)
-const panel = document.getElementById("logs")!;
-panel.style.cssText = htmlLogHostStyle(/* theme */ resolveTheme("solarized-dark"));
-const html = formatRecordHtml(
-  { level: 30, msg: "ready", module: "app", hello: "world" },
-  { theme: "solarized-dark" },
-);
-if (html) {
-  const line = document.createElement("div");
-  line.innerHTML = html;
-  panel.appendChild(line);
-}
-```
 
 ### Node
 
@@ -103,6 +77,18 @@ setPB(log);
 const log = getLogger("Checkout");
 ```
 
+### Try adapters in the browser
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
+
+Or run locally:
+
+```bash
+yarn demo:browser
+```
+
+## Advanced
+
 ### Multi-Transport
 
 ```ts
@@ -131,16 +117,26 @@ const log = pino(
 log.info({ port: 3030 }, "ready");
 ```
 
-### Try adapters in the browser
+### Browser
 
-The [live demo](https://westlane.github.io/pino-blanc/) opens with a log burst for the active framework tab (Vanilla, React, Vue, or Svelte). Each tab has a dark/light theme pair and a scheme toggle.
+```ts
+import { createLogger, formatRecordHtml, htmlLogHostStyle } from "@westlane/pino-blanc/browser";
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
+const log = createLogger("app", { theme: "solarized-dark" });
+log.verbose("ready", { hello: "world" });
 
-Or run locally:
-
-```bash
-yarn demo:browser
+// On-page sink (same colors and column spacing as console %c)
+const panel = document.getElementById("logs")!;
+panel.style.cssText = htmlLogHostStyle(/* theme */ resolveTheme("solarized-dark"));
+const html = formatRecordHtml(
+  { level: 30, msg: "ready", module: "app", hello: "world" },
+  { theme: "solarized-dark" },
+);
+if (html) {
+  const line = document.createElement("div");
+  line.innerHTML = html;
+  panel.appendChild(line);
+}
 ```
 
 ## License
