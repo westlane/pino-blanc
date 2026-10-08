@@ -20,7 +20,6 @@ const {
   hashString,
   renderBannerLine,
   renderBoxBlock,
-  resolveBoxBarWidth,
   resolveTheme,
   writeBoxToConsole,
 } = await import(entry);
@@ -73,7 +72,6 @@ function themesToRun() {
   return ALL_THEMES;
 }
 
-/** DID tint — defaults to theme `tintRamp` (full Solarized accent set). */
 function didColorTransform(themeId) {
   const theme = resolveTheme(themeId);
   return (id, defaultHex) => {
@@ -101,18 +99,24 @@ const loggerOptions = {
   consoleLeadingNewline: true,
 };
 
-function runStandardLevels(log) {
-  process.stdout.write("\n  standard levels\n");
-  log.trace("trace — fine-grained detail", { step: 1 });
-  log.debug("debug — diagnostic", { pid: process.pid });
-  log.info("info — ready", { port: 3030 });
-  log.warn("warn — slow query", { ms: 420 });
-  log.error("error — request failed", { status: 500 });
-  log.fatal("fatal — shutting down", { code: "EEXIT" });
+function writeBox(title, subtitle, themeId) {
+  process.stdout.write(
+    `\n${renderBannerLine({ title, subtitle }, themeId)}\n`,
+  );
 }
 
-function runEvents(log) {
-  process.stdout.write("\n  events (log.event)\n");
+function runStandardLevels(log, themeId) {
+  writeBox("levels", "all", themeId);
+  log.trace("trace", { step: 1 });
+  log.debug("debug", { pid: process.pid });
+  log.info("ready", { port: 3030 });
+  log.warn("slow", { ms: 420 });
+  log.error("failed", { status: 500 });
+  log.fatal("exit", { code: "EEXIT" });
+}
+
+function runEvents(log, themeId) {
+  writeBox("events", "log.event", themeId);
   log.event("api.ready", { _emoji: "🚀" });
   log.event("user.signed_in", {
     _emoji: "✅",
@@ -122,8 +126,8 @@ function runEvents(log) {
   log.event("cache.miss", { _emoji: "📭", key: "session:abc", ttl: 0 });
 }
 
-function runSolarizedEvents(log) {
-  process.stdout.write("\n  events — JSON roles (accent / meta / number)\n");
+function runSolarizedEvents(log, themeId) {
+  writeBox("events", "json", themeId);
   log.event("host.catalog.discovered", {
     _emoji: "📡",
     total: 15,
@@ -145,21 +149,19 @@ function runSolarizedEvents(log) {
 }
 
 function runSolarizedModuleRamp(themeId) {
+  writeBox("modules", "tintRamp", themeId);
   const theme = resolveTheme(themeId);
-  process.stdout.write(
-    "\n  module tags — one line per Solarized tintRamp accent\n",
-  );
   for (let i = 0; i < theme.tintRamp.length; i += 1) {
     const label = SOLARIZED_RAMP_LABELS[i] ?? `accent-${i}`;
     const mod = moduleNameForRampIndex(theme, i);
     const log = createLogger(mod, { ...loggerOptions, theme: themeId });
-    log.info(`tintRamp ${label} (${theme.tintRamp[i]})`, { index: i });
+    log.info(label, { index: i, hex: theme.tintRamp[i] });
   }
 }
 
 function runSolarizedLayouts(themeId) {
-  process.stdout.write("\n  layouts — default vs complex\n");
-  const msg = "same message, different column template";
+  writeBox("layouts", "default / complex", themeId);
+  const msg = "hello";
   createLogger("layout-default", {
     ...loggerOptions,
     theme: themeId,
@@ -173,7 +175,7 @@ function runSolarizedLayouts(themeId) {
 }
 
 function runBoxes(themeId, { extended = false } = {}) {
-  process.stdout.write("\n  box.complex (content-width DID tint)\n");
+  writeBox("box", "complex", themeId);
   const boxOpts = {
     theme: themeId,
     colorize: didColorTransform(themeId),
@@ -182,57 +184,34 @@ function runBoxes(themeId, { extended = false } = {}) {
 
   const identities = extended
     ? [
+        { subtitle: "@demo-user", did: "did:user:z6MkDemoBox", chrome: "inverted" },
         {
-          alias: "@demo-user",
-          did: "did:user:z6MkDemoBox",
-          chrome: "inverted",
-        },
-        {
-          alias: "/energetic-domehut-y5Yk",
+          subtitle: "/energetic-domehut-y5Yk",
           did: "did:locker:energetic-domehut-y5Yk",
           chrome: "inverted",
         },
-        {
-          alias: "@lucky-aphid",
-          did: "did:user:z6Mkluckyaphid",
-          chrome: "faint",
-        },
-        {
-          alias: "@host-replica",
-          did: "did:locker:z6MkHostReplica",
-          chrome: "fill",
-        },
+        { subtitle: "@lucky-aphid", did: "did:user:z6Mkluckyaphid", chrome: "faint" },
+        { subtitle: "@host-replica", did: "did:locker:z6MkHostReplica", chrome: "fill" },
       ]
     : [
-        {
-          alias: "@demo-user",
-          did: "did:user:z6MkDemoBox",
-          chrome: "inverted",
-        },
+        { subtitle: "@demo-user", did: "did:user:z6MkDemoBox", chrome: "inverted" },
       ];
 
-  if (!extended) {
-    for (const chrome of ["inverted", "faint", "fill"]) {
-      const appLine = "pino-blanc v0.1.0 - info level";
-      const aliasLine = "@demo-user";
-      const spans = buildBoxSpans({
-        appLine,
-        aliasLine,
-        barWidth: resolveBoxBarWidth(appLine, aliasLine),
-        identityTintKey: "did:user:z6MkDemoBox",
-        identityChrome: chrome,
-      });
-      writeBoxToConsole(renderBoxBlock(spans, boxOpts));
-    }
-    return;
-  }
+  const chromes = extended
+    ? identities
+    : ["inverted", "faint", "fill"].map((chrome) => ({
+        subtitle: "@demo-user",
+        did: "did:user:z6MkDemoBox",
+        chrome,
+      }));
 
-  const appLine = "pino-blanc demo — solarized identity chrome";
-  for (const { alias, did, chrome } of identities) {
+  for (const { subtitle, did, chrome } of chromes) {
     const spans = buildBoxSpans({
-      appLine,
-      aliasLine: alias,
-      barWidth: resolveBoxBarWidth(appLine, alias),
+      boxLayout: "complex",
+      title: "pino-blanc",
+      version: "0.1.0",
+      level: "info",
+      subtitle,
       identityTintKey: did,
       identityChrome: chrome,
     });
@@ -242,16 +221,14 @@ function runBoxes(themeId, { extended = false } = {}) {
 
 function runThemeBlock(themeId) {
   const isSolarized = themeId.startsWith("solarized-");
-  process.stdout.write(
-    `\n${renderBannerLine(`theme: ${themeId}`, themeId)}\n`,
-  );
+  writeBox("pino-blanc", themeId, themeId);
   const log = createLogger("demo", { ...loggerOptions, theme: themeId });
 
-  runStandardLevels(log);
-  runEvents(log);
+  runStandardLevels(log, themeId);
+  runEvents(log, themeId);
   if (isSolarized) {
     runSolarizedModuleRamp(themeId);
-    runSolarizedEvents(log);
+    runSolarizedEvents(log, themeId);
     runSolarizedLayouts(themeId);
   }
   runBoxes(themeId, { extended: isSolarized });

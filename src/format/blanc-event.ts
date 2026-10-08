@@ -1,9 +1,7 @@
 import { resolveEventLayoutTemplate } from "../layout/presets.js";
-import { padEventNameColumn, resolveEmojiFromMeta } from "../layout/event-columns.js";
+import { resolveEmojiFromMeta } from "../layout/event-columns.js";
 import { formatEventLayoutSpans } from "../layout/event-template.js";
 import { formatStandardSpans } from "../layout/line.js";
-import { padEndDisplay } from "../layout/pad.js";
-import { GRID_DEFAULTS } from "../layout/grid-defaults.js";
 import { isBlancEventRecord } from "../record.js";
 import type { CreateLoggerOptions, LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 
@@ -26,16 +24,11 @@ export function formatBlancEventSpans(
     });
   }
 
-  // No eventLayout → same text layout (incl. optional %meta% row from layout.yml).
-  const message = String(record.msg ?? "");
-  const eventMessage = padEndDisplay(
-    padEventNameColumn(message),
-    GRID_DEFAULTS.message,
-  );
+  // No event presets in layout data → text layout (column widths from text.*).
   return formatStandardSpans(
     "info",
     ctx.module,
-    eventMessage,
+    String(record.msg ?? ""),
     ctx.layout,
     resolveEmojiFromMeta(record),
     record,

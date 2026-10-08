@@ -32,8 +32,9 @@ export function resolvePinoLogLine(
     input,
   );
 
+  const explicitFormatRecord = options.formatRecord;
   const formatRecord: FormatRecord | undefined =
-    options.formatRecord ?? blancEventFormatRecord(options);
+    explicitFormatRecord ?? blancEventFormatRecord(options);
   if (formatRecord) {
     const custom = formatRecord(input, {
       level,
@@ -42,7 +43,13 @@ export function resolvePinoLogLine(
       options,
     });
     if (custom === null || custom === undefined) {
+      // Built-in event formatter may return null for non-events (fall through).
+      // An explicit formatRecord that returns null/undefined means “skip this line”
+      // — do not re-layout blanc events with unenriched spans.
       if (isBlancEventRecord(input)) {
+        if (explicitFormatRecord) {
+          return { mode: "empty" };
+        }
         return {
           mode: "spans",
           spans: formatBlancEventSpans(input, {

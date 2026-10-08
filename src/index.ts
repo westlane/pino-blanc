@@ -33,6 +33,10 @@ export {
   IDENTITY_LAYOUT,
   DEFAULT_LOG_LAYOUT,
   DEFAULT_LOG_LAYOUT_ID,
+  getDefaultLogLayout,
+  getClassicLogLayout,
+  getLogLayoutPresets,
+  getLogEventLayoutPresets,
   LOG_LAYOUT_PRESETS,
   LOG_EVENT_LAYOUT_PRESETS,
   complexLayout,
@@ -53,17 +57,23 @@ export {
   identityColumnSpan,
   resolveEventIdentity,
 } from "./layout/identity-meta.js";
-export { bannerLogSpans, renderBannerLine } from "./format/banner.js";
+export {
+  bannerLogSpans,
+  renderBannerLine,
+  type BannerFields,
+} from "./format/banner.js";
 export {
   buildBoxSpans,
   buildSessionBannerSpans,
   resolveBoxBarWidth,
   resolveSessionBannerBarWidth,
+  boxMinBarWidth,
   BOX_MIN_BAR_WIDTH,
   BOX_BAR_SIDE_PADDING,
   SESSION_BANNER_MIN_BAR_WIDTH,
   SESSION_BANNER_BAR_SIDE_PADDING,
 } from "./format/box-spans.js";
+export { getLayoutData, clearLayoutCache } from "./layout/layout-store.js";
 export {
   formatBoxBandText,
   formatBoxBandLines,

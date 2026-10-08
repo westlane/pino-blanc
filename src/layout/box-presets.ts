@@ -1,5 +1,5 @@
 import { COMPLEX_LAYOUT, DEFAULT_LAYOUT } from "./layout-ids.js";
-import { layoutData } from "./layout.data.js";
+import { getLayoutData } from "./layout-store.js";
 import type { BoxLayoutPreset } from "../types/layout.js";
 
 /** Legacy ids → current preset names. */
@@ -19,6 +19,7 @@ export function resolveBoxLayoutId(boxLayout?: string): string {
 /** Resolve a box preset by id (`default`, `complex`, or any name in layout.yml). */
 export function resolveBoxLayout(boxLayout?: string): BoxLayoutPreset {
   const id = resolveBoxLayoutId(boxLayout);
+  const layoutData = getLayoutData();
   const preset = layoutData.box[id];
   if (!preset) {
     const known = Object.keys(layoutData.box).join(", ");

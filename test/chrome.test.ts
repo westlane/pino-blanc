@@ -37,27 +37,40 @@ describe("chrome", () => {
     expect(contrastRatio(colors.foreground, colors.background)).toBeGreaterThan(3);
   });
 
-  it("renderBannerLine emits box.default padding bands + title", () => {
+  it("renderBannerLine emits box.complex title + subtitle at fixed width", () => {
     const prev = process.env.FORCE_COLOR;
     process.env.FORCE_COLOR = "1";
     delete process.env.NO_COLOR;
-    const line = renderBannerLine("pino-blanc live NDJSON demo", "solarized-dark", {
-      forceColor: true,
-      ansiMode: "truecolor",
-    });
+    const line = renderBannerLine(
+      { title: "pino-blanc", subtitle: "live" },
+      "solarized-dark",
+      { forceColor: true, ansiMode: "truecolor" },
+    );
+    const long = renderBannerLine(
+      {
+        title: "createLogger with a very long title that must truncate",
+        subtitle: "ndjson-peer",
+      },
+      "solarized-dark",
+      { forceColor: true, ansiMode: "truecolor" },
+    );
     if (prev === undefined) {
       delete process.env.FORCE_COLOR;
     } else {
       process.env.FORCE_COLOR = prev;
     }
     const plain = stripAnsiForPlainOutput(line);
-    expect(plain).toContain("pino-blanc live NDJSON demo");
-    // box.default: pad + title + pad
+    const longPlain = stripAnsiForPlainOutput(long);
+    expect(plain).toContain("pino-blanc");
+    expect(plain).toContain("live");
+    // box.complex: pad + title + pad + subtitle + pad
     const bars = plain.split("\n").filter((row) => row.length === 48);
-    expect(bars.length).toBe(3);
-    expect(bars[1]).toContain("pino-blanc live NDJSON demo");
-    expect(bars[0]?.trim()).toBe("");
-    expect(bars[2]?.trim()).toBe("");
+    const longBars = longPlain.split("\n").filter((row) => row.length === 48);
+    expect(bars.length).toBe(5);
+    expect(longBars.length).toBe(5);
+    expect(bars[1]).toContain("pino-blanc");
+    expect(bars[3]).toContain("live");
+    expect(longBars[1]?.includes("...")).toBe(true);
     expect(line).toMatch(/48;2;\d+;\d+;\d+/);
   });
 });

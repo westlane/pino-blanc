@@ -58,15 +58,15 @@ log.info("connected");
 
 Env: `PINO_BLANC_THEME=solarized-light`
 
-**Demo:** `yarn demo:themes` (all palettes) or `yarn demo:solarized` (Solarized dark + light with tint-ramp modules, rich events, layouts, and multi-DID banners). `PINO_BLANC_DEMO=gruvbox` limits to Gruvbox pair.
+**Demo:** `yarn demo` (alias for `demo:themes` — all palettes) or `yarn demo:solarized` (Solarized dark + light with tint-ramp modules, rich events, layouts, and multi-DID banners). `PINO_BLANC_DEMO=gruvbox` limits to Gruvbox pair.
 
-**Live NDJSON:** `yarn demo:live` — simulates WebSocket-style `log.event` ticks through the worker transport, an inline NDJSON→pretty `Writable`, and a shell-style `producer | pretty` pipe. Frame ticks use `_liveReplace: true` so each tick rewrites one terminal block (CSI up + erase) instead of stacking scrollback; a following non-live event (e.g. `ws.batch_done`) commits the last frame. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`, `PINO_BLANC_LIVE_MODE=transport|peer|createLogger|all` (`peer` = inline `Writable`; `createLogger` = in-process pretty). Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
+**Live NDJSON:** `yarn demo:live` — `createLogger` emits `_liveReplace` `ws.frame` ticks (one terminal block rewritten in place), then a non-live `ws.batch_done` commits the last frame. Tune with `PINO_BLANC_LIVE_TICKS`, `PINO_BLANC_LIVE_INTERVAL_MS`. Integrated terminals (Cursor) often set `NO_COLOR`; `yarn demo:live` forces `FORCE_COLOR=1` so Solarized tints show (disable with `PINO_BLANC_DEMO_FORCE_COLOR=0`).
 
-Line layout and column widths: edit [config/layout.yml](config/layout.yml), then `yarn build`. Palettes: [themes/](themes/) — credits in [themes/README.md](themes/README.md).
+Line layout and column widths: edit [config/layout.yml](config/layout.yml) — Node reloads it on change (no rebuild). Palettes: [themes/](themes/) — credits in [themes/README.md](themes/README.md).
 
 ### Line layout
 
-Edit [config/layout.yml](config/layout.yml), then `yarn build`.
+Edit [config/layout.yml](config/layout.yml). Node picks up mtime changes automatically.
 
 | Preset id | Applies to | What it is |
 | --- | --- | --- |
@@ -100,7 +100,7 @@ log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port:
 - `formatRecord` / `defineFormatRecord()` — full-line pretty override per NDJSON record
 - `consolePrettyDelivery` — MCP-style hosts: emit side channel, return `false` to skip stdout
 - `buildBoxSpans` / `renderBoxBlock` — layout.yml `box` presets (padding bands + title/subtitle; `box.complex` for title + subtitle)
-- `renderBannerLine` — `box.default` section headers (padded bars)
+- `renderBannerLine({ title, subtitle })` — `box.complex` (or `box.default` when subtitle omitted)
 - `stripPinoBindings`, `isBlancEventRecord`, `consoleLeadingNewlineUnless` — record helpers
 - `_liveReplace: true` on a record — pretty transport overwrites the previous live block in-place (high-frequency ticks / WS frames)
 - `tint` / `columns` — `TintResolver` and `ColumnDecorator` hooks
@@ -108,7 +108,7 @@ log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port:
 - `forceColor` — default **on** for `createLogger` (pretty ANSI even when Cursor sets `NO_COLOR`). Opt out: `forceColor: false`, `PINO_BLANC_FORCE_COLOR=0`, or `PINO_BLANC_PLAIN=1`.
 - `ansiMode` / `PINO_BLANC_ANSI` — `auto` (default) uses **256-color** when `COLORTERM` is unset (Cursor integrated terminal); set `truecolor` or `PINO_BLANC_ANSI=truecolor` for iTerm. Run `yarn verify:ansi` after build.
 - `log.event(msg, meta)` — writes at info with `blancEvent: true` for custom layouts
-- `renderBannerLine(title, theme)` — centered box bar (`theme.roles.box` background)
+- `renderBannerLine({ title, subtitle }, theme)` — padded box bars (`theme.roles.box`)
 
 ## Branches
 

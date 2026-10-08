@@ -1,9 +1,25 @@
 import { describe, expect, it } from "vitest";
+import { bannerLogSpans } from "../src/format/banner.js";
 import { buildBoxSpans } from "../src/format/box-spans.js";
 import { renderBoxBlock } from "../src/format/render-box.js";
 import { stripAnsiForPlainOutput } from "../src/render/plain.js";
 
 describe("box spans", () => {
+  it("keeps every box at layout.yml frame width", () => {
+    const short = buildBoxSpans({ boxLayout: "default", title: "short" });
+    const long = buildBoxSpans({
+      boxLayout: "default",
+      title: "createLogger (in-process pretty, syncPretty) – live NDJSON stream",
+    });
+    const shortBars = short.filter((s) => s.role === "banner").map((s) => s.text);
+    const longBars = long.filter((s) => s.role === "banner").map((s) => s.text);
+    expect(shortBars).toHaveLength(3);
+    expect(longBars).toHaveLength(3);
+    for (const row of [...shortBars, ...longBars]) {
+      expect(row.length).toBe(48);
+    }
+  });
+
   it("renders box.complex with padding bands + identity subtitle", () => {
     const spans = buildBoxSpans({
       boxLayout: "complex",
@@ -46,5 +62,27 @@ describe("box spans", () => {
     if (rendered.mode === "ansi") {
       expect(rendered.line).toMatch(/48;5;\d+/);
     }
+  });
+
+  it("two-content banner keeps first section white (app), later bands theme box", () => {
+    const spans = bannerLogSpans({ title: "levels", subtitle: "all" });
+    const bars = spans.filter((s) => s.role === "banner" || s.role === "box");
+    expect(bars.length).toBe(5);
+    // pad + title + pad → white app chrome; subtitle + pad → theme box
+    expect(bars[0]?.role).toBe("banner");
+    expect(bars[0]?.bannerChrome).toBe("app");
+    expect(bars[1]?.role).toBe("banner");
+    expect(bars[1]?.bannerChrome).toBe("app");
+    expect(bars[2]?.role).toBe("banner");
+    expect(bars[2]?.bannerChrome).toBe("app");
+    expect(bars[3]?.role).toBe("box");
+    expect(bars[4]?.role).toBe("box");
+  });
+
+  it("single-content banner stays theme box color on every band", () => {
+    const spans = bannerLogSpans({ title: "solo" });
+    const bars = spans.filter((s) => s.role === "banner" || s.role === "box");
+    expect(bars.length).toBe(3);
+    expect(bars.every((s) => s.role === "box")).toBe(true);
   });
 });

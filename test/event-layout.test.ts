@@ -20,7 +20,7 @@ describe("event layout (two-line)", () => {
     const plain = spansToPlain(
       formatBlancEventSpans(record, {
         module: "boot",
-        eventLayout: "default",
+        eventLayout: "complex",
         symbolMap: { host: "/" },
       }),
     );

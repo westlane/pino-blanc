@@ -1,21 +1,24 @@
-import {
-  formatBoxBandLines,
-  formatBoxBandText,
-  isBoxPaddingBand,
-} from "../layout/box-bands.js";
+import { formatBoxBandText, isBoxPaddingBand } from "../layout/box-bands.js";
 import { resolveBoxLayout } from "../layout/box-presets.js";
 import { COMPLEX_LAYOUT } from "../layout/layout-ids.js";
 import { centerInBar } from "../layout/center-bar.js";
-import { displayWidth } from "../layout/width.js";
 import type { ChipChrome, LogSpan } from "../types.js";
 
-/** Min bar width from `box.default` in layout.yml. */
-export const BOX_MIN_BAR_WIDTH = resolveBoxLayout().width;
-/** Side pad when growing past min width. */
-export const BOX_BAR_SIDE_PADDING = 1;
+/** Frame width from `box.default` in layout.yml (live / mtime-cached). */
+export function boxMinBarWidth(): number {
+  return resolveBoxLayout().width;
+}
 
-/** @deprecated Use {@link BOX_MIN_BAR_WIDTH}. */
-export const SESSION_BANNER_MIN_BAR_WIDTH = BOX_MIN_BAR_WIDTH;
+/** @deprecated Prefer {@link boxMinBarWidth}. */
+export function BOX_MIN_BAR_WIDTH(): number {
+  return boxMinBarWidth();
+}
+
+/** @deprecated Box width is fixed by layout.yml. */
+export const BOX_BAR_SIDE_PADDING = 0;
+
+/** @deprecated Use {@link boxMinBarWidth}. */
+export const SESSION_BANNER_MIN_BAR_WIDTH = boxMinBarWidth;
 /** @deprecated Use {@link BOX_BAR_SIDE_PADDING}. */
 export const SESSION_BANNER_BAR_SIDE_PADDING = BOX_BAR_SIDE_PADDING;
 
@@ -78,31 +81,29 @@ function resolveBoxFields(input: BoxSpansInput): {
   };
 }
 
-/** Content-sized bar width from title / subtitle / optional did line. */
+/**
+ * Box bar width from layout.yml (`box.*.width`).
+ * Content length is ignored — all boxes share the configured max width.
+ */
 export function resolveBoxBarWidth(
-  titleLine: string,
-  subtitleLine: string,
-  didLine = "",
-  minWidth = BOX_MIN_BAR_WIDTH,
-  sidePadding = BOX_BAR_SIDE_PADDING,
+  _titleLine?: string,
+  _subtitleLine?: string,
+  _didLine = "",
+  maxWidth = boxMinBarWidth(),
+  _sidePadding = BOX_BAR_SIDE_PADDING,
 ): number {
-  const peak = Math.max(
-    displayWidth(titleLine),
-    displayWidth(subtitleLine),
-    displayWidth(didLine),
-  );
-  return Math.max(minWidth, peak + sidePadding * 2);
+  return maxWidth;
 }
 
 /** @deprecated Prefer {@link resolveBoxBarWidth}. */
 export function resolveSessionBannerBarWidth(
-  appLine: string,
-  aliasLine: string,
+  appLine?: string,
+  aliasLine?: string,
   didLine = "",
-  minWidth = BOX_MIN_BAR_WIDTH,
+  maxWidth = boxMinBarWidth(),
   sidePadding = BOX_BAR_SIDE_PADDING,
 ): number {
-  return resolveBoxBarWidth(appLine, aliasLine, didLine, minWidth, sidePadding);
+  return resolveBoxBarWidth(appLine, aliasLine, didLine, maxWidth, sidePadding);
 }
 
 function boxRow(
@@ -141,39 +142,8 @@ export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
     fields.level !== undefined ||
     fields.subtitle !== undefined;
 
-  const lines = hasStructured
-    ? formatBoxBandLines(
-        {
-          title: fields.title,
-          version: fields.version,
-          level: fields.level,
-          subtitle: fields.subtitle,
-        },
-        boxLayout,
-      )
-    : {
-        titleLine: fields.appLine ?? "",
-        subtitleLine: fields.subtitle ?? "",
-        hasSubtitleBand: preset.bands.some(
-          (b) => !isBoxPaddingBand(b) && /%(subtitle|sub)%/.test(b),
-        ),
-        minBarWidth: preset.width,
-      };
-
-  const titleLine =
-    fields.appLine && fields.title === undefined
-      ? fields.appLine
-      : lines.titleLine;
-  const subtitleLine = lines.subtitleLine;
-
-  const barWidth =
-    input.barWidth ??
-    resolveBoxBarWidth(
-      titleLine,
-      lines.hasSubtitleBand ? subtitleLine : "",
-      input.didLine ?? "",
-      lines.minBarWidth,
-    );
+  // Fixed to layout.yml frame width so every box is even; long text truncates.
+  const barWidth = input.barWidth ?? preset.width;
 
   const identityTintKey = input.identityTintKey ?? "";
   const identityChrome = input.identityChrome ?? "inverted";
@@ -182,13 +152,10 @@ export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
   let contentOrdinal = 0;
   for (const band of preset.bands) {
     const padding = isBoxPaddingBand(band);
-    const chrome: ChipChrome | "app" = padding
-      ? contentOrdinal <= 1
-        ? "app"
-        : identityChrome
-      : contentOrdinal === 0
-        ? "app"
-        : identityChrome;
+    // First content section (and its leading pads) stay white (`app`).
+    // Pads after the first content — including the band above subtitle — use color.
+    const chrome: ChipChrome | "app" =
+      contentOrdinal === 0 ? "app" : identityChrome;
 
     let text = "";
     if (!padding) {

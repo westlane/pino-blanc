@@ -8,6 +8,7 @@ import {
   canonicalizeFieldToken,
   parseFieldModifiers,
   templateHasIdentity,
+  templateHasMeta,
 } from "./field-token.js";
 import { EVENT_IDENTITY_META_KEYS, identityColumnSpan } from "./identity-meta.js";
 import { formatLayoutSpans, type LayoutRowContext } from "./template.js";
@@ -74,10 +75,21 @@ export function eventLayoutUsesIdentity(template: string): boolean {
 }
 
 function eventPayload(record: PinoLogRecord): Record<string, unknown> | undefined {
-  return stripPinoBindings(record, [
+  const payload = stripPinoBindings(record, [
     ...BLANC_CONTROL_META_KEYS,
     ...EVENT_IDENTITY_META_KEYS,
   ]);
+  // Event payloads use `name` as display data; pino also uses `name` as a binding.
+  const displayName = record.name;
+  if (
+    payload &&
+    typeof displayName === "string" &&
+    displayName.length > 0 &&
+    !("name" in payload)
+  ) {
+    return { ...payload, name: displayName };
+  }
+  return payload;
 }
 
 function layoutContext(
@@ -121,9 +133,7 @@ function formatEventRow(
       continue;
     }
     if (part.kind === "meta") {
-      if (row !== 2) {
-        continue;
-      }
+      // `%mt%` may sit on row 1 (inline, event.default) or row 2 (stacked).
       const metaText = record._metaText;
       if (typeof metaText === "string" && metaText.length > 0) {
         spans.push({ text: metaText, role: "message" });
@@ -153,12 +163,16 @@ export function formatEventLayoutSpans(
     ctx.symbolMap,
     ctx.identityWidth,
   );
+  const stackedMeta = Boolean(row2 && templateHasMeta(row2));
+  if (!stackedMeta || !row2) {
+    return spans;
+  }
   const payload = eventPayload(record);
   const metaText =
     typeof record._metaText === "string" && record._metaText.length > 0
       ? record._metaText
       : undefined;
-  if (row2 && (metaText || (payload && Object.keys(payload).length > 0))) {
+  if (metaText || (payload && Object.keys(payload).length > 0)) {
     spans.push({ text: "\n", role: "message" });
     spans.push(
       ...formatEventRow(row2, record, 2, ctx.module, ctx.symbolMap, ctx.identityWidth),

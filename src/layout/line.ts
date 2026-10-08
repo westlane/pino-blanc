@@ -3,13 +3,12 @@ import {
   BLANC_CONTROL_META_KEYS,
   stripPinoBindings,
 } from "../record.js";
-import type { LogSpan, LogLevelName } from "../types.js";
+import type { LogSpan, LogLevelName, PinoLogRecord } from "../types.js";
 import { expandPadBrackets } from "./pad-brackets.js";
 import { templateHasMeta } from "./field-token.js";
 import { EVENT_IDENTITY_META_KEYS } from "./identity-meta.js";
 import { resolveLayoutTemplate } from "./presets.js";
 import { formatLayoutSpans } from "./template.js";
-import type { PinoLogRecord } from "../types.js";
 
 function splitTextLayout(template: string): { row1: string; row2?: string } {
   const lines = template.split("\n");
@@ -23,9 +22,51 @@ function splitTextLayout(template: string): { row1: string; row2?: string } {
   return { row1, row2 };
 }
 
+/** Remove `%mt%` / `%meta%` (and their `[…]` cells) so text field parsing never sees them. */
+export function stripMetaTokens(row: string): string {
+  return row
+    .replace(/\[[^\]]*%(?:mt|meta)(?::[^%\]]*)?%?[^\]]*\]/g, "")
+    .replace(/%(?:mt|meta)(?::[^%]*)?%/g, "")
+    .replace(/[ \t]+$/g, "");
+}
+
+function resolveMetaPayload(
+  record: Record<string, unknown>,
+): { metaText?: string; payload?: Record<string, unknown> } {
+  const metaText =
+    typeof record._metaText === "string" && record._metaText.length > 0
+      ? record._metaText
+      : undefined;
+  const payload = stripPinoBindings(record, [
+    ...BLANC_CONTROL_META_KEYS,
+    ...EVENT_IDENTITY_META_KEYS,
+  ]);
+  const hasPayload = Boolean(payload && Object.keys(payload).length > 0);
+  if (!metaText && !hasPayload) {
+    return {};
+  }
+  return {
+    ...(metaText ? { metaText } : {}),
+    ...(hasPayload && payload ? { payload } : {}),
+  };
+}
+
+function appendMetaSpans(
+  spans: LogSpan[],
+  meta: { metaText?: string; payload?: Record<string, unknown> },
+): void {
+  if (meta.metaText) {
+    spans.push({ text: meta.metaText, role: "message" });
+    return;
+  }
+  if (meta.payload) {
+    spans.push(...jsonMetaSpans(meta.payload));
+  }
+}
+
 /**
- * Standard text line. When the layout template has a second row with `%mt%` / `%meta%`
- * and `record` has user fields (or `_metaText`), appends meta under the pads.
+ * Standard text line. `%mt%` / `%meta%` may sit on row 1 (inline) or row 2
+ * (stacked under pads). Meta is never passed through {@link formatLayoutSpans}.
  */
 export function formatStandardSpans(
   level: LogLevelName,
@@ -37,7 +78,9 @@ export function formatStandardSpans(
 ): LogSpan[] {
   const template = resolveLayoutTemplate(layout);
   const { row1, row2 } = splitTextLayout(template);
-  const spans = formatLayoutSpans(row1, {
+  const inlineMeta = templateHasMeta(row1);
+  const stackedMeta = Boolean(row2 && templateHasMeta(row2));
+  const spans = formatLayoutSpans(stripMetaTokens(row1), {
     level,
     module,
     message,
@@ -45,36 +88,28 @@ export function formatStandardSpans(
     record: record as PinoLogRecord | undefined,
   });
 
-  if (!row2 || !record) {
-    return spans;
-  }
-  if (!templateHasMeta(row2)) {
+  if (!record || (!inlineMeta && !stackedMeta)) {
     return spans;
   }
 
-  const metaText =
-    typeof record._metaText === "string" && record._metaText.length > 0
-      ? record._metaText
-      : undefined;
-  const payload = stripPinoBindings(record, [
-    ...BLANC_CONTROL_META_KEYS,
-    ...EVENT_IDENTITY_META_KEYS,
-  ]);
-  const hasPayload = Boolean(payload && Object.keys(payload).length > 0);
-  if (!metaText && !hasPayload) {
+  const meta = resolveMetaPayload(record);
+  if (!meta.metaText && !meta.payload) {
     return spans;
   }
 
-  const pad = expandPadBrackets(row2).replace(/%(?:meta|mt)(?::[^%]*)?%/g, "");
-  spans.push({ text: "\n", role: "message" });
-  if (pad) {
-    spans.push({ text: pad, role: "message" });
+  if (stackedMeta && row2) {
+    const pad = expandPadBrackets(row2).replace(/%(?:meta|mt)(?::[^%]*)?%/g, "");
+    spans.push({ text: "\n", role: "message" });
+    if (pad) {
+      spans.push({ text: pad, role: "message" });
+    }
+    appendMetaSpans(spans, meta);
+    return spans;
   }
-  if (metaText) {
-    spans.push({ text: metaText, role: "message" });
-  } else if (payload) {
-    spans.push(...jsonMetaSpans(payload));
-  }
+
+  // Inline meta on row 1 — keep one space before the JSON / _metaText.
+  spans.push({ text: " ", role: "message" });
+  appendMetaSpans(spans, meta);
   return spans;
 }
 

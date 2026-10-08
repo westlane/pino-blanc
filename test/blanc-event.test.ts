@@ -1,29 +1,48 @@
 import { describe, expect, it } from "vitest";
 import { formatBlancEventSpans } from "../src/format/blanc-event.js";
 import { jsonMetaSpans } from "../src/format/json-meta.js";
-import { formatStandardSpans, spansToPlain } from "../src/layout/line.js";
-import { displayWidth } from "../src/layout/width.js";
+import { spansToPlain } from "../src/layout/line.js";
 import { BLANC_EVENT_KEY } from "../src/record.js";
 import { renderAnsi } from "../src/render/ansi.js";
 import { createTintResolver, resolveTheme } from "../src/color/theme.js";
 
-function moduleBracketColumn(plain: string, module = "demo"): number {
-  const idx = plain.indexOf(`[${module}]`);
-  return displayWidth(plain.slice(0, idx));
-}
-
 describe("blanc event rows", () => {
-  it("aligns [module] with standard log lines", () => {
-    const standard = spansToPlain(
-      formatStandardSpans("info", "demo", "ready"),
-    );
+  it("uses event.default (emoji + event name; inline meta on row 1)", () => {
     const event = spansToPlain(
       formatBlancEventSpans(
-        { level: 30, msg: "api.ready", module: "demo", [BLANC_EVENT_KEY]: true },
+        {
+          level: 30,
+          msg: "ws.batch_done",
+          module: "demo",
+          [BLANC_EVENT_KEY]: true,
+          frames: 2,
+        },
         { module: "demo" },
       ),
     );
-    expect(moduleBracketColumn(event)).toBe(moduleBracketColumn(standard));
+    expect(event).toContain("ws.batch_done");
+    expect(event).toContain("frames");
+    expect(event.includes("\n")).toBe(false);
+    expect(event.indexOf("ws.batch_done")).toBeLessThan(event.indexOf("{"));
+  });
+
+  it("uses event.complex (stacked meta on row 2)", () => {
+    const event = spansToPlain(
+      formatBlancEventSpans(
+        {
+          level: 30,
+          msg: "ws.batch_done",
+          module: "demo",
+          [BLANC_EVENT_KEY]: true,
+          frames: 2,
+        },
+        { module: "demo", eventLayout: "complex" },
+      ),
+    );
+    const lines = event.split("\n");
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toContain("ws.batch_done");
+    expect(lines[1]).toContain("frames");
   });
 
   it("jsonMetaSpans uses multiple highlight roles", () => {

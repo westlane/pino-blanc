@@ -1,8 +1,8 @@
-import { tint } from "../layout/layout.data.js";
+import { getTintMultiplier } from "../layout/layout-store.js";
 
 export function hashString(input: string): number {
   let hash = 0;
-  const mult = tint.multiplier;
+  const mult = getTintMultiplier();
   for (let i = 0; i < input.length; i++) {
     hash = hash * mult + input.charCodeAt(i);
     hash |= 0;
