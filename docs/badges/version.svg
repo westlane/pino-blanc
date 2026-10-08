@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="93" height="20" role="img" aria-label="dev: 0.1.0">
-  <title>dev: 0.1.0</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="99" height="20" role="img" aria-label="main: 0.1.0">
+  <title>main: 0.1.0</title>
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <clipPath id="r"><rect width="93" height="20" rx="3" fill="#fff"/></clipPath>
+  <clipPath id="r"><rect width="99" height="20" rx="3" fill="#fff"/></clipPath>
   <g clip-path="url(#r)">
-    <rect width="40" height="20" fill="#555"/>
-    <rect x="40" width="53" height="20" fill="#007ec6"/>
-    <rect width="93" height="20" fill="url(#s)"/>
+    <rect width="46" height="20" fill="#555"/>
+    <rect x="46" width="53" height="20" fill="#007ec6"/>
+    <rect width="99" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text x="200" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">dev</text>
-    <text x="200" y="150" transform="scale(.1)">dev</text>
-    <text x="665" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">0.1.0</text>
-    <text x="665" y="150" transform="scale(.1)">0.1.0</text>
+    <text x="230" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">main</text>
+    <text x="230" y="150" transform="scale(.1)">main</text>
+    <text x="725" y="140" transform="scale(.1)" fill="#010101" fill-opacity=".3">0.1.0</text>
+    <text x="725" y="150" transform="scale(.1)">0.1.0</text>
   </g>
 </svg>
