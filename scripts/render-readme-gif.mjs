@@ -87,8 +87,10 @@ const DELAY_LINE_MAX_MS = 720;
 const DELAY_LAST_LINE_MS = 5000;
 /** Full-block scenes (boxes) — appear at once, then hold. */
 const DELAY_INSTANT_MS = 5000;
-/** Live `_liveReplace` tick cadence (progress / JSON rewrite). */
-const DELAY_LIVE_TICK_MS = 200;
+/** Live rewrite tick cadence (progress / JSON) — long enough to read. */
+const DELAY_LIVE_TICK_MS = 850;
+/** Extra beat on the last live tick before the commit line. */
+const DELAY_LIVE_HOLD_MS = 1400;
 /** Brief beat between themes. */
 const DELAY_THEME_GAP_MS = 400;
 
@@ -651,61 +653,80 @@ function captureBoxes(themeId) {
   });
 }
 
-/** Live progress bar ticks (`_liveReplace`) — bar in the message row. */
-function captureProgressChunks(themeId) {
-  return captureChunks(() => {
+/**
+ * Capture one pretty write at a time (no CSI). GIF live scenes rebuild
+ * banner + current tick each frame so rewrites are obvious in the loop.
+ */
+function captureOne(fn) {
+  const chunks = captureChunks(fn);
+  return chunks.join("");
+}
+
+/** Live progress bar ticks — bar in the message row. */
+function captureProgressLive(themeId) {
+  const total = 8;
+  const steps = [0, 25, 50, 75, 100];
+  const ticks = steps.map((pct) => {
+    const packed = Math.round((pct / 100) * total);
+    return captureOne(() => {
+      const log = createLogger("cellar", {
+        ...loggerOptions,
+        theme: themeId,
+        layout: "complex",
+      });
+      log.info(`${progressBar(pct, 16)} ${String(pct).padStart(3, " ")}%`, {
+        _emoji: "📦",
+        n: packed,
+        of: total,
+      });
+    });
+  });
+  const done = captureOne(() => {
     const log = createLogger("cellar", {
       ...loggerOptions,
       theme: themeId,
       layout: "complex",
     });
-    const total = 8;
-    const steps = [0, 25, 50, 75, 100];
-    for (const pct of steps) {
-      const packed = Math.round((pct / 100) * total);
-      log.info(`${progressBar(pct, 16)} ${String(pct).padStart(3, " ")}%`, {
-        _emoji: "📦",
-        _liveReplace: true,
-        n: packed,
-        of: total,
-      });
-    }
     log.info("packed", {
       _emoji: "✅",
       bottles: total,
       durationMs: DELAY_LIVE_TICK_MS * (steps.length - 1),
     });
   });
+  return { ticks, done };
 }
 
-/** Live JSON field rewrites (`_liveReplace`) — no progress bar. */
-function captureLiveJsonChunks(themeId) {
-  return captureChunks(() => {
-    const log = createLogger("till", {
+/** Live JSON field rewrites — changing seq/bytes (no progress bar). */
+function captureLiveJsonLive(themeId) {
+  const steps = [0, 1, 2, 3, 4, 5, 6, 7];
+  const ticks = steps.map((i) =>
+    captureOne(() => {
+      const log = createLogger("peer", {
+        ...loggerOptions,
+        theme: themeId,
+        eventLayout: "default",
+      });
+      log.event("ws.frame", {
+        _emoji: "📨",
+        seq: i + 1,
+        bytes: 64 + i * 24,
+        path: "/ws/",
+      });
+    }),
+  );
+  const done = captureOne(() => {
+    const log = createLogger("peer", {
       ...loggerOptions,
       theme: themeId,
       eventLayout: "default",
     });
-    const ticks = [
-      { attempt: 1, last4: "4242", ms: 40 },
-      { attempt: 1, last4: "4242", ms: 120 },
-      { attempt: 2, last4: "4242", ms: 210 },
-      { attempt: 2, last4: "4242", ms: 340 },
-      { attempt: 3, last4: "4242", ms: 480 },
-    ];
-    for (const tick of ticks) {
-      log.event("card.auth", {
-        _emoji: "💳",
-        _liveReplace: true,
-        ...tick,
-      });
-    }
-    log.event("card.paid", {
+    log.event("ws.batch_done", {
       _emoji: "✅",
-      total: 56,
-      tip: 8,
+      frames: steps.length,
+      bytes: 64 + (steps.length - 1) * 24,
     });
   });
+  return { ticks, done };
 }
 
 function captureFor(kind, themeId) {
@@ -730,9 +751,9 @@ function captureFor(kind, themeId) {
 function captureLiveFor(kind, themeId) {
   switch (kind) {
     case "progress":
-      return captureProgressChunks(themeId);
+      return captureProgressLive(themeId);
     case "liveJson":
-      return captureLiveJsonChunks(themeId);
+      return captureLiveJsonLive(themeId);
     default: {
       const _exhaustive = kind;
       throw new Error(`Unknown live capture kind: ${_exhaustive}`);
@@ -741,7 +762,7 @@ function captureLiveFor(kind, themeId) {
 }
 
 function buildScenes() {
-  /** @type {{ themeId: string, label: string, reveal: "line" | "instant" | "live", lines?: string[], bannerCount?: number, bannerLines?: string[], chunks?: string[] }[]} */
+  /** @type {{ themeId: string, label: string, reveal: "line" | "instant" | "live", lines?: string[], bannerCount?: number, bannerLines?: string[], ticks?: string[], done?: string }[]} */
   return SHOWCASE.map((item) => {
     if (item.reveal === "live") {
       const banner = renderBannerLine(
@@ -755,13 +776,15 @@ function buildScenes() {
       const bannerLines = stripTrailingEmpty(
         banner.replace(/\r/g, "").split("\n"),
       );
+      const live = captureLiveFor(item.capture, item.themeId);
       return {
         themeId: item.themeId,
         label: `${item.themeId} · ${item.kind}`,
         reveal: "live",
         bannerLines,
         bannerCount: bannerLines.length + 1,
-        chunks: captureLiveFor(item.capture, item.themeId),
+        ticks: live.ticks,
+        done: live.done,
       };
     }
     const built = sceneLines(
@@ -801,19 +824,26 @@ function framesFromScenes(scenes) {
       screen.write(`${scene.lines.join("\n")}\n`);
       frames.push({ screen: cloneScreen(screen), delay: DELAY_INSTANT_MS });
     } else if (scene.reveal === "live") {
-      // Banner first, then `_liveReplace` ticks rewrite one block in place.
-      let acc = `${scene.bannerLines.join("\n")}\n\n`;
-      screen.write(acc);
+      // Rebuild banner + tick each frame so JSON/progress rewrites read clearly.
+      const head = `${scene.bannerLines.join("\n")}\n\n`;
+      screen.write(head);
       frames.push({ screen: cloneScreen(screen), delay: DELAY_BANNER_MS });
 
-      const lastChunk = scene.chunks.length - 1;
-      for (let i = 0; i < scene.chunks.length; i += 1) {
-        screen.write(scene.chunks[i]);
+      for (let i = 0; i < scene.ticks.length; i += 1) {
+        screen.clear();
+        screen.write(`${head}${scene.ticks[i]}`);
+        const isLastTick = i === scene.ticks.length - 1;
         frames.push({
           screen: cloneScreen(screen),
-          delay: i === lastChunk ? DELAY_LAST_LINE_MS : DELAY_LIVE_TICK_MS,
+          delay: isLastTick ? DELAY_LIVE_HOLD_MS : DELAY_LIVE_TICK_MS,
         });
       }
+
+      // Commit line under the final live tick (non-replace).
+      const lastTick = scene.ticks[scene.ticks.length - 1] ?? "";
+      screen.clear();
+      screen.write(`${head}${lastTick}${scene.done}`);
+      frames.push({ screen: cloneScreen(screen), delay: DELAY_LAST_LINE_MS });
     } else {
       // Banner/box header appears all at once, then log lines type out.
       const bannerLines = scene.lines.slice(0, scene.bannerCount);

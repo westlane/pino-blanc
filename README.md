@@ -1,6 +1,6 @@
 # pino-blanc
 
-A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works the same way in the browser, too.
+A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.
 
 ### Features
 
@@ -30,10 +30,23 @@ yarn add @westlane/pino-blanc
 ### Browser
 
 ```ts
-import { createLogger } from "@westlane/pino-blanc/browser";
+import { createLogger, formatRecordHtml, htmlLogHostStyle } from "@westlane/pino-blanc/browser";
 
 const log = createLogger("app", { theme: "solarized-dark" });
 log.verbose("ready", { hello: "world" });
+
+// On-page sink (same colors and column spacing as console %c)
+const panel = document.getElementById("logs")!;
+panel.style.cssText = htmlLogHostStyle(/* theme */ resolveTheme("solarized-dark"));
+const html = formatRecordHtml(
+  { level: 30, msg: "ready", module: "app", hello: "world" },
+  { theme: "solarized-dark" },
+);
+if (html) {
+  const line = document.createElement("div");
+  line.innerHTML = html;
+  panel.appendChild(line);
+}
 ```
 
 
@@ -45,36 +58,7 @@ import { createLogger } from "@westlane/pino-blanc";
 
 const log = createLogger("server", { theme: "solarized-dark" });
 log.info("ready", { port: 3030 });
-```
 
-
-
-### Multi-Transport
-
-```ts
-import pino from "pino";
-
-const transport = pino.transport({
-  targets: [
-    {
-      target: "@westlane/pino-blanc/pretty",
-      level: "debug",
-      options: { options: { theme: "solarized-dark" } },
-    },
-    {
-      target: "pino/file",
-      level: "info",
-      options: { destination: "./logs/server.ndjson", mkdir: true },
-    },
-  ],
-});
-
-const log = pino(
-  { level: "debug", base: { module: "server" }, timestamp: pino.stdTimeFunctions.isoTime },
-  transport,
-);
-
-log.info({ port: 3030 }, "ready");
 ```
 
 
@@ -126,6 +110,44 @@ const log = getLogger("Checkout");
 ```
 
 
+
+### Multi-Transport
+
+```ts
+import pino from "pino";
+
+const transport = pino.transport({
+  targets: [
+    {
+      target: "@westlane/pino-blanc/pretty",
+      level: "debug",
+      options: { options: { theme: "solarized-dark" } },
+    },
+    {
+      target: "pino/file",
+      level: "info",
+      options: { destination: "./logs/server.ndjson", mkdir: true },
+    },
+  ],
+});
+
+const log = pino(
+  { level: "debug", base: { module: "server" }, timestamp: pino.stdTimeFunctions.isoTime },
+  transport,
+);
+
+log.info({ port: 3030 }, "ready");
+```
+
+
+
+### Try adapters in the browser
+
+```bash
+yarn demo:browser
+```
+
+Open **[http://localhost:5179](http://localhost:5179)** (if you see port **5173**, stop the server and run the command again — the demo must load `examples/browser-frameworks/vite.config.ts` so Svelte is compiled). Use DevTools **Console** and click each framework button for themed output.
 
 ## License
 
