@@ -12,17 +12,23 @@ A themed logger to bring order and beauty to your logging experience. Built arou
 | 😎 Emojis inline           | 🪧 Banner layouts                 |
 
 
+
+
 ## Install
 
 ```bash
 yarn add @westlane/pino-blanc
+#or
+npm install @westlane/pino-blanc
 ```
 
-![pino-blanc features](https://raw.githubusercontent.com/westlane/pino-blanc/main/docs/features.gif)
+[![pino-blanc features](https://raw.githubusercontent.com/westlane/pino-blanc/main/docs/features.gif)](https://westlane.github.io/pino-blanc/)
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
 
 ## Usage
+
+
 
 ### Node
 
@@ -33,6 +39,8 @@ const log = createLogger("server", { theme: "solarized-dark" });
 log.info("ready", { port: 3030 });
 
 ```
+
+
 
 ### React
 
@@ -50,6 +58,8 @@ const log = useLogger("Checkout");
 log.info("mounted");
 ```
 
+
+
 ### Vue
 
 ```ts
@@ -62,6 +72,8 @@ createApp(App).use(pbPlugin, { logger: log }).mount("#app");
 // in setup()
 const log = useLogger("Checkout");
 ```
+
+
 
 ### Svelte
 
@@ -76,6 +88,8 @@ setPB(log);
 const log = useLogger("Checkout");
 ```
 
+
+
 ### Try adapters in the browser
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_in_browser-0a7ea4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://westlane.github.io/pino-blanc/)
@@ -85,6 +99,8 @@ Or run locally:
 ```bash
 yarn demo:browser
 ```
+
+
 
 ### Try on Node (Express, Koa, Hapi)
 
@@ -97,7 +113,11 @@ yarn demo:node hapi      # hapi-pino
 curl http://127.0.0.1:3040/health
 ```
 
+
+
 ## Advanced
+
+
 
 ### Multi-Transport
 
@@ -127,38 +147,17 @@ const log = pino(
 log.info({ port: 3030 }, "ready");
 ```
 
-### Browser
 
-```ts
-import {
-  createLogger,
-  formatRecordHtml,
-  htmlLogHostStyle,
-  resolveTheme,
-} from "@westlane/pino-blanc/browser";
-
-const log = createLogger("app", { theme: "solarized-dark" });
-log.info("ready", { hello: "world" });
-
-// On-page sink (same colors and column spacing as console %c)
-const panel = document.getElementById("logs")!;
-panel.style.cssText = htmlLogHostStyle(resolveTheme("solarized-dark"));
-const html = formatRecordHtml(
-  { level: 30, msg: "ready", module: "app", hello: "world" },
-  { theme: "solarized-dark" },
-);
-if (html) {
-  const line = document.createElement("div");
-  line.innerHTML = html;
-  panel.appendChild(line);
-}
-```
 
 ## Install
 
 ```bash
+yarn add @westlane/pino-blanc
+#or
 npm install @westlane/pino-blanc
 ```
+
+
 
 ## License
 
