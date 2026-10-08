@@ -9,8 +9,8 @@ import {
 import type { DemoTabId } from "./tabs";
 
 export type DemoLogContext = {
-  loggerOptions: CreateLoggerOptions;
-  root: PBLogger;
+  loggerOptionsByTab: Record<DemoTabId, CreateLoggerOptions>;
+  frameworkRoots: Pick<Record<DemoTabId, PBLogger>, "react" | "vue" | "svelte">;
   previews: Partial<Record<DemoTabId, LogPreview>>;
 };
 
@@ -32,12 +32,13 @@ function emitWineSample(
 }
 
 export function emitDemoLog(id: DemoTabId, ctx: DemoLogContext): void {
-  const { loggerOptions, root, previews } = ctx;
+  const { loggerOptionsByTab, frameworkRoots, previews } = ctx;
   const preview = previews[id];
   if (!preview) {
     return;
   }
 
+  const loggerOptions = loggerOptionsByTab[id];
   const sample = pickRandomWineSample();
 
   switch (id) {
@@ -49,7 +50,7 @@ export function emitDemoLog(id: DemoTabId, ctx: DemoLogContext): void {
     case "react":
     case "vue":
     case "svelte": {
-      const log = root.child({ module: sample.module });
+      const log = frameworkRoots[id].child({ module: sample.module });
       emitWineSample(log, preview, id, sample);
       return;
     }

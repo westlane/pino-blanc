@@ -1,30 +1,35 @@
 import { createLogger } from "@westlane/pino-blanc/browser";
 import { emitDemoLog, type DemoLogContext } from "./demo-log";
-import { demoLoggerOptions } from "./demo-logger-options";
+import { demoLoggerOptionsForAllTabs, demoLoggerOptionsForTab } from "./demo-logger-options";
 import { applyLogHostStyle, createLogPreview } from "./demo-preview";
-import { initDemoTabs } from "./tabs";
+import { initDemoTabs, type DemoTabId } from "./tabs";
 
-const loggerOptions = demoLoggerOptions;
+const loggerOptionsByTab = demoLoggerOptionsForAllTabs();
 
-function wirePreview(panelId: string): ReturnType<typeof createLogPreview> | undefined {
+function wirePreview(tab: DemoTabId, panelId: string): ReturnType<typeof createLogPreview> | undefined {
   const panel = document.getElementById(panelId);
   if (!panel) {
     return undefined;
   }
-  applyLogHostStyle(panel, loggerOptions);
-  return createLogPreview(panel, loggerOptions);
+  const options = demoLoggerOptionsForTab(tab);
+  applyLogHostStyle(panel, options);
+  return createLogPreview(panel, options);
 }
 
-const vanillaPreview = wirePreview("log-preview-vanilla");
-const reactPreview = wirePreview("log-preview-react");
-const vuePreview = wirePreview("log-preview-vue");
-const sveltePreview = wirePreview("log-preview-svelte");
+const vanillaPreview = wirePreview("vanilla", "log-preview-vanilla");
+const reactPreview = wirePreview("react", "log-preview-react");
+const vuePreview = wirePreview("vue", "log-preview-vue");
+const sveltePreview = wirePreview("svelte", "log-preview-svelte");
 
-const root = createLogger("app", loggerOptions);
+const frameworkRoots = {
+  react: createLogger("app", loggerOptionsByTab.react),
+  vue: createLogger("app", loggerOptionsByTab.vue),
+  svelte: createLogger("app", loggerOptionsByTab.svelte),
+};
 
 const logContext: DemoLogContext = {
-  loggerOptions,
-  root,
+  loggerOptionsByTab,
+  frameworkRoots,
   previews: {
     vanilla: vanillaPreview,
     react: reactPreview,
