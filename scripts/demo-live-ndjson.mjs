@@ -1,5 +1,5 @@
 /**
- * Live NDJSON → pretty: `_liveReplace` ticks overwrite one block; a non-live
+ * Live NDJSON to pretty: `_liveReplace` ticks overwrite one block; a non-live
  * event commits the last frame into scrollback.
  *
  *   yarn demo:live

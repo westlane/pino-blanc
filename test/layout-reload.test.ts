@@ -59,7 +59,7 @@ tint:
     write("[%lv%  ][%ms% ----][%md%]");
     fs.utimesSync(yml, now, now);
     clearLayoutCache();
-    // Without clear, mtime change alone should reload — exercise that path:
+    // Without clear, mtime change alone should reload: exercise that path:
     write("[%lv%  ][%ms% CHANGED ----][%md%]");
     fs.utimesSync(yml, now + 2, now + 2);
     expect(getLayoutData().text.complex).toContain("CHANGED");

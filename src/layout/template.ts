@@ -12,8 +12,6 @@ import { padCenterDisplay, padEndDisplay, padStartDisplay } from "./pad.js";
 import { displayWidth } from "./width.js";
 import type { LogLayoutField, LogSpan, LogLevelName, PinoLogRecord } from "../types.js";
 
-export { CLASSIC_LOG_LAYOUT, DEFAULT_LOG_LAYOUT } from "./presets.js";
-
 export type LayoutRowContext = {
   level: LogLevelName;
   module: string;

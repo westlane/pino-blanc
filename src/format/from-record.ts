@@ -44,8 +44,8 @@ export function resolvePinoLogLine(
     });
     if (custom === null || custom === undefined) {
       // Built-in event formatter may return null for non-events (fall through).
-      // An explicit formatRecord that returns null/undefined means “skip this line”
-      // — do not re-layout pb events with unenriched spans.
+      // An explicit formatRecord that returns null/undefined means “skip this line”;
+      // do not re-layout pb events with unenriched spans.
       if (isPBEventRecord(input)) {
         if (explicitFormatRecord) {
           return { mode: "empty" };

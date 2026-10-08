@@ -1,4 +1,4 @@
-/** Solarized palette — Ethan Schoonover. See themes/README.md */
+/** Solarized palette. Ethan Schoonover. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const solarizedLight: LogTheme = {

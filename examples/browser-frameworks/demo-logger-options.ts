@@ -21,14 +21,14 @@ export function demoThemeForTab(
 }
 
 /**
- * One layout family per tab — never mix level/module lines with emoji events
+ * One layout family per tab: never mix level/module lines with emoji events
  * in the same stream. Sample mode is paired in `demo-wine-samples.ts`.
  */
 function demoLayoutForTab(tab: DemoTabId): CreateLoggerOptions {
   switch (tab) {
     case "vanilla":
       return {
-        // Identity chip + stacked meta — samples supply `_identity*`.
+        // Identity chip + stacked meta: samples supply `_identity*`.
         eventLayout: "complex",
         symbolMap: {
           shop: "/",

@@ -9,29 +9,16 @@ export function boxMinBarWidth(): number {
   return resolveBoxLayout().width;
 }
 
-/** @deprecated Prefer {@link boxMinBarWidth}. */
-export function BOX_MIN_BAR_WIDTH(): number {
-  return boxMinBarWidth();
-}
-
-/** @deprecated Box width is fixed by layout.yml. */
-export const BOX_BAR_SIDE_PADDING = 0;
-
-/** @deprecated Use {@link boxMinBarWidth}. */
-export const SESSION_BANNER_MIN_BAR_WIDTH = boxMinBarWidth;
-/** @deprecated Use {@link BOX_BAR_SIDE_PADDING}. */
-export const SESSION_BANNER_BAR_SIDE_PADDING = BOX_BAR_SIDE_PADDING;
-
 export type BoxSpansInput = {
-  /** Box preset id — `default` or `complex`, or any name in layout.yml. */
+  /** Box preset id: `default` or `complex`, or any name in layout.yml. */
   boxLayout?: string | undefined;
-  /** App name — fills `%title%`. */
+  /** App name: fills `%title%`. */
   title?: string | undefined;
-  /** Semver (with or without `v`) — fills `%version%`. */
+  /** Semver (with or without `v`): fills `%version%`. */
   version?: string | undefined;
-  /** Log level name — fills `%lv%`. */
+  /** Log level name: fills `%lv%`. */
   level?: string | undefined;
-  /** Identity / alias — fills `%subtitle%` on complex. */
+  /** Identity / alias: fills `%subtitle%` on complex. */
   subtitle?: string | undefined;
   /**
    * Preformatted title band (legacy). Used when `title`/`version`/`level` omitted.
@@ -48,9 +35,6 @@ export type BoxSpansInput = {
   identityTintKey?: string | undefined;
   identityChrome?: ChipChrome | undefined;
 };
-
-/** @deprecated Prefer {@link BoxSpansInput}. */
-export type SessionBannerInput = BoxSpansInput;
 
 function inferBoxLayout(input: BoxSpansInput): string | undefined {
   if (input.boxLayout) {
@@ -83,27 +67,15 @@ function resolveBoxFields(input: BoxSpansInput): {
 
 /**
  * Box bar width from layout.yml (`box.*.width`).
- * Content length is ignored — all boxes share the configured max width.
+ * Content length is ignored: all boxes share the configured max width.
  */
 export function resolveBoxBarWidth(
   _titleLine?: string,
   _subtitleLine?: string,
   _didLine = "",
   maxWidth = boxMinBarWidth(),
-  _sidePadding = BOX_BAR_SIDE_PADDING,
 ): number {
   return maxWidth;
-}
-
-/** @deprecated Prefer {@link resolveBoxBarWidth}. */
-export function resolveSessionBannerBarWidth(
-  appLine?: string,
-  aliasLine?: string,
-  didLine = "",
-  maxWidth = boxMinBarWidth(),
-  sidePadding = BOX_BAR_SIDE_PADDING,
-): number {
-  return resolveBoxBarWidth(appLine, aliasLine, didLine, maxWidth, sidePadding);
 }
 
 function boxRow(
@@ -214,9 +186,4 @@ export function buildBoxSpans(input: BoxSpansInput): LogSpan[] {
   }
 
   return spans;
-}
-
-/** @deprecated Prefer {@link buildBoxSpans}. */
-export function buildSessionBannerSpans(input: BoxSpansInput): LogSpan[] {
-  return buildBoxSpans(input);
 }

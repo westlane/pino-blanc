@@ -3,15 +3,15 @@ import { getLayoutData } from "./layout-store.js";
 import type { LogLayoutPreset } from "../types/layout.js";
 
 export type { LogLayoutPreset } from "../types/layout.js";
-export { COMPLEX_LAYOUT, DEFAULT_LAYOUT, IDENTITY_LAYOUT } from "./layout-ids.js";
+export { COMPLEX_LAYOUT, DEFAULT_LAYOUT } from "./layout-ids.js";
 
-/** Legacy ids → current preset names. */
+/** Legacy ids map to current preset names. */
 const TEXT_LAYOUT_ALIASES: Record<string, string> = {
   "module-right": DEFAULT_LAYOUT,
   "emoji-module": COMPLEX_LAYOUT,
   "module-first": COMPLEX_LAYOUT,
   classic: COMPLEX_LAYOUT,
-  /** Removed `text.identity` — identity chips are event-only. */
+  /** Removed `text.identity`: identity chips are event-only. */
   identity: COMPLEX_LAYOUT,
 };
 
@@ -119,34 +119,6 @@ export function getComplexLayout(): LogLayoutPreset {
   return requireTextPreset(COMPLEX_LAYOUT);
 }
 
-/** @deprecated Prefer {@link getDefaultLayout}. */
-export const defaultLayout = {
-  get id() {
-    return getDefaultLayout().id;
-  },
-  get description() {
-    return getDefaultLayout().description;
-  },
-  get template() {
-    return getDefaultLayout().template;
-  },
-} as LogLayoutPreset;
-
-/** @deprecated Prefer {@link getComplexLayout}. */
-export const complexLayout = {
-  get id() {
-    return getComplexLayout().id;
-  },
-  get description() {
-    return getComplexLayout().description;
-  },
-  get template() {
-    return getComplexLayout().template;
-  },
-} as LogLayoutPreset;
-
-export const DEFAULT_LOG_LAYOUT_ID = DEFAULT_LAYOUT;
-
 /** First row of `text.default` (live from yml). */
 export function getDefaultLogLayout(): string {
   return resolveLayoutTemplate(DEFAULT_LAYOUT).split("\n")[0] ?? "";
@@ -156,26 +128,6 @@ export function getDefaultLogLayout(): string {
 export function getClassicLogLayout(): string {
   return resolveLayoutTemplate(COMPLEX_LAYOUT).split("\n")[0] ?? "";
 }
-
-/**
- * @deprecated Prefer {@link getDefaultLogLayout} — this is evaluated per access via getter object.
- */
-export const DEFAULT_LOG_LAYOUT = {
-  toString: getDefaultLogLayout,
-  valueOf: getDefaultLogLayout,
-  [Symbol.toPrimitive]: getDefaultLogLayout,
-  split: (...args: Parameters<string["split"]>) => getDefaultLogLayout().split(...args),
-  includes: (...args: Parameters<string["includes"]>) =>
-    getDefaultLogLayout().includes(...args),
-} as unknown as string;
-
-/** @deprecated Prefer {@link getClassicLogLayout}. */
-export const CLASSIC_LOG_LAYOUT = {
-  toString: getClassicLogLayout,
-  valueOf: getClassicLogLayout,
-  [Symbol.toPrimitive]: getClassicLogLayout,
-  split: (...args: Parameters<string["split"]>) => getClassicLogLayout().split(...args),
-} as unknown as string;
 
 export type LogLayoutPresetId = string;
 export type LogEventLayoutPresetId = string;
@@ -214,7 +166,7 @@ export function resolveEventLayoutTemplate(eventLayout?: string): string | undef
   const presets = eventPresets();
   const entry = presets[id];
   if (!entry) {
-    // No event presets (or unknown id with no alias) — falls back to text layout.
+    // No event presets (or unknown id with no alias): falls back to text layout.
     if (!eventLayout) {
       return undefined;
     }

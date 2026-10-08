@@ -96,7 +96,7 @@ function themesToRun() {
   return ALL_THEMES;
 }
 
-/** Kind → log prefix glyph. */
+/** Kind to log prefix glyph. */
 const IDENTITY_SYMBOL_MAP = {
   host: "/",
   user: "@",
@@ -104,7 +104,7 @@ const IDENTITY_SYMBOL_MAP = {
   agent: "%",
 };
 
-/** Real Rally host DID — same seed as live `/energetic-domehut-y5Yk` chips (#956cb3). */
+/** Real Rally host DID: same seed as live `/energetic-domehut-y5Yk` chips (#956cb3). */
 const HOST_DID =
   "did:host:z7r8oppFnzGRygj2ZYeqJKs3NpEqgtva8tvAX1j8sFsPWygjqvapBhvor1uJE1kpaWmhBCCsJpqC6SnomTZ7tM3tAy5Yk";
 
@@ -200,7 +200,7 @@ function runSolarizedLayouts(themeId) {
   }).info(msg);
 }
 
-/** Event rows with `%id%` chips — host / user / locker + chrome variants. */
+/** Event rows with `%id%` chips: host / user / locker + chrome variants. */
 function runIdentityEvents(themeId) {
   writeBox("identity", "event.complex", themeId);
   const log = createLogger("identity", {
@@ -211,7 +211,7 @@ function runIdentityEvents(themeId) {
   });
 
   // Event-column IDs: blanc `fill` = white glyph box + 25% tinted body
-  // (session banners stay inverted separately). Host tint = HOST_DID → #956cb3.
+  // (session banners stay inverted separately). Host tint = HOST_DID is #956cb3.
   const samples = [
     {
       event: "host.catalog.discovered",

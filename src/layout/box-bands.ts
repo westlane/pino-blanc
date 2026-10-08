@@ -85,13 +85,10 @@ export type BoxBandLines = {
   minBarWidth: number;
 };
 
-/** @deprecated Prefer {@link BoxBandLines}. */
-export type SessionBannerBandLines = BoxBandLines;
-
 /**
  * Title (+ optional subtitle) lines from a `config/layout.yml` box preset.
  * Padding bands (`[----…]`) are skipped when picking content.
- * @param boxLayout preset id — `default`, `complex`, or any name in layout.yml
+ * @param boxLayout preset id: `default`, `complex`, or any name in layout.yml
  */
 export function formatBoxBandLines(
   fields: BoxBandFields,
@@ -109,12 +106,4 @@ export function formatBoxBandLines(
     hasSubtitleBand: Boolean(subtitleBand),
     minBarWidth: preset.width,
   };
-}
-
-/** @deprecated Prefer {@link formatBoxBandLines}. */
-export function formatSessionBannerBandLines(
-  fields: BoxBandFields,
-  boxLayout?: string,
-): BoxBandLines {
-  return formatBoxBandLines(fields, boxLayout);
 }

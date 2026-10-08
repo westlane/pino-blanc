@@ -22,7 +22,7 @@
       <code>getLogger("{DEMO_MODULE}")</code> via <code>setPB</code>
     </p>
   </header>
-  <p class="demo-app__copy">Svelte adapter — root logger in context.</p>
+  <p class="demo-app__copy">Svelte adapter: root logger in context.</p>
   <div class="demo-app__row">
     <span class="demo-app__label">Qty</span>
     <button

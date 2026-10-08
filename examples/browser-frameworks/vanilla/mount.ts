@@ -10,7 +10,7 @@ export function mountVanillaDemo(host: HTMLElement | null): void {
       <h3 class="demo-app__title">Checkout</h3>
       <p class="demo-app__meta"><code>createLogger("${DEMO_MODULE}")</code></p>
     </header>
-    <p class="demo-app__copy">Vanilla browser logger — no framework adapter.</p>
+    <p class="demo-app__copy">Vanilla browser logger: no framework adapter.</p>
     <div class="demo-app__row">
       <span class="demo-app__label">Qty</span>
       <button type="button" class="demo-app__step" data-step="-1" aria-label="Decrease quantity">−</button>

@@ -1,4 +1,0 @@
-{
-  "defaultPlain": "INFO    [   api    ] hello world                ",
-  "complexPlain": "INFO        hello world                       [   api    ]"
-}

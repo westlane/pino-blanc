@@ -10,13 +10,6 @@ import { tokyoNightDark } from "./tokyo-night-dark.js";
 import { tokyoNightLight } from "./tokyo-night-light.js";
 import type { LogTheme } from "../src/types.js";
 
-/** @deprecated Use {@link draculaDark} (`dracula-dark`). */
-export const dracula = draculaDark;
-/** @deprecated Use {@link catppuccinDark} (`catppuccin-dark`). Mocha flavor. */
-export const catppuccinMocha = catppuccinDark;
-/** @deprecated Use {@link catppuccinLight} (`catppuccin-light`). Latte flavor. */
-export const catppuccinLatte = catppuccinLight;
-
 export {
   catppuccinDark,
   catppuccinLight,
@@ -30,7 +23,7 @@ export {
   tokyoNightLight,
 };
 
-/** Canonical dark/light pairs (alias ids omitted). */
+/** Canonical dark/light pairs. */
 export const BUILT_IN_THEME_PAIRS = [
   ["solarized-dark", "solarized-light"],
   ["gruvbox-dark", "gruvbox-light"],
@@ -50,10 +43,6 @@ export const BUILT_IN_THEMES: Record<string, LogTheme> = {
   "dracula-light": draculaLight,
   "catppuccin-dark": catppuccinDark,
   "catppuccin-light": catppuccinLight,
-  // Aliases (not listed by {@link builtInThemeIds}).
-  dracula: draculaDark,
-  "catppuccin-mocha": catppuccinDark,
-  "catppuccin-latte": catppuccinLight,
 };
 
 export function builtInThemeIds(): string[] {

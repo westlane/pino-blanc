@@ -70,7 +70,7 @@ export function formatFixedWidthColumn(text: string, max: number): string {
   return leftChars + sep + rightChars;
 }
 
-/** Event name column — truncates long names; does not pad short names. */
+/** Event name column: truncates long names; does not pad short names. */
 export function formatEventNameColumn(
   name: string,
   width: number = GRID_DEFAULTS.event,
@@ -100,7 +100,7 @@ export function padEventNameColumn(
 
 /**
  * Fixed-width emoji slot: leading space + emoji + pad + trailing space.
- * Empty emoji → blank column of `width` spaces.
+ * Empty emoji yields a blank column of `width` spaces.
  */
 export function formatEmojiColumn(emoji: string | undefined, width: number = GRID_DEFAULTS.emoji): string {
   const trimmed = emoji?.trim();

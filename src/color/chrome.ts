@@ -163,10 +163,6 @@ const THEME_SURFACE_BY_ID: Record<string, string> = {
   "dracula-light": "#fffbeb",
   "catppuccin-dark": "#1e1e2e",
   "catppuccin-light": "#eff1f5",
-  // Aliases
-  dracula: "#282a36",
-  "catppuccin-mocha": "#1e1e2e",
-  "catppuccin-latte": "#eff1f5",
 };
 
 export function themeSurfaceHex(theme: LogTheme): string {

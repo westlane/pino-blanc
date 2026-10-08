@@ -1,4 +1,4 @@
-/** Catppuccin Mocha (dark) — Catppuccin Org. See themes/README.md */
+/** Catppuccin Mocha (dark). Catppuccin Org. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const catppuccinDark: LogTheme = {

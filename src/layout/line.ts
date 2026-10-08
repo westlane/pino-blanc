@@ -110,7 +110,7 @@ export function formatStandardSpans(
     return spans;
   }
 
-  // Inline meta on row 1 — keep one space before the JSON / _metaText.
+  // Inline meta on row 1: keep one space before the JSON / _metaText.
   spans.push({ text: " ", role: "message" });
   appendMetaSpans(spans, meta);
   return spans;

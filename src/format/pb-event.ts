@@ -24,7 +24,7 @@ export function formatPBEventSpans(
     });
   }
 
-  // No event presets in layout data → text layout (column widths from text.*).
+  // No event presets in layout data: use text layout (column widths from text.*).
   return formatStandardSpans(
     "info",
     ctx.module,

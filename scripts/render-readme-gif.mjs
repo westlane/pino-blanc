@@ -1,5 +1,5 @@
 /**
- * Render docs/features.gif — wine-shop visit story across themes
+ * Render docs/features.gif: wine-shop visit story across themes
  * (levels, live progress, live JSON, events, identity chips, boxes).
  *
  * Usage (from package root, after build):
@@ -83,7 +83,7 @@ const DELAY_LINE_MAX_MS = 280;
  * (so the full frame can be read before the next scene).
  */
 const DELAY_LAST_LINE_MS = 1800;
-/** Full-block scenes (boxes) — appear at once, then hold. */
+/** Full-block scenes (boxes): appear at once, then hold. */
 const DELAY_INSTANT_MS = 1800;
 /** Live rewrite tick cadence (progress / JSON). */
 const DELAY_LIVE_TICK_MS = 280;
@@ -98,8 +98,8 @@ function randomLineDelayMs() {
 }
 
 /**
- * Showcase scenes — max variety in a short loop:
- * levels → live progress → live JSON → events → identity → boxes.
+ * Showcase scenes: max variety in a short loop:
+ * levels, live progress, live JSON, events, identity, boxes.
  */
 const SHOWCASE = [
   {
@@ -161,7 +161,7 @@ const TINT = {
   clerk: "wine-clerk:sam",
 };
 
-/** Kind → leading glyph for identity chips. */
+/** Kind to leading glyph for identity chips. */
 const SYMBOL_MAP = {
   shop: "/",
   guest: "@",
@@ -615,7 +615,7 @@ function captureBoxes(themeId) {
         boxLayout: "complex",
         title: "wine night",
         version: "0.1.0",
-        level, // → e.g. "warning level" in the title band
+        level, // e.g. "warning level" in the title band
         subtitle,
         identityTintKey: tint,
         identityChrome: chrome,
@@ -636,7 +636,7 @@ function captureOne(fn) {
   return chunks.join("");
 }
 
-/** Live progress bar ticks — bar in the message row. */
+/** Live progress bar ticks: bar in the message row. */
 function captureProgressLive(themeId) {
   const total = 8;
   const steps = [0, 25, 50, 75, 100];
@@ -671,7 +671,7 @@ function captureProgressLive(themeId) {
 }
 
 /**
- * Live JSON field rewrites — status + seq + bytes must change enough that
+ * Live JSON field rewrites: status + seq + bytes must change enough that
  * GIF quantization still shows motion (tiny digit flips often look static).
  */
 function captureLiveJsonLive(themeId) {
@@ -808,7 +808,7 @@ function framesFromScenes(scenes) {
       frames.push({ screen: cloneScreen(screen), delay: DELAY_INSTANT_MS });
     } else if (scene.reveal === "live") {
       // Rebuild banner + tick each frame so JSON/progress rewrites read clearly.
-      // Skip banner-only frames — first frame already includes the first tick.
+      // Skip banner-only frames: first frame already includes the first tick.
       const head = `${scene.bannerLines.join("\n")}\n\n`;
 
       for (let i = 0; i < scene.ticks.length; i += 1) {
@@ -827,7 +827,7 @@ function framesFromScenes(scenes) {
       screen.write(`${head}${lastTick}${scene.done}`);
       frames.push({ screen: cloneScreen(screen), delay: DELAY_LAST_LINE_MS });
     } else {
-      // Banner stays with the first log line — no banner-only frames.
+      // Banner stays with the first log line: no banner-only frames.
       const bannerLines = scene.lines.slice(0, scene.bannerCount);
       const bodyLines = scene.lines.slice(scene.bannerCount);
       let acc = `${bannerLines.join("\n")}\n`;

@@ -65,7 +65,7 @@ function prettyTargetPath(): string {
   return join(here, "transport", "pretty.js");
 }
 
-/** Worker `process.env` — stdout is not a TTY in the thread; honor FORCE_COLOR. */
+/** Worker `process.env`: stdout is not a TTY in the thread; honor FORCE_COLOR. */
 function prettyTransportWorkerEnv(): NodeJS.ProcessEnv {
   const env = { ...process.env };
   if (env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0") {

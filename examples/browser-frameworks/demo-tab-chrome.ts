@@ -58,7 +58,7 @@ function resolvePageChrome(themeId: string): PageChromeVars {
 
   const fill = chromeColors(surface, "fill", theme);
   const ink = "#1a1a2e";
-  // Light: soft washes — keep theme hint without saturating the plate.
+  // Light: soft washes: keep theme hint without saturating the plate.
   const pageBg = blendHexWithWhite(surface, 0.82);
   const headerBg = blendHexWithWhite(surface, 0.68);
   const sidebarBg = "#ffffff";

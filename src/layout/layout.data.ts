@@ -1,4 +1,4 @@
-// Generated from config/layout.yml — browser/publish fallback.
+// Generated from config/layout.yml: browser/publish fallback.
 // Node reloads config/layout.yml on mtime change (see layout-store.ts).
 import type { LayoutData } from "../types/layout.js";
 
@@ -41,6 +41,6 @@ export const layoutData: LayoutData = {
   }
 };
 
-/** Active box preset (`box.default`) — metrics for formatBoxLine. */
+/** Active box preset (`box.default`): metrics for formatBoxLine. */
 export const box = layoutData.box.default;
 export const tint = layoutData.tint;

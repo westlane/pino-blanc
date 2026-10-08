@@ -113,7 +113,7 @@ export function wrapAnsi(
 }
 
 /**
- * Chip open sequence — combined bg/fg SGR
+ * Chip open sequence: combined bg/fg SGR
  * (`48;2;r;g;b;38;2;r;g;b` in one CSI), not separate bg/fg opens.
  */
 export function hexToAnsiChromeOpen(

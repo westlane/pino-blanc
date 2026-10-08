@@ -17,7 +17,7 @@ function CheckoutDemo() {
           <code>useLogger(&quot;{DEMO_MODULE}&quot;)</code> via <code>PBProvider</code>
         </p>
       </header>
-      <p className="demo-app__copy">React adapter — scoped child logger from context.</p>
+      <p className="demo-app__copy">React adapter: scoped child logger from context.</p>
       <div className="demo-app__row">
         <span className="demo-app__label">Qty</span>
         <button

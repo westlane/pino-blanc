@@ -1,4 +1,4 @@
-/** Alucard (Dracula light) — Zeno Rocha & contributors. See themes/README.md */
+/** Alucard (Dracula light). Zeno Rocha & contributors. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const draculaLight: LogTheme = {

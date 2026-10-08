@@ -8,7 +8,7 @@ let cacheClearHook: (() => void) | null = null;
 
 /**
  * Node registers a yml mtime loader (see `layout-store.node.ts`).
- * Browser / unregistered → baked `layout.data.ts` snapshot.
+ * Browser / unregistered uses baked `layout.data.ts` snapshot.
  */
 export function setLayoutDataLoader(loader: LayoutLoader | null): void {
   liveLoader = loader;
@@ -21,7 +21,7 @@ export function setLayoutCacheClearHook(hook: (() => void) | null): void {
 
 /**
  * Active layout data. On Node (after {@link installNodeLayoutLoader}), reloads
- * `config/layout.yml` when its mtime changes. Browser → baked snapshot.
+ * `config/layout.yml` when its mtime changes. Browser uses the baked snapshot.
  */
 export function getLayoutData(): LayoutData {
   if (liveLoader) {
@@ -38,7 +38,7 @@ export function getTintMultiplier(): number {
   return getLayoutData().tint.multiplier;
 }
 
-/** Test helper — drop the node mtime cache (loader stays installed). */
+/** Test helper: drop the node mtime cache (loader stays installed). */
 export function clearLayoutCache(): void {
   cacheClearHook?.();
 }

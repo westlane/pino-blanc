@@ -1,7 +1,7 @@
 /**
  * Quick check that pretty output contains ANSI escapes (run after `yarn build`).
  *   yarn verify:ansi
- * Exits 1 if no escapes — usually means stale dist or PINO_BLANC_PLAIN=1.
+ * Exits 1 if no escapes: usually means stale dist or PINO_BLANC_PLAIN=1.
  */
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -41,7 +41,7 @@ const { resolveAnsiMode } = await import(join(root, "dist/src/color/gate.js"));
 const palette = resolveAnsiMode({ ansiMode: "auto" });
 console.log("OK: ANSI escapes in pretty output:", escapes);
 console.log(
-  `palette=${palette} COLORTERM=${process.env.COLORTERM ?? "(unset)"} — sample strips ANSI below`,
+  `palette=${palette} COLORTERM=${process.env.COLORTERM ?? "(unset)"}: sample strips ANSI below`,
 );
 console.log("Sample (visible):", line.replace(/\u001B\[[0-9;]*m/g, ""));
 if (!line.includes("38;5;") && !line.includes("38;2;")) {

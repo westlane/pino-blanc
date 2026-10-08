@@ -1,4 +1,4 @@
-/** Dracula (classic) — Zeno Rocha & contributors. See themes/README.md */
+/** Dracula (classic). Zeno Rocha & contributors. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const draculaDark: LogTheme = {

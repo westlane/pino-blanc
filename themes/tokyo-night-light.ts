@@ -1,4 +1,4 @@
-/** Tokyo Night Light — enkia. See themes/README.md */
+/** Tokyo Night Light. enkia. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const tokyoNightLight: LogTheme = {

@@ -27,7 +27,7 @@ function stdoutIsTTY(): boolean {
 }
 
 /**
- * Pick palette. Default `auto` → truecolor (same as identity chrome).
+ * Pick palette. Default `auto` means truecolor (same as identity chrome).
  * Opt into 256/16 via `PINO_BLANC_ANSI` or `ansiMode` when the terminal cannot.
  */
 export function resolveAnsiMode(

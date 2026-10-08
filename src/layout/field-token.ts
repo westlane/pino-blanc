@@ -8,7 +8,7 @@ export type FieldModifiers = {
   minWidth?: number | undefined;
 };
 
-/** Short aliases → canonical token names. Long names also accepted. */
+/** Short aliases map to canonical token names. Long names also accepted. */
 export const FIELD_ALIASES: Record<string, string> = {
   lv: "level",
   mj: "emoji",
@@ -25,7 +25,7 @@ export function canonicalizeFieldToken(token: string): string {
   return FIELD_ALIASES[token] ?? token;
 }
 
-/** Text-line fields (`%lv%` / `%level%`, …). `%ev%` / `%event%` → message column. */
+/** Text-line fields (`%lv%` / `%level%`, …). `%ev%` / `%event%` fill the message column. */
 export function resolveLayoutField(token: string): LogLayoutField {
   const canonical = canonicalizeFieldToken(token);
   if (canonical === "event") {

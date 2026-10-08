@@ -1,4 +1,4 @@
-/** Gruvbox palette — Pavel Pertsev. See themes/README.md */
+/** Gruvbox palette. Pavel Pertsev. See themes/README.md */
 import type { LogTheme } from "../src/types.js";
 
 export const gruvboxLight: LogTheme = {

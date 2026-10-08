@@ -50,13 +50,7 @@ export type LogThemeId =
   | "dracula-dark"
   | "dracula-light"
   | "catppuccin-dark"
-  | "catppuccin-light"
-  /** @deprecated Prefer `dracula-dark`. */
-  | "dracula"
-  /** @deprecated Prefer `catppuccin-dark` (Mocha). */
-  | "catppuccin-mocha"
-  /** @deprecated Prefer `catppuccin-light` (Latte). */
-  | "catppuccin-latte";
+  | "catppuccin-light";
 
 export type LogTheme = {
   id: string;
@@ -70,7 +64,7 @@ export type LogTheme = {
 
 export type Colorize = (id: string, defaultHex: string) => string;
 
-/** App PII policy — transform log fields before write (parallel to {@link Colorize}). */
+/** App PII policy: transform log fields before write (parallel to {@link Colorize}). */
 export type Redact = (fields: Record<string, unknown>) => Record<string, unknown>;
 
 export type TintResolver = {
@@ -111,7 +105,7 @@ export type ConsoleLeadingNewline =
 
 export type ConsoleColorReset = "triple" | "none";
 
-/** ANSI palette for Node pretty output (`auto` → truecolor). */
+/** ANSI palette for Node pretty output (`auto` means truecolor). */
 export type AnsiMode = "auto" | "truecolor" | "256" | "16";
 
 export type ResolvedAnsiPalette = "truecolor" | "256" | "16";
@@ -123,7 +117,7 @@ export type EventColumnSpec = {
   showEmoji?: boolean | undefined;
 };
 
-/** NDJSON file sink (`pino/file`) — separate level from console pretty. */
+/** NDJSON file sink (`pino/file`): separate level from console pretty. */
 export type FileLogOptions = {
   path: string;
   level?: LogLevelName | string | undefined;
@@ -136,7 +130,7 @@ export type CreateLoggerOptions = {
   themeOverrides?: Partial<LogTheme> | undefined;
   /**
    * Text preset id (`default`, `complex`, …) or a `%level%` / `%module%` / `%message%` template.
-   * See `config/layout.yml` — `text.default` when omitted.
+   * See `config/layout.yml`: `text.default` when omitted.
    */
   layout?: string | undefined;
   /**
@@ -157,14 +151,14 @@ export type CreateLoggerOptions = {
   consoleLeadingNewline?: ConsoleLeadingNewline | undefined;
   /** Append background/foreground reset after each line (chip rows). */
   consoleColorReset?: ConsoleColorReset | undefined;
-  /** Opaque kind → leading glyph (e.g. host → `/`). */
+  /** Opaque kind to leading glyph (e.g. host uses `/`). */
   symbolMap?: SymbolMap | undefined;
   /** Optional fixed columns on custom event rows (emoji slot, event name width). */
   eventColumns?: EventColumnSpec | undefined;
   plainStdout?: boolean | undefined;
   /** Emit ANSI even when `NO_COLOR` / non-TTY (dev terminals, worker pretty thread). */
   forceColor?: boolean | undefined;
-  /** `auto` → truecolor (default); set `PINO_BLANC_ANSI=256` to quantize. */
+  /** `auto` means truecolor (default); set `PINO_BLANC_ANSI=256` to quantize. */
   ansiMode?: AnsiMode | undefined;
   /** In-process pretty stream (no worker transport); use for tests or custom hooks. */
   syncPretty?: boolean | undefined;

@@ -23,7 +23,7 @@ export function mountVueDemo(host: HTMLElement | null, logger: PBLogger): void {
               h("code", null, "pbPlugin"),
             ]),
           ]),
-          h("p", { class: "demo-app__copy" }, "Vue adapter — inject plugin + composable."),
+          h("p", { class: "demo-app__copy" }, "Vue adapter: inject plugin + composable."),
           h("div", { class: "demo-app__row" }, [
             h("span", { class: "demo-app__label" }, "Qty"),
             h(

@@ -11,9 +11,6 @@ export type RenderedBox =
   | { mode: "css"; payload: CssConsolePayload }
   | { mode: "plain"; line: string };
 
-/** @deprecated Prefer {@link RenderedBox}. */
-export type RenderedSessionBanner = RenderedBox;
-
 /** Render box spans for Node or browser console. */
 export function renderBoxBlock(
   spans: LogSpan[],
@@ -44,14 +41,6 @@ export function renderBoxBlock(
   return { mode: "css", payload };
 }
 
-/** @deprecated Prefer {@link renderBoxBlock}. */
-export function renderSessionBannerBlock(
-  spans: LogSpan[],
-  options: CreateLoggerOptions = {},
-): RenderedBox {
-  return renderBoxBlock(spans, options);
-}
-
 export function writeBoxToConsole(
   rendered: RenderedBox,
   method: "info" | "error" = "info",
@@ -62,12 +51,4 @@ export function writeBoxToConsole(
     return;
   }
   fn(rendered.line);
-}
-
-/** @deprecated Prefer {@link writeBoxToConsole}. */
-export function writeSessionBannerToConsole(
-  rendered: RenderedBox,
-  method: "info" | "error" = "info",
-): void {
-  writeBoxToConsole(rendered, method);
 }

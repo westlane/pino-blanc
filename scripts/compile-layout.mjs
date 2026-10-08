@@ -1,6 +1,6 @@
 /**
  * Bake `src/layout/layout.data.ts` from config/layout.yml (browser / publish fallback).
- * Node runtime reloads the yml via mtime cache — edit layout.yml without rebuilding.
+ * Node runtime reloads the yml via mtime cache: edit layout.yml without rebuilding.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,13 +16,13 @@ const parseUrl = pathToFileURL(
 const { parseLayoutYaml } = await import(parseUrl);
 const doc = parseLayoutYaml(fs.readFileSync(ymlPath, "utf8"));
 
-const body = `// Generated from config/layout.yml — browser/publish fallback.
+const body = `// Generated from config/layout.yml: browser/publish fallback.
 // Node reloads config/layout.yml on mtime change (see layout-store.ts).
 import type { LayoutData } from "../types/layout.js";
 
 export const layoutData: LayoutData = ${JSON.stringify(doc, null, 2)};
 
-/** Active box preset (\`box.default\`) — metrics for formatBoxLine. */
+/** Active box preset (\`box.default\`): metrics for formatBoxLine. */
 export const box = layoutData.box.default;
 export const tint = layoutData.tint;
 `;

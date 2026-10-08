@@ -93,7 +93,7 @@ export function appendRecordHtml(
 }
 
 /**
- * Re-paint stored lines with the current theme — same events, new colors.
+ * Re-paint stored lines with the current theme: same events, new colors.
  * Used on light/dark toggle so we don't emit a fresh burst.
  */
 export function restyleLogPreview(

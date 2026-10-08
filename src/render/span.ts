@@ -40,7 +40,7 @@ export function resolveIdentityHex(
 
 const ROW_LEVEL_EMPHASIS = new Set(["warn", "error"]);
 
-/** Level hues reserved for alerts — never use these for module `[tags]`. */
+/** Level hues reserved for alerts: never use these for module `[tags]`. */
 const MODULE_TAG_RESERVED_LEVELS = ["warn", "error", "fatal"] as const;
 
 function rowEmphasisHex(ctx: SpanRenderContext): string | undefined {
@@ -127,7 +127,7 @@ function paintWithColumnPad(
 }
 
 /**
- * Identity chip paint — event-column semantics:
+ * Identity chip paint (event-column semantics):
  * - `prefix`: saturated glyph box + saturated body (actors)
  * - `fill`: white glyph box + 25% tinted body (resource `/` `_` subjects)
  */

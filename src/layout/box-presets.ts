@@ -2,7 +2,7 @@ import { COMPLEX_LAYOUT, DEFAULT_LAYOUT } from "./layout-ids.js";
 import { getLayoutData } from "./layout-store.js";
 import type { BoxLayoutPreset } from "../types/layout.js";
 
-/** Legacy ids → current preset names. */
+/** Legacy ids map to current preset names. */
 const BOX_ALIASES: Record<string, string> = {
   title: DEFAULT_LAYOUT,
   simple: DEFAULT_LAYOUT,

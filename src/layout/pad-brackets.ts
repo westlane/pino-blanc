@@ -15,7 +15,7 @@ const CELL_FIELD_RE = /%([a-z]+)(?::([^%\s\]]+))?%?/;
 const BRACKET_RE = /\[([^\]]*)\]/g;
 
 /**
- * Pad brackets — `[…]` is a column; width = characters inside the brackets.
+ * Pad brackets: `[…]` is a column; width = characters inside the brackets.
  *
  * ```
  * [%lv%--][%mj%][%ms%------------------------------][--------------%md%]
@@ -23,11 +23,11 @@ const BRACKET_RE = /\[([^\]]*)\]/g;
  * [----------- %id% -----------][%mj%][%ev%------------------------]
  * ```
  *
- * Align from padding around the token (spaces/dashes both sides → center,
- * only before → right, else left). Empty bracket → space pad.
+ * Align from padding around the token (spaces/dashes both sides: center,
+ * only before: right, else left). Empty bracket becomes space pad.
  *
  * Spaces between `]` and `[` are real gutters in the output
- * (e.g. `][%mj%]  [%ev%` → two spaces between emoji and event).
+ * (e.g. `][%mj%]  [%ev%` means two spaces between emoji and event).
  *
  * Legacy `| cell | cell |` rows are still expanded (same width/align rules)
  * so leftover pipe templates never print `|` literally.
@@ -91,7 +91,7 @@ export function parseBracketSlot(inner: string): ParsedBracketSlot {
 
 function expandSlot(inner: string): string {
   const fieldMatch = CELL_FIELD_RE.exec(inner);
-  // Meta is not a fixed-width cell — keep leading pad, then bare %mt%/%meta%.
+  // Meta is not a fixed-width cell: keep leading pad, then bare %mt%/%meta%.
   const fieldName = fieldMatch?.[1];
   if (fieldMatch && fieldName && /^(mt|meta)$/.test(fieldName)) {
     const prefix = inner.slice(0, fieldMatch.index);
@@ -143,7 +143,7 @@ function expandBracketRow(row: string): string {
   return out;
 }
 
-/** Legacy `|…|…|` rows — same cell rules as brackets; drops the pipe delimiters. */
+/** Legacy `|…|…|` rows: same cell rules as brackets; drops the pipe delimiters. */
 function expandPipeRow(row: string): string {
   const cells = row.split("|");
   const start = cells[0] === "" ? 1 : 0;

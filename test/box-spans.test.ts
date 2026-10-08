@@ -9,7 +9,7 @@ describe("box spans", () => {
     const short = buildBoxSpans({ boxLayout: "default", title: "short" });
     const long = buildBoxSpans({
       boxLayout: "default",
-      title: "createLogger (in-process pretty, syncPretty) – live NDJSON stream",
+      title: "createLogger (in-process pretty, syncPretty): live NDJSON stream",
     });
     const shortBars = short.filter((s) => s.role === "banner").map((s) => s.text);
     const longBars = long.filter((s) => s.role === "banner").map((s) => s.text);
@@ -68,7 +68,7 @@ describe("box spans", () => {
     const spans = bannerLogSpans({ title: "levels", subtitle: "all" });
     const bars = spans.filter((s) => s.role === "banner" || s.role === "box");
     expect(bars.length).toBe(6);
-    // pad + title + closer pad → white; pad above subtitle + subtitle + pad → color
+    // pad + title + closer pad are white; pad above subtitle + subtitle + pad use color
     expect(bars[0]?.role).toBe("banner");
     expect(bars[0]?.bannerChrome).toBe("app");
     expect(bars[1]?.role).toBe("banner");
