@@ -2,7 +2,9 @@ name: pages
 
 on:
   push:
-    branches: [main]
+    # Demo ships from `dev` (and `main` after promote). Workflow must also live on
+    # the pushed branch — `pages.yml` is not yet on `main`, so `dev` is required.
+    branches: [dev, main]
     paths:
       - "examples/browser-frameworks/**"
       - "src/**"
