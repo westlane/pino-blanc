@@ -3,6 +3,7 @@ import type { LogPreview } from "./demo-preview";
 import { logAndPreview, logEventAndPreview } from "./demo-preview";
 import {
   adapterFieldsForTab,
+  demoLogBurstSchedule,
   pickRandomWineSample,
   type WineSample,
 } from "./demo-wine-samples";
@@ -13,6 +14,19 @@ export type DemoLogContext = {
   frameworkRoots: Pick<Record<DemoTabId, PBLogger>, "react" | "vue" | "svelte">;
   previews: Partial<Record<DemoTabId, LogPreview>>;
 };
+
+const pendingBurstTimers = new Map<DemoTabId, ReturnType<typeof setTimeout>[]>();
+
+function clearPendingBurst(tab: DemoTabId): void {
+  const timers = pendingBurstTimers.get(tab);
+  if (!timers) {
+    return;
+  }
+  for (const timer of timers) {
+    clearTimeout(timer);
+  }
+  pendingBurstTimers.set(tab, []);
+}
 
 function emitWineSample(
   log: PBLogger,
@@ -31,32 +45,56 @@ function emitWineSample(
   logAndPreview(log, preview, sample.level, sample.module, sample.msg, fields);
 }
 
-export function emitDemoLog(id: DemoTabId, ctx: DemoLogContext): void {
-  const { loggerOptionsByTab, frameworkRoots, previews } = ctx;
-  const preview = previews[id];
-  if (!preview) {
-    return;
-  }
-
+function loggerForSample(
+  id: DemoTabId,
+  ctx: DemoLogContext,
+  sample: WineSample,
+): PBLogger | undefined {
+  const { loggerOptionsByTab, frameworkRoots } = ctx;
   const loggerOptions = loggerOptionsByTab[id];
-  const sample = pickRandomWineSample();
 
   switch (id) {
-    case "vanilla": {
-      const log = createLogger(sample.module, loggerOptions);
-      emitWineSample(log, preview, id, sample);
-      return;
-    }
+    case "vanilla":
+      return createLogger(sample.module, loggerOptions);
     case "react":
     case "vue":
-    case "svelte": {
-      const log = frameworkRoots[id].child({ module: sample.module });
-      emitWineSample(log, preview, id, sample);
-      return;
-    }
+    case "svelte":
+      return frameworkRoots[id].child({ module: sample.module });
     default: {
       const _never: never = id;
       return _never;
     }
   }
+}
+
+function emitOneDemoLog(id: DemoTabId, ctx: DemoLogContext): void {
+  const preview = ctx.previews[id];
+  if (!preview) {
+    return;
+  }
+  const sample = pickRandomWineSample(id);
+  const log = loggerForSample(id, ctx, sample);
+  if (!log) {
+    return;
+  }
+  emitWineSample(log, preview, id, sample);
+}
+
+export function emitDemoLog(id: DemoTabId, ctx: DemoLogContext): void {
+  if (!ctx.previews[id]) {
+    return;
+  }
+
+  clearPendingBurst(id);
+  const gaps = demoLogBurstSchedule();
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  let elapsed = 0;
+
+  for (const gap of gaps) {
+    elapsed += gap;
+    const timer = setTimeout(() => emitOneDemoLog(id, ctx), elapsed);
+    timers.push(timer);
+  }
+
+  pendingBurstTimers.set(id, timers);
 }

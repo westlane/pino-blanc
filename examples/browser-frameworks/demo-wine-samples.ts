@@ -44,7 +44,16 @@ const PAIRINGS = [
   "charcuterie board",
 ];
 const SHOP_MODULES = ["shop", "cart", "till", "cellar", "visit"] as const;
-const EVENT_WEIGHT = 0.32;
+
+/** Which sample pool a tab draws from (paired with layout in demo-logger-options). */
+type DemoSampleMode = "lines" | "emoji-lines" | "events";
+
+const TAB_SAMPLE_MODE: Record<DemoTabId, DemoSampleMode> = {
+  vanilla: "lines",
+  react: "events",
+  vue: "emoji-lines",
+  svelte: "events",
+};
 
 const demoChance = new Chance();
 
@@ -52,7 +61,12 @@ type LineBuilder = (c: Chance) => WineLineSample;
 type EventBuilder = (c: Chance) => WineEventSample;
 
 function randomGuest(c: Chance): string {
-  return c.pickone([c.first(), c.first({ nationality: "es" }), c.first({ nationality: "fr" })]);
+  // Chance firstNames: en | it | nl | fr only
+  return c.pickone([
+    c.first(),
+    c.first({ nationality: "it" }),
+    c.first({ nationality: "fr" }),
+  ]);
 }
 
 function randomBottle(c: Chance): {
@@ -78,7 +92,8 @@ function randomHour(c: Chance): number {
   return c.integer({ min: 9, max: 21 });
 }
 
-const LINE_BUILDERS: LineBuilder[] = [
+/** Level / module / message lines (no emoji column). */
+const STRUCTURED_LINE_BUILDERS: LineBuilder[] = [
   (c) => ({
     kind: "line",
     level: "trace",
@@ -153,6 +168,10 @@ const LINE_BUILDERS: LineBuilder[] = [
       fields: { total, tip, currency: c.currency().code },
     };
   },
+];
+
+/** Lines that carry `_emoji` for text layouts with a `%mj%` column. */
+const EMOJI_LINE_BUILDERS: LineBuilder[] = [
   (c) => ({
     kind: "line",
     level: c.pickone<LogLevelName>(["info", "debug"]),
@@ -197,43 +216,79 @@ const LINE_BUILDERS: LineBuilder[] = [
   }),
 ];
 
+function identityFields(
+  kind: string,
+  body: string,
+  tintKey?: string,
+): Record<string, unknown> {
+  const trimmed = body.trim();
+  return {
+    _identityKind: kind,
+    _identityBody: trimmed,
+    _identityTintKey: tintKey ?? `${kind}:${trimmed}`,
+    _identityChrome: "fill",
+  };
+}
+
 const EVENT_BUILDERS: EventBuilder[] = [
-  (c) => ({
-    kind: "event",
-    module: "visit",
-    name: "shop.open",
-    fields: { _emoji: "🏪", city: c.city(), open: c.bool({ likelihood: 90 }) },
-  }),
-  (c) => ({
-    kind: "event",
-    module: "visit",
-    name: "guest.arrived",
-    fields: {
-      _emoji: "👋",
-      name: randomGuest(c),
-      party: c.integer({ min: 1, max: 8 }),
-      occasion: c.pickone(["dinner", "tasting", "gift", "anniversary"]),
-    },
-  }),
+  (c) => {
+    const city = c.city();
+    return {
+      kind: "event",
+      module: "visit",
+      name: "shop.open",
+      fields: {
+        _emoji: "🏪",
+        ...identityFields("shop", city),
+        city,
+        open: c.bool({ likelihood: 90 }),
+      },
+    };
+  },
+  (c) => {
+    const name = randomGuest(c);
+    return {
+      kind: "event",
+      module: "visit",
+      name: "guest.arrived",
+      fields: {
+        _emoji: "👋",
+        ...identityFields("guest", name),
+        name,
+        party: c.integer({ min: 1, max: 8 }),
+        occasion: c.pickone(["dinner", "tasting", "gift", "anniversary"]),
+      },
+    };
+  },
   (c) => {
     const bottle = randomBottle(c);
     return {
       kind: "event",
       module: "visit",
       name: "bottle.picked",
-      fields: { _emoji: "🍷", wine: bottle.wine, year: bottle.year, region: bottle.region },
+      fields: {
+        _emoji: "🍷",
+        ...identityFields("sku", bottle.sku),
+        wine: bottle.wine,
+        year: bottle.year,
+        region: bottle.region,
+      },
     };
   },
-  (c) => ({
-    kind: "event",
-    module: "visit",
-    name: "clerk.recommend",
-    fields: {
-      _emoji: "💬",
-      pair: c.pickone(PAIRINGS),
-      clerk: c.pickone(["sam", "jules", "marco", "priya"]),
-    },
-  }),
+  (c) => {
+    const clerk = c.pickone(["sam", "jules", "marco", "priya"]);
+    return {
+      kind: "event",
+      module: "visit",
+      name: "clerk.recommend",
+      fields: {
+        _emoji: "💬",
+        ...identityFields("clerk", clerk),
+        pair: c.pickone(PAIRINGS),
+        clerk,
+      },
+    };
+  },
   (c) => {
     const total = c.floating({ min: 32, max: 220, fixed: 2 });
     const tip = c.floating({ min: 0, max: Math.min(32, total * 0.25), fixed: 2 });
@@ -241,26 +296,55 @@ const EVENT_BUILDERS: EventBuilder[] = [
       kind: "event",
       module: "visit",
       name: "checkout.paid",
-      fields: { _emoji: "✅", total, tip, bottles: c.integer({ min: 1, max: 5 }) },
+      fields: {
+        _emoji: "✅",
+        ...identityFields("till", `$${total.toFixed(0)}`),
+        total,
+        tip,
+        bottles: c.integer({ min: 1, max: 5 }),
+      },
     };
   },
-  (c) => ({
-    kind: "event",
-    module: c.pickone([...SHOP_MODULES]),
-    name: "tasting.note",
-    fields: {
-      _emoji: "📝",
-      note: c.sentence({ words: c.integer({ min: 4, max: 9 }) }),
-      rating: c.integer({ min: 1, max: 5 }),
-    },
-  }),
+  (c) => {
+    const module = c.pickone([...SHOP_MODULES]);
+    return {
+      kind: "event",
+      module,
+      name: "tasting.note",
+      fields: {
+        _emoji: "📝",
+        ...identityFields("note", module),
+        note: c.sentence({ words: c.integer({ min: 4, max: 9 }) }),
+        rating: c.integer({ min: 1, max: 5 }),
+      },
+    };
+  },
 ];
 
-export function pickRandomWineSample(rng: Chance = demoChance): WineSample {
-  if (rng.floating({ min: 0, max: 1 }) < EVENT_WEIGHT) {
-    return rng.pickone(EVENT_BUILDERS)(rng);
+/** Staggered delays (ms) for a tab-activate log burst; first entry is always 0. */
+export function demoLogBurstSchedule(rng: Chance = demoChance): number[] {
+  const count = rng.integer({ min: 3, max: 6 });
+  const schedule = [0];
+  for (let i = 1; i < count; i++) {
+    schedule.push(rng.integer({ min: 85, max: 340 }));
   }
-  return rng.pickone(LINE_BUILDERS)(rng);
+  return schedule;
+}
+
+export function pickRandomWineSample(tab: DemoTabId, rng: Chance = demoChance): WineSample {
+  const mode = TAB_SAMPLE_MODE[tab];
+  switch (mode) {
+    case "lines":
+      return rng.pickone(STRUCTURED_LINE_BUILDERS)(rng);
+    case "emoji-lines":
+      return rng.pickone(EMOJI_LINE_BUILDERS)(rng);
+    case "events":
+      return rng.pickone(EVENT_BUILDERS)(rng);
+    default: {
+      const _never: never = mode;
+      return _never;
+    }
+  }
 }
 
 export function adapterFieldsForTab(tab: DemoTabId): Record<string, string> {
