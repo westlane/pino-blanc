@@ -1,16 +1,11 @@
 import { resolveEventLayoutTemplate } from "../layout/presets.js";
-import { padEventNameColumn, eventRow2TailSpans, resolveEmojiFromMeta } from "../layout/event-columns.js";
+import { padEventNameColumn, resolveEmojiFromMeta } from "../layout/event-columns.js";
 import { formatEventLayoutSpans } from "../layout/event-template.js";
 import { formatStandardSpans } from "../layout/line.js";
 import { padEndDisplay } from "../layout/pad.js";
 import { GRID_DEFAULTS } from "../layout/grid-defaults.js";
-import {
-  BLANC_CONTROL_META_KEYS,
-  isBlancEventRecord,
-  stripPinoBindings,
-} from "../record.js";
+import { isBlancEventRecord } from "../record.js";
 import type { CreateLoggerOptions, LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
-import { jsonMetaSpans } from "./json-meta.js";
 
 export function formatBlancEventSpans(
   record: PinoLogRecord,
@@ -31,28 +26,20 @@ export function formatBlancEventSpans(
     });
   }
 
+  // No eventLayout → same text layout (incl. optional %meta% row from layout.yml).
   const message = String(record.msg ?? "");
-  const emoji = resolveEmojiFromMeta(record);
-  const payload = stripPinoBindings(record, [...BLANC_CONTROL_META_KEYS]);
-
   const eventMessage = padEndDisplay(
     padEventNameColumn(message),
     GRID_DEFAULTS.message,
   );
-  const spans = formatStandardSpans(
+  return formatStandardSpans(
     "info",
     ctx.module,
     eventMessage,
     ctx.layout,
-    emoji,
+    resolveEmojiFromMeta(record),
+    record,
   );
-
-  if (payload && Object.keys(payload).length > 0) {
-    spans.push({ text: "\n", role: "message" });
-    spans.push(...eventRow2TailSpans());
-    spans.push(...jsonMetaSpans(payload));
-  }
-  return spans;
 }
 
 export function blancEventFormatRecord(

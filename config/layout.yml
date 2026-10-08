@@ -1,26 +1,51 @@
 # yarn build → src/layout/layout.data.ts
-#
-# default     Active text preset when createLogger omits layout.
-# text.*      Plain lines — layout: "<id>"
-# event.*     log.event() — eventLayout: "<id>"
-#
-# Field tokens: %name% or %name:width% or %name:width:right% (module aligns right when last).
 
-default: module-right
+# lv = level
+# ms = message
+# mt = meta
+# id = identity
+# ev = event
+# mj = emoji
+# title = title
+# subtitle = subtitle
+# md = module
+# version = version
 
 text:
-  module-right: "%level:6% %emoji:4%  %message:34% %module:18%"
-  module-first: "%level:6% %module:18% %message%"
+  default: |
+    [%lv%  ]  [%mj%][%ms% -----------------------------][------------- %md%]
+    [------]  [----][%mt%]
+
+  complex: |
+    [%mj%][%ms% -------------------------------------------------][----------- %md%]
+    [----][%mt%]
+
+  # Identity chip + emoji + message + module (no level)
+  identity: |
+    [%id% -------------------]  [%mj%][%ms% -------------------------------------------------][----------- %md%]
+    [------------------------]  [----][%mt%]
 
 event:
-  identity-meta: |
-    %identity:28% %emoji:4%  %event:28%
-    %identity:28% %emoji:4%  %meta%
+  default: |
+    [ ---------- %id% ---------- ]  [%mj%][%ev% -----------------------]
+    [----------------------------]  [----][%mt%]
 
-columns:
-  box:
-    width: 80
-    minInner: 20
-    pad: 4
-    ellipsis: 3
-  hashShift: 5
+  complex: |
+    [%id% -------------------]  [%mj%][%ev% -----------------------]
+    [%id% -------------------]  [----][%mt%]
+
+box:
+  default: |
+    [------------------------------------------------]
+    [------------------- %title% --------------------]
+    [------------------------------------------------]
+
+  complex: |
+    [------------------------------------------------]
+    [-------- %title% %version% - %lv% level --------]
+    [------------------------------------------------]
+    [------------------ %subtitle% ------------------]
+    [------------------------------------------------]
+
+tint:
+  multiplier: 31

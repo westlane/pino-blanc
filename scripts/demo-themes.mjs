@@ -14,15 +14,15 @@ if (!existsSync(entry)) {
 }
 
 const {
-  buildSessionBannerSpans,
+  buildBoxSpans,
   colorFromId,
   createLogger,
   hashString,
   renderBannerLine,
-  renderSessionBannerBlock,
-  resolveSessionBannerBarWidth,
+  renderBoxBlock,
+  resolveBoxBarWidth,
   resolveTheme,
-  writeSessionBannerToConsole,
+  writeBoxToConsole,
 } = await import(entry);
 
 const SOLARIZED_RAMP_LABELS = [
@@ -158,25 +158,25 @@ function runSolarizedModuleRamp(themeId) {
 }
 
 function runSolarizedLayouts(themeId) {
-  process.stdout.write("\n  layouts — module-right vs module-first\n");
+  process.stdout.write("\n  layouts — default vs complex\n");
   const msg = "same message, different column template";
   createLogger("layout-default", {
     ...loggerOptions,
     theme: themeId,
     layout: "default",
   }).info(msg);
-  createLogger("layout-module-first", {
+  createLogger("layout-complex", {
     ...loggerOptions,
     theme: themeId,
-    layout: "module-first",
+    layout: "complex",
   }).info(msg);
 }
 
-function runSessionBanners(themeId, { extended = false } = {}) {
-  process.stdout.write("\n  session banner (content-width DID tint)\n");
-  const bannerOpts = {
+function runBoxes(themeId, { extended = false } = {}) {
+  process.stdout.write("\n  box.complex (content-width DID tint)\n");
+  const boxOpts = {
     theme: themeId,
-    colorTransform: didColorTransform(themeId),
+    colorize: didColorTransform(themeId),
     consoleColorReset: "triple",
   };
 
@@ -184,7 +184,7 @@ function runSessionBanners(themeId, { extended = false } = {}) {
     ? [
         {
           alias: "@demo-user",
-          did: "did:user:z6MkDemoSessionBanner",
+          did: "did:user:z6MkDemoBox",
           chrome: "inverted",
         },
         {
@@ -206,7 +206,7 @@ function runSessionBanners(themeId, { extended = false } = {}) {
     : [
         {
           alias: "@demo-user",
-          did: "did:user:z6MkDemoSessionBanner",
+          did: "did:user:z6MkDemoBox",
           chrome: "inverted",
         },
       ];
@@ -215,28 +215,28 @@ function runSessionBanners(themeId, { extended = false } = {}) {
     for (const chrome of ["inverted", "faint", "fill"]) {
       const appLine = "pino-blanc v0.1.0 - info level";
       const aliasLine = "@demo-user";
-      const spans = buildSessionBannerSpans({
+      const spans = buildBoxSpans({
         appLine,
         aliasLine,
-        barWidth: resolveSessionBannerBarWidth(appLine, aliasLine),
-        identityTintKey: "did:user:z6MkDemoSessionBanner",
+        barWidth: resolveBoxBarWidth(appLine, aliasLine),
+        identityTintKey: "did:user:z6MkDemoBox",
         identityChrome: chrome,
       });
-      writeSessionBannerToConsole(renderSessionBannerBlock(spans, bannerOpts));
+      writeBoxToConsole(renderBoxBlock(spans, boxOpts));
     }
     return;
   }
 
   const appLine = "pino-blanc demo — solarized identity chrome";
   for (const { alias, did, chrome } of identities) {
-    const spans = buildSessionBannerSpans({
+    const spans = buildBoxSpans({
       appLine,
       aliasLine: alias,
-      barWidth: resolveSessionBannerBarWidth(appLine, alias),
+      barWidth: resolveBoxBarWidth(appLine, alias),
       identityTintKey: did,
       identityChrome: chrome,
     });
-    writeSessionBannerToConsole(renderSessionBannerBlock(spans, bannerOpts));
+    writeBoxToConsole(renderBoxBlock(spans, boxOpts));
   }
 }
 
@@ -254,7 +254,7 @@ function runThemeBlock(themeId) {
     runSolarizedEvents(log);
     runSolarizedLayouts(themeId);
   }
-  runSessionBanners(themeId, { extended: isSolarized });
+  runBoxes(themeId, { extended: isSolarized });
 }
 
 for (const theme of themesToRun()) {

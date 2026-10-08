@@ -1,21 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { buildSessionBannerSpans } from "../src/format/session-banner.js";
-import { renderSessionBannerBlock } from "../src/format/render-session-banner.js";
+import { buildBoxSpans } from "../src/format/box-spans.js";
+import { renderBoxBlock } from "../src/format/render-box.js";
 import { stripAnsiForPlainOutput } from "../src/render/plain.js";
 
-describe("session banner spans", () => {
-  it("renders DID-tinted identity bar with app header", () => {
-    const spans = buildSessionBannerSpans({
-      appLine: "pino-blanc v1.0.0 - info level",
-      aliasLine: "@lucky-aphid",
+describe("box spans", () => {
+  it("renders box.complex with padding bands + identity subtitle", () => {
+    const spans = buildBoxSpans({
+      boxLayout: "complex",
+      title: "pino-blanc",
+      version: "1.0.0",
+      level: "info",
+      subtitle: "@lucky-aphid",
       barWidth: 48,
       identityTintKey: "did:user:z6Mktest",
       identityChrome: "inverted",
     });
+
     const prev = process.env.FORCE_COLOR;
     process.env.FORCE_COLOR = "1";
     delete process.env.NO_COLOR;
-    const rendered = renderSessionBannerBlock(spans, {
+    const rendered = renderBoxBlock(spans, {
       colorize: (id, fallback) =>
         id.startsWith("did:") ? "#c71585" : fallback,
     });
@@ -32,10 +36,11 @@ describe("session banner spans", () => {
           ? rendered.line
           : "";
     const plain = stripAnsiForPlainOutput(line);
-    expect(plain).toContain("pino-blanc v1.0.0");
+    expect(plain).toContain("pino-blanc v1.0.0 - info level");
     expect(plain).toContain("@lucky-aphid");
+    // box.complex: pad + title + pad + subtitle + pad
     const barLines = plain.split("\n").filter((row) => row.length === 48);
-    expect(barLines.length).toBeGreaterThanOrEqual(5);
+    expect(barLines.length).toBe(5);
     expect(barLines.some((row) => row.includes("pino-blanc"))).toBe(true);
     expect(barLines.some((row) => row.includes("@lucky-aphid"))).toBe(true);
     if (rendered.mode === "ansi") {

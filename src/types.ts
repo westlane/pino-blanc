@@ -25,7 +25,7 @@ export type ChipChrome = "fg" | "inverted" | "fill" | "faint" | "prefix";
 export type SymbolMap = Record<string, string>;
 
 /** Placeholders for `layout` / `formatLayoutSpans`. */
-export type LogLayoutField = "level" | "module" | "message" | "emoji";
+export type LogLayoutField = "level" | "module" | "message" | "emoji" | "identity";
 
 export type LogSpan = {
   text: string;
@@ -36,7 +36,7 @@ export type LogSpan = {
   kind?: string;
   /** When true, text is emitted as-is (no ANSI/CSS wrapping). */
   raw?: boolean;
-  /** Session banner full-width row styling. */
+  /** Full-width box row styling (`role: "banner"`). */
   bannerChrome?: BannerChrome;
 };
 
@@ -114,13 +114,13 @@ export type CreateLoggerOptions = {
   theme?: LogThemeId | LogTheme;
   themeOverrides?: Partial<LogTheme>;
   /**
-   * Preset id (`module-right`, `module-first`) or a `%level%` / `%module%` / `%message%` template.
-   * See `config/layout.yml`.
+   * Text preset id (`default`, `complex`, …) or a `%level%` / `%module%` / `%message%` template.
+   * See `config/layout.yml` — `text.default` when omitted.
    */
   layout?: string;
   /**
    * Event-only layout (`log.event` / `blancEvent`). May include a newline for row 2
-   * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset: `identity-meta`.
+   * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset id or raw template.
    */
   eventLayout?: string;
   /** Fixed display width for `%identity%` in `eventLayout` (: 24). */

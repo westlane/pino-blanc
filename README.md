@@ -74,7 +74,7 @@ Edit [config/layout.yml](config/layout.yml), then `yarn build`.
 | **`module-first`** | Same text lines | Level → `[module]` → message (no emoji column). |
 | **`identity-meta`** | `log.event()` only | Two rows: identity chip + event name, then JSON under the name. Set `eventLayout: "identity-meta"`. |
 
-Tokens: `%field%`, `%field:width%`, `%field:width:right%` — e.g. `%level:6%`, `%message:34%`, `%module:18%`. `%module%` right-aligns when last. `%event:N%` = event name column. `%identity%`, `%meta%`. Fallback widths: `src/layout/grid-defaults.ts`. `columns` in YAML is only box drawing + `hashShift`.
+Tokens: `%lv%` level, `%mj%` emoji, `%ms%` message, `%md%` module, `%id%` identity, `%ev%` event, `%mt%` meta. Columns use `|` — cell width is the max; pad around the token sets align (both sides = center, before only = right). See `config/layout.yml`.
 
 ```ts
 createLogger("api"); // YAML `default` → module-right
@@ -99,7 +99,8 @@ log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port:
 - `redact(fields)` — app PII policy; runs on log fields before each write
 - `formatRecord` / `defineFormatRecord()` — full-line pretty override per NDJSON record
 - `consolePrettyDelivery` — MCP-style hosts: emit side channel, return `false` to skip stdout
-- `buildSessionBannerSpans` / `renderSessionBannerBlock` — full-width DID-tinted session banners (parity)
+- `buildBoxSpans` / `renderBoxBlock` — layout.yml `box` presets (padding bands + title/subtitle; uses `box.complex`)
+- `renderBannerLine` — `box.default` section headers (padded bars)
 - `stripPinoBindings`, `isBlancEventRecord`, `consoleLeadingNewlineUnless` — record helpers
 - `_liveReplace: true` on a record — pretty transport overwrites the previous live block in-place (high-frequency ticks / WS frames)
 - `tint` / `columns` — `TintResolver` and `ColumnDecorator` hooks
@@ -107,7 +108,7 @@ log.event("host.ready", { _identityKind: "host", _identityBody: "my-host", port:
 - `forceColor` — default **on** for `createLogger` (pretty ANSI even when Cursor sets `NO_COLOR`). Opt out: `forceColor: false`, `PINO_BLANC_FORCE_COLOR=0`, or `PINO_BLANC_PLAIN=1`.
 - `ansiMode` / `PINO_BLANC_ANSI` — `auto` (default) uses **256-color** when `COLORTERM` is unset (Cursor integrated terminal); set `truecolor` or `PINO_BLANC_ANSI=truecolor` for iTerm. Run `yarn verify:ansi` after build.
 - `log.event(msg, meta)` — writes at info with `blancEvent: true` for custom layouts
-- `renderBannerLine(title, theme)` — centered box headline using `theme.roles.box`
+- `renderBannerLine(title, theme)` — centered box bar (`theme.roles.box` background)
 
 ## Branches
 

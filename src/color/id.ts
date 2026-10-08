@@ -1,9 +1,10 @@
-import { spec } from "../layout/layout.data.js";
+import { tint } from "../layout/layout.data.js";
 
 export function hashString(input: string): number {
   let hash = 0;
+  const mult = tint.multiplier;
   for (let i = 0; i < input.length; i++) {
-    hash = (hash << spec.hashShift) - hash + input.charCodeAt(i);
+    hash = hash * mult + input.charCodeAt(i);
     hash |= 0;
   }
   return Math.abs(hash);

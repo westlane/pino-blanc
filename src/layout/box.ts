@@ -1,21 +1,19 @@
-import { spec } from "./layout.data.js";
+import { centerInBar } from "./center-bar.js";
+import { box } from "./layout.data.js";
+import { displayWidth } from "./width.js";
 
-export function formatBoxLine(text: string, width = spec.box.width): string {
-  const minW = spec.box.minInner;
-  const w = Math.max(minW, width);
+const BOX_TRUNCATE_ELLIPSIS = "...";
+
+/** Center text in the active box preset width (`box.default`). */
+export function formatBoxLine(text: string, width = box.width): string {
+  const w = Math.max(box.minInner, width);
   if (!text) {
     return " ".repeat(w);
   }
-  const maxText = w - spec.box.pad;
   let display = text;
-  if (display.length > maxText) {
-    display = `${display.slice(0, maxText - spec.box.ellipsis)}...`;
+  if (displayWidth(display) > w) {
+    const max = Math.max(0, w - BOX_TRUNCATE_ELLIPSIS.length);
+    display = `${display.slice(0, max)}${BOX_TRUNCATE_ELLIPSIS}`;
   }
-  const gutter = spec.box.pad / 2;
-  const padding = Math.max(0, Math.floor((w - display.length - gutter) / 2));
-  const left = " ".repeat(padding);
-  const right = " ".repeat(
-    Math.max(0, w - display.length - padding - gutter),
-  );
-  return `${left} ${display} ${right}`;
+  return centerInBar(display, w);
 }

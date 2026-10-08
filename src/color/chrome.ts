@@ -1,6 +1,7 @@
 import type { ChipChrome, LogTheme } from "../types.js";
 
 export const SURFACE_WHITE_HEX = "#ffffff";
+export const SURFACE_INK_HEX = "#212121";
 
 /** Fraction of identity hue retained on faint chip backgrounds. */
 export const FAINT_BG_COLOR_WEIGHT = 0.12;
@@ -8,6 +9,8 @@ export const FAINT_BG_COLOR_WEIGHT = 0.12;
 /** Fraction retained on soft fill chips. */
 export const FILL_BG_COLOR_WEIGHT = 0.25;
 
+const DEFAULT_BOX_BG_DARK = "#586e75";
+const DEFAULT_BOX_BG_LIGHT = "#93a1a1";
 
 export type ChromeColors = {
   background: string;
@@ -153,6 +156,20 @@ export function themeSurfaceHex(theme: LogTheme): string {
     return "#fdf6e3";
   }
   return "#002b36";
+}
+
+/** Theme box bar: `roles.box` as background with a readable foreground. */
+export function boxChromeColors(theme: LogTheme): ChromeColors {
+  const fallback =
+    theme.background === "light" ? DEFAULT_BOX_BG_LIGHT : DEFAULT_BOX_BG_DARK;
+  const background = normalizeHex(theme.roles?.box ?? fallback);
+  const preferred =
+    theme.roles?.message ??
+    (isLightHex(background) ? SURFACE_INK_HEX : SURFACE_WHITE_HEX);
+  return {
+    background,
+    foreground: readableForeground(background, preferred),
+  };
 }
 
 function chipBackgroundHex(

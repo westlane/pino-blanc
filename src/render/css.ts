@@ -1,4 +1,4 @@
-import { chromeColors } from "../color/chrome.js";
+import { boxChromeColors, chromeColors } from "../color/chrome.js";
 import { hexToCssChrome, hexToCssFg } from "../color/css.js";
 import { splitPrefix } from "../layout/symbol.js";
 import type { ChipChrome, CreateLoggerOptions, LogSpan, LogTheme, TintResolver } from "../types.js";
@@ -72,6 +72,15 @@ export function renderCss(
     }
     if (span.role === "banner") {
       pushCssPart(span.text, renderBannerBarCss(span, ctx), payload);
+      continue;
+    }
+    if (span.role === "box") {
+      const colors = boxChromeColors(theme);
+      pushCssPart(
+        span.text,
+        hexToCssChrome(colors.background, colors.foreground, true),
+        payload,
+      );
       continue;
     }
     if (span.role === "chip" && span.tintKey) {

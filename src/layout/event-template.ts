@@ -1,8 +1,14 @@
 import { jsonMetaSpans } from "../format/json-meta.js";
 import { BLANC_CONTROL_META_KEYS, stripPinoBindings } from "../record.js";
 import type { LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
+import { expandPadBrackets } from "./pad-brackets.js";
 import { padEventNameColumn, resolveEmojiFromMeta } from "./event-columns.js";
-import { LAYOUT_FIELD_RE, parseFieldModifiers } from "./field-token.js";
+import {
+  LAYOUT_FIELD_RE,
+  canonicalizeFieldToken,
+  parseFieldModifiers,
+  templateHasIdentity,
+} from "./field-token.js";
 import { EVENT_IDENTITY_META_KEYS, identityColumnSpan } from "./identity-meta.js";
 import { formatLayoutSpans, type LayoutRowContext } from "./template.js";
 
@@ -13,30 +19,37 @@ type EventLayoutPart =
   | { kind: "field"; token: string };
 
 function parseEventLayoutRow(template: string): EventLayoutPart[] {
+  const expanded = expandPadBrackets(template);
   const parts: EventLayoutPart[] = [];
   let cursor = 0;
-  for (const match of template.matchAll(LAYOUT_FIELD_RE)) {
+  for (const match of expanded.matchAll(LAYOUT_FIELD_RE)) {
     const index = match.index ?? 0;
     if (index > cursor) {
-      parts.push({ kind: "literal", text: template.slice(cursor, index) });
+      parts.push({ kind: "literal", text: expanded.slice(cursor, index) });
     }
-    const name = match[1];
-    const clause = match[2];
+    const name = canonicalizeFieldToken(match[1]);
+    const mods = parseFieldModifiers(match[1], match[2]);
     if (name === "identity") {
-      parts.push({ kind: "identity", width: parseFieldModifiers(name, clause).width });
+      parts.push({ kind: "identity", width: mods.width });
     } else if (name === "meta") {
       parts.push({ kind: "meta" });
     } else {
-      const token = clause ? `${name}:${clause}` : name;
-      parts.push({
-        kind: "field",
-        token: name === "event" ? token.replace(/^event/, "message") : token,
-      });
+      const fieldName = name === "event" ? "message" : name;
+      const segs: string[] = [fieldName];
+      if (mods.minWidth !== undefined && mods.width !== undefined) {
+        segs.push(`${mods.minWidth}-${mods.width}`);
+      } else if (mods.width !== undefined) {
+        segs.push(String(mods.width));
+      }
+      if (mods.align === "left" || mods.align === "right" || mods.align === "center") {
+        segs.push(mods.align);
+      }
+      parts.push({ kind: "field", token: segs.join(":") });
     }
     cursor = index + match[0].length;
   }
-  if (cursor < template.length) {
-    parts.push({ kind: "literal", text: template.slice(cursor) });
+  if (cursor < expanded.length) {
+    parts.push({ kind: "literal", text: expanded.slice(cursor) });
   }
   return parts;
 }
@@ -50,12 +63,14 @@ export function splitEventLayoutTemplate(template: string): {
     throw new Error("Event layout supports at most two lines (one newline).");
   }
   const row1 = lines[0] ?? "";
-  const row2 = lines[1]?.trim() ? lines[1] : undefined;
+  const row2Raw = lines[1];
+  const row2 =
+    row2Raw !== undefined && /[%[]/.test(row2Raw) ? row2Raw : undefined;
   return { row1, row2 };
 }
 
 export function eventLayoutUsesIdentity(template: string): boolean {
-  return /%identity/.test(template);
+  return templateHasIdentity(template);
 }
 
 function eventPayload(record: PinoLogRecord): Record<string, unknown> | undefined {
@@ -106,7 +121,15 @@ function formatEventRow(
       continue;
     }
     if (part.kind === "meta") {
-      if (row === 2 && payload && Object.keys(payload).length > 0) {
+      if (row !== 2) {
+        continue;
+      }
+      const metaText = record._metaText;
+      if (typeof metaText === "string" && metaText.length > 0) {
+        spans.push({ text: metaText, role: "message" });
+        continue;
+      }
+      if (payload && Object.keys(payload).length > 0) {
         spans.push(...jsonMetaSpans(payload));
       }
       continue;
@@ -131,7 +154,11 @@ export function formatEventLayoutSpans(
     ctx.identityWidth,
   );
   const payload = eventPayload(record);
-  if (row2 && payload && Object.keys(payload).length > 0) {
+  const metaText =
+    typeof record._metaText === "string" && record._metaText.length > 0
+      ? record._metaText
+      : undefined;
+  if (row2 && (metaText || (payload && Object.keys(payload).length > 0))) {
     spans.push({ text: "\n", role: "message" });
     spans.push(
       ...formatEventRow(row2, record, 2, ctx.module, ctx.symbolMap, ctx.identityWidth),

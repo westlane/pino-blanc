@@ -14,6 +14,7 @@ export { renderCss } from "./render/css.js";
 export {
   blendHexWithBlack,
   blendHexWithWhite,
+  boxChromeColors,
   chromeColors,
   contrastRatio,
   isLightHex,
@@ -27,16 +28,21 @@ export { renderPlain, stripAnsi, stripAnsiForPlainOutput } from "./render/plain.
 export { formatStandardSpans, spansToPlain } from "./layout/line.js";
 export {
   CLASSIC_LOG_LAYOUT,
+  COMPLEX_LAYOUT,
+  DEFAULT_LAYOUT,
+  IDENTITY_LAYOUT,
   DEFAULT_LOG_LAYOUT,
   DEFAULT_LOG_LAYOUT_ID,
   LOG_LAYOUT_PRESETS,
   LOG_EVENT_LAYOUT_PRESETS,
+  complexLayout,
   resolveLayoutTemplate,
   resolveEventLayoutTemplate,
   type LogLayoutPreset,
   type LogLayoutPresetId,
   type LogEventLayoutPresetId,
 } from "./layout/presets.js";
+
 export { formatLayoutSpans, parseLogLayout } from "./layout/template.js";
 export {
   formatEventLayoutSpans,
@@ -49,14 +55,32 @@ export {
 } from "./layout/identity-meta.js";
 export { bannerLogSpans, renderBannerLine } from "./format/banner.js";
 export {
+  buildBoxSpans,
   buildSessionBannerSpans,
+  resolveBoxBarWidth,
   resolveSessionBannerBarWidth,
+  BOX_MIN_BAR_WIDTH,
+  BOX_BAR_SIDE_PADDING,
   SESSION_BANNER_MIN_BAR_WIDTH,
-} from "./format/session-banner.js";
+  SESSION_BANNER_BAR_SIDE_PADDING,
+} from "./format/box-spans.js";
 export {
+  formatBoxBandText,
+  formatBoxBandLines,
+  formatSessionBannerBandLines,
+  boxBandContentPattern,
+  isBoxPaddingBand,
+  boxContentBands,
+} from "./layout/box-bands.js";
+export { resolveBoxLayout, resolveBoxLayoutId } from "./layout/box-presets.js";
+
+
+export {
+  renderBoxBlock,
+  writeBoxToConsole,
   renderSessionBannerBlock,
   writeSessionBannerToConsole,
-} from "./format/render-session-banner.js";
+} from "./format/render-box.js";
 export { centerInBar } from "./layout/center-bar.js";
 export { formatBlancEventSpans, blancEventFormatRecord } from "./format/blanc-event.js";
 export { jsonMetaSpans } from "./format/json-meta.js";
@@ -78,6 +102,7 @@ export {
   padEventNameColumn,
   resolveEmojiFromMeta,
 } from "./layout/event-columns.js";
+export { displayWidth } from "./layout/width.js";
 export {
   BLANC_CONTROL_META_KEYS,
   BLANC_EVENT_KEY,

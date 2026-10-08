@@ -56,7 +56,7 @@ if (!existsSync(entry) || !existsSync(prettyEntry)) {
   process.exit(1);
 }
 
-const { createLogger, renderBannerLine, supportsColors } = await import(entry);
+const { createLogger, renderBannerLine } = await import(entry);
 const buildPrettyStream = (await import(prettyEntry)).default;
 
 const theme = process.env.PINO_BLANC_THEME?.trim() || "solarized-dark";
@@ -243,13 +243,6 @@ for (let i = 0; i < ${ticks}; i++) {
 
 process.stdout.write(
   `\n${renderBannerLine("pino-blanc live NDJSON demo", theme)}\n`,
-);
-const colorMode = supportsColors() ? "ansi-env" : "plain-env";
-process.stdout.write(
-  `  theme=${theme} forceColor=true pretty=${colorMode} ticks=${ticks} interval=${intervalMs}ms mode=${mode}\n`,
-);
-process.stderr.write(
-  "  (Solarized ANSI is on via forceColor — rebuild pino-blanc if this line is missing)\n",
 );
 flushStdout();
 

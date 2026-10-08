@@ -19,6 +19,8 @@ export const EVENT_IDENTITY_META_KEYS = [
   "_identityRow2Body",
   "_identityRow2TintKey",
   "_identityRow2Chrome",
+  /** Preformatted payload text (e.g. compact JSON); skips jsonMetaSpans. */
+  "_metaText",
 ] as const;
 
 function resolveIdentityWidth(width?: number): number {

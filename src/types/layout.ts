@@ -1,15 +1,17 @@
+export type BoxLayoutPreset = {
+  width: number;
+  minInner: number;
+  pad: number;
+  /** Inner text of each `[…]` band (title, optional subtitle). */
+  bands: string[];
+};
+
 export type LayoutData = {
-  default: string;
   text: Record<string, string>;
   event: Record<string, string>;
-  columns: {
-    box: {
-      width: number;
-      minInner: number;
-      pad: number;
-      ellipsis: number;
-    };
-    hashShift: number;
+  box: Record<string, BoxLayoutPreset>;
+  tint: {
+    multiplier: number;
   };
 };
 

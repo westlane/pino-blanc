@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   CLASSIC_LOG_LAYOUT,
+  COMPLEX_LAYOUT,
+  DEFAULT_LAYOUT,
   DEFAULT_LOG_LAYOUT,
   resolveLayoutTemplate,
 } from "../src/layout/presets.js";
@@ -28,8 +30,8 @@ describe("log layout template", () => {
         message: "hello world",
       }),
     );
-    expect(plain).toMatch(/^INFO\s+hello world\s+\[api\]/);
-    expect(plain.trimEnd()).toMatch(/\[api\]\s*$/);
+    expect(plain).toMatch(/^INFO\s+hello world\s+\[\s*api\s*\]/);
+    expect(plain.trimEnd()).toMatch(/\[\s*api\s*\]\s*$/);
   });
 
   it("reserves emoji column width when template includes %emoji%", () => {
@@ -51,7 +53,7 @@ describe("log layout template", () => {
     expect(withSlot).toMatch(/^INFO\s+ {4}/);
   });
 
-  it("classic layout matches legacy column order", () => {
+  it("complex layout omits level and keeps module trailing", () => {
     const plain = spansToPlain(
       formatLayoutSpans(CLASSIC_LOG_LAYOUT, {
         level: "info",
@@ -59,7 +61,9 @@ describe("log layout template", () => {
         message: "hello world",
       }),
     );
-    expect(plain).toBe("INFO   [api]              hello world");
+    expect(plain).not.toMatch(/^INFO/);
+    expect(plain).toMatch(/\[\s*api\s*\]/);
+    expect(plain).toContain("hello world");
   });
 
   it("%event% is an alias for %message%", () => {
@@ -74,18 +78,23 @@ describe("log layout template", () => {
   });
 
   it("resolveLayoutTemplate accepts preset ids", () => {
-    expect(resolveLayoutTemplate("module-first")).toBe(CLASSIC_LOG_LAYOUT);
-    expect(resolveLayoutTemplate("module-right")).toBe(DEFAULT_LOG_LAYOUT);
-    expect(resolveLayoutTemplate("classic")).toBe(CLASSIC_LOG_LAYOUT);
+    expect(resolveLayoutTemplate(COMPLEX_LAYOUT).split("\n")[0]).toBe(CLASSIC_LOG_LAYOUT);
+    expect(resolveLayoutTemplate(DEFAULT_LAYOUT).split("\n")[0]).toBe(DEFAULT_LOG_LAYOUT);
+    expect(resolveLayoutTemplate("module-right").split("\n")[0]).toBe(DEFAULT_LOG_LAYOUT);
+    expect(resolveLayoutTemplate("emoji-module").split("\n")[0]).toBe(CLASSIC_LOG_LAYOUT);
+    expect(resolveLayoutTemplate(DEFAULT_LAYOUT)).toMatch(/%m(?:eta|t)%/);
     expect(resolveLayoutTemplate("%level% %message%")).toBe("%level% %message%");
   });
 
-  it("formatStandardSpans uses default preset", () => {
+  it("formatStandardSpans uses default vs complex", () => {
     const plain = spansToPlain(formatStandardSpans("info", "api", "hello world"));
-    const classic = spansToPlain(
-      formatStandardSpans("info", "api", "hello world", "module-first"),
+    const complex = spansToPlain(
+      formatStandardSpans("info", "api", "hello world", COMPLEX_LAYOUT),
     );
-    expect(plain).not.toBe(classic);
-    expect(classic).toBe("INFO   [api]              hello world");
+    expect(plain).not.toBe(complex);
+    expect(plain).toMatch(/^INFO/);
+    expect(complex).not.toMatch(/^INFO/);
+    expect(complex).toMatch(/\[.*api.*\]/);
+    expect(complex).toContain("hello world");
   });
 });

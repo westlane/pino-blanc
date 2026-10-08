@@ -6,16 +6,19 @@ import { renderCss, type CssConsolePayload } from "../render/css.js";
 import { renderPlain } from "../render/plain.js";
 import type { CreateLoggerOptions, LogSpan } from "../types.js";
 
-export type RenderedSessionBanner =
+export type RenderedBox =
   | { mode: "ansi"; line: string }
   | { mode: "css"; payload: CssConsolePayload }
   | { mode: "plain"; line: string };
 
-/** Render session banner spans for Node or browser console. */
-export function renderSessionBannerBlock(
+/** @deprecated Prefer {@link RenderedBox}. */
+export type RenderedSessionBanner = RenderedBox;
+
+/** Render box spans for Node or browser console. */
+export function renderBoxBlock(
   spans: LogSpan[],
   options: CreateLoggerOptions = {},
-): RenderedSessionBanner {
+): RenderedBox {
   const theme = resolveTheme(options.theme, options.themeOverrides);
   const tint = createTintResolver(
     theme,
@@ -38,8 +41,16 @@ export function renderSessionBannerBlock(
   return { mode: "css", payload };
 }
 
-export function writeSessionBannerToConsole(
-  rendered: RenderedSessionBanner,
+/** @deprecated Prefer {@link renderBoxBlock}. */
+export function renderSessionBannerBlock(
+  spans: LogSpan[],
+  options: CreateLoggerOptions = {},
+): RenderedBox {
+  return renderBoxBlock(spans, options);
+}
+
+export function writeBoxToConsole(
+  rendered: RenderedBox,
   method: "info" | "error" = "info",
 ): void {
   const fn = method === "error" ? console.error : console.info;
@@ -48,4 +59,12 @@ export function writeSessionBannerToConsole(
     return;
   }
   fn(rendered.line);
+}
+
+/** @deprecated Prefer {@link writeBoxToConsole}. */
+export function writeSessionBannerToConsole(
+  rendered: RenderedBox,
+  method: "info" | "error" = "info",
+): void {
+  writeBoxToConsole(rendered, method);
 }

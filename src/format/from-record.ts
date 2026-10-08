@@ -29,6 +29,7 @@ export function resolvePinoLogLine(
     message,
     options.layout,
     resolveEmojiFromMeta(input),
+    input,
   );
 
   const formatRecord: FormatRecord | undefined =

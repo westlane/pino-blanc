@@ -2,23 +2,44 @@
 import type { LayoutData } from "../types/layout.js";
 
 export const layoutData: LayoutData = {
-  "default": "module-right",
   "text": {
-    "module-right": "%level:6% %emoji:4%  %message:34% %module:18%",
-    "module-first": "%level:6% %module:18% %message%"
+    "default": "[%lv%  ]  [%mj%][%ms% -----------------------------][------------- %md%]\n[------]  [----][%mt%]",
+    "complex": "[%mj%][%ms% -------------------------------------------------][----------- %md%]\n[----][%mt%]",
+    "identity": "[%id% -------------------]  [%mj%][%ms% -------------------------------------------------][----------- %md%]\n[------------------------]  [----][%mt%]"
   },
   "event": {
-    "identity-meta": "%identity:28% %emoji:4%  %event:28%\n%identity:28% %emoji:4%  %meta%"
+    "default": "[ ---------- %id% ---------- ]  [%mj%][%ev% -----------------------]\n[----------------------------]  [----][%mt%]",
+    "complex": "[%id% -------------------]  [%mj%][%ev% -----------------------]\n[%id% -------------------]  [----][%mt%]"
   },
-  "columns": {
-    "box": {
-      "width": 80,
-      "minInner": 20,
-      "pad": 4,
-      "ellipsis": 3
+  "box": {
+    "default": {
+      "width": 48,
+      "minInner": 48,
+      "pad": 48,
+      "bands": [
+        "------------------------------------------------",
+        "------------------- %title% --------------------",
+        "------------------------------------------------"
+      ]
     },
-    "hashShift": 5
+    "complex": {
+      "width": 48,
+      "minInner": 48,
+      "pad": 48,
+      "bands": [
+        "------------------------------------------------",
+        "-------- %title% %version% - %lv% level --------",
+        "------------------------------------------------",
+        "------------------ %subtitle% ------------------",
+        "------------------------------------------------"
+      ]
+    }
+  },
+  "tint": {
+    "multiplier": 31
   }
 };
 
-export const spec = layoutData.columns;
+/** Active box preset (`box.default`) — metrics for formatBoxLine. */
+export const box = layoutData.box.default;
+export const tint = layoutData.tint;
