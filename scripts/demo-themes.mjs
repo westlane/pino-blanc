@@ -81,6 +81,10 @@ const IDENTITY_SYMBOL_MAP = {
   agent: "%",
 };
 
+/** Real Rally host DID — same seed as live `/energetic-domehut-y5Yk` chips (#956cb3). */
+const HOST_DID =
+  "did:host:z7r8oppFnzGRygj2ZYeqJKs3NpEqgtva8tvAX1j8sFsPWygjqvapBhvor1uJE1kpaWmhBCCsJpqC6SnomTZ7tM3tAy5Yk";
+
 function moduleNameForRampIndex(theme, targetIndex) {
   const len = theme.tintRamp.length;
   for (let n = 0; n < 20_000; n += 1) {
@@ -183,26 +187,23 @@ function runIdentityEvents(themeId) {
     symbolMap: IDENTITY_SYMBOL_MAP,
   });
 
-  const hostDid =
-    "did:host:z7r8oppFnzGRygj2ZYeqJKs3NpEqgtva8tvAX1j8sFsPWygjqvapBhvor1uJE1kpaWmhBCCsJpqC6SnomTZ7tM3tAy5Yk";
-
-  // Tint keys are full DIDs; seeds chosen so chrome variants read as distinct hues
-  // (host uses the real energetic-domehut DID → #956cb3).
+  // Event-column IDs: blanc `fill` = white glyph box + 25% tinted body
+  // (session banners stay inverted separately). Host tint = HOST_DID → #956cb3.
   const samples = [
     {
       event: "host.catalog.discovered",
       kind: "host",
       body: "energetic-domehut-y5Yk",
-      did: hostDid,
-      chrome: "inverted",
+      did: HOST_DID,
+      chrome: "fill",
       meta: { total: 15, replicas: 15 },
     },
     {
       event: "host.identity.ready",
       kind: "host",
       body: "energetic-domehut-y5Yk",
-      did: hostDid,
-      chrome: "inverted",
+      did: HOST_DID,
+      chrome: "fill",
       meta: { slug: "energetic-domehut-y5Yk", success: true },
     },
     {
@@ -210,7 +211,7 @@ function runIdentityEvents(themeId) {
       kind: "user",
       body: "lucky-aphid-2doK",
       did: "did:user:z6MksbDemoSeedPadForColor5i5",
-      chrome: "faint",
+      chrome: "fill",
       meta: { client: "chrome", path: "/ws/" },
     },
     {
@@ -218,7 +219,7 @@ function runIdentityEvents(themeId) {
       kind: "locker",
       body: "polished-cusp-nqN",
       did: "did:locker:z6Mk4ivDemoSeedPadForColorvo1",
-      chrome: "inverted",
+      chrome: "fill",
       meta: { bytes: 92_461 },
     },
     {
@@ -234,14 +235,13 @@ function runIdentityEvents(themeId) {
       kind: "agent",
       body: "brisk-copper-bot",
       did: "did:agent:z6MkbtmDemoSeedPadForColor2ara",
-      chrome: "inverted",
+      chrome: "fill",
       meta: { task: "index" },
     },
   ];
 
   for (const sample of samples) {
     log.event(sample.event, {
-      _emoji: "·",
       _identityKind: sample.kind,
       _identityBody: sample.body,
       _identityTintKey: sample.did,
@@ -263,11 +263,11 @@ function runBoxes(themeId, { extended = false } = {}) {
         { subtitle: "@demo-user", did: "did:user:z6MkDemoBox", chrome: "inverted" },
         {
           subtitle: "/energetic-domehut-y5Yk",
-          did: "did:locker:energetic-domehut-y5Yk",
+          did: HOST_DID,
           chrome: "inverted",
         },
-        { subtitle: "@lucky-aphid", did: "did:user:z6Mkluckyaphid", chrome: "faint" },
-        { subtitle: "@host-replica", did: "did:locker:z6MkHostReplica", chrome: "fill" },
+        { subtitle: "@lucky-aphid", did: "did:user:z6MksbDemoSeedPadForColor5i5", chrome: "faint" },
+        { subtitle: "@host-replica", did: "did:locker:z6Mk1h9DemoSeedPadForColoracr", chrome: "fill" },
       ]
     : [
         { subtitle: "@demo-user", did: "did:user:z6MkDemoBox", chrome: "inverted" },
