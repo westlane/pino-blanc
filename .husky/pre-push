@@ -2,4 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Fast gate before push (full `yarn check` remains for publish).
-yarn typecheck && yarn test
+yarn typecheck && yarn test && node scripts/verify-readme-badges.mjs

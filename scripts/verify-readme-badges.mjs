@@ -1,32 +1,13 @@
 #!/usr/bin/env node
 /**
- * CI guard: committed docs/badges/*.svg must match the last `yarn test` badge write.
- * Branch label in version.svg differs per branch (dev vs main); re-run after promote.
+ * CI / pre-push guard: committed docs/badges/*.svg must match the last `yarn test`.
  */
 import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveBadgeBranch } from "./badge-branch.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
-function resolveBranch() {
-  const headRef = process.env.GITHUB_HEAD_REF?.trim();
-  if (headRef) {
-    return headRef;
-  }
-  const fromCi = process.env.GITHUB_REF_NAME?.trim();
-  if (fromCi && !fromCi.includes("/")) {
-    return fromCi;
-  }
-  try {
-    return execSync("git branch --show-current", {
-      cwd: root,
-      encoding: "utf8",
-    }).trim() || "dev";
-  } catch {
-    return "dev";
-  }
-}
 
 try {
   execSync("git diff --exit-code -- docs/badges/", {
@@ -34,19 +15,21 @@ try {
     stdio: "pipe",
   });
 } catch {
-  const branch = resolveBranch();
+  const branch = resolveBadgeBranch(root);
   console.error(
     [
-      "README badges under docs/badges/ do not match this branch.",
+      "README badges under docs/badges/ are out of date (run tests/badges, then commit).",
       "",
-      `Expected version badge label: "${branch}" (from package.json on this branch).`,
+      `Version badge label for this run: "${branch}".`,
       "",
       "Fix:",
-      `  git checkout ${branch}`,
       "  yarn badges",
-      "  git add docs/badges && git commit -m \"chore(docs): sync README badges\"",
+      '  git add docs/badges && git commit -m "chore(docs): sync README badges"',
       "",
-      "After merging dev → main, run the above on main before CI will pass.",
+      "After merging dev → main, on main run:",
+      "  git checkout main && yarn badges && git add docs/badges && git commit",
+      "",
+      "Or override once: PINO_BLANC_BADGE_BRANCH=main yarn badges",
     ].join("\n"),
   );
   process.exit(1);
