@@ -112,6 +112,33 @@ export function wrapAnsi(
   return `${open}${text}${ANSI_RESET}`;
 }
 
+/**
+ * Chip open sequence — combined bg/fg SGR
+ * (`48;2;r;g;b;38;2;r;g;b` in one CSI), not separate bg/fg opens.
+ */
+export function hexToAnsiChromeOpen(
+  background: string,
+  foreground: string,
+  bold = false,
+  palette: ResolvedAnsiPalette = "truecolor",
+): string {
+  const bg = parseRgb(background);
+  const fg = parseRgb(foreground);
+  if (!bg || !fg) {
+    return "";
+  }
+  const weight = bold ? "1;" : "";
+  if (palette === "16") {
+    return `\u001B[${weight}47;37m`;
+  }
+  if (palette === "256") {
+    const bgIdx = rgbToAnsi256(bg.r, bg.g, bg.b);
+    const fgIdx = rgbToAnsi256(fg.r, fg.g, fg.b);
+    return `\u001B[${weight}48;5;${bgIdx};38;5;${fgIdx}m`;
+  }
+  return `\u001B[${weight}48;2;${bg.r};${bg.g};${bg.b};38;2;${fg.r};${fg.g};${fg.b}m`;
+}
+
 export function wrapAnsiChrome(
   text: string,
   background: string,
@@ -119,10 +146,9 @@ export function wrapAnsiChrome(
   bold = false,
   palette: ResolvedAnsiPalette = "truecolor",
 ): string {
-  const bg = hexToAnsiBg(background, bold, palette);
-  const fg = hexToAnsiFg(foreground, bold, palette);
-  if (!bg || !fg) {
+  const open = hexToAnsiChromeOpen(background, foreground, bold, palette);
+  if (!open) {
     return text;
   }
-  return `${bg}${fg}${text}\u001B[49m\u001B[39m${ANSI_RESET}`;
+  return `${open}${text}\u001B[49m\u001B[39m${ANSI_RESET}`;
 }
