@@ -1,11 +1,11 @@
-import { BLANC_LIVE_REPLACE_KEY } from "../record.js";
+import { PB_LIVE_REPLACE_KEY } from "../record.js";
 
-export { BLANC_LIVE_REPLACE_KEY };
+export { PB_LIVE_REPLACE_KEY };
 
 export function isLiveReplaceRecord(
   record: Record<string, unknown> | undefined | null,
 ): boolean {
-  return record?.[BLANC_LIVE_REPLACE_KEY] === true;
+  return record?.[PB_LIVE_REPLACE_KEY] === true;
 }
 
 /** Visible terminal rows occupied by a pretty chunk (trailing newline counts). */

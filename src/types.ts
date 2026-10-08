@@ -44,7 +44,11 @@ export type LogThemeId =
   | "solarized-dark"
   | "solarized-light"
   | "gruvbox-dark"
-  | "gruvbox-light";
+  | "gruvbox-light"
+  | "nord"
+  | "dracula"
+  | "catppuccin-mocha"
+  | "catppuccin-latte";
 
 export type LogTheme = {
   id: string;
@@ -111,6 +115,13 @@ export type EventColumnSpec = {
   showEmoji?: boolean | undefined;
 };
 
+/** NDJSON file sink (`pino/file`) — separate level from console pretty. */
+export type FileLogOptions = {
+  path: string;
+  level?: LogLevelName | string | undefined;
+  mkdir?: boolean | undefined;
+};
+
 export type CreateLoggerOptions = {
   level?: LogLevelName | string | undefined;
   theme?: LogThemeId | LogTheme | undefined;
@@ -121,7 +132,7 @@ export type CreateLoggerOptions = {
    */
   layout?: string | undefined;
   /**
-   * Event-only layout (`log.event` / `blancEvent`). May include a newline for row 2
+   * Event-only layout (`log.event` / `pbEvent`). May include a newline for row 2
    * (`%identity%`, `%meta%`, plus `%emoji%` / `%event%`). Preset id or raw template.
    */
   eventLayout?: string | undefined;
@@ -158,11 +169,15 @@ export type CreateLoggerOptions = {
   consolePrettyDelivery?:
     | ((line: string, record: PinoLogRecord) => boolean)
     | undefined;
+  /** Append NDJSON lines via `pino/file` (multi-target with pretty console). */
+  file?: string | FileLogOptions | undefined;
+  /** Pretty console stream (default `process.stdout`; use `process.stderr` for plain/MCP). */
+  consoleDestination?: NodeJS.WritableStream | undefined;
 };
 
-export type BlancLogger = {
+export type PBLogger = {
   pino: import("pino").Logger;
-  child: (bindings: { module: string }) => BlancLogger;
+  child: (bindings: { module: string }) => PBLogger;
   trace: (msg: string, fields?: object) => void;
   debug: (msg: string, fields?: object) => void;
   info: (msg: string, fields?: object) => void;

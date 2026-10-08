@@ -1,11 +1,50 @@
 import pino from "pino";
-import { BLANC_EVENT_KEY } from "../record.js";
-import type { BlancLogger, CreateLoggerOptions } from "../types.js";
+import { PB_EVENT_KEY } from "../record.js";
+import type {
+  CreateLoggerOptions,
+  FileLogOptions,
+  PBLogger,
+} from "../types.js";
 import { toPinoLevel } from "./levels.js";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import buildPrettyStream from "./transport/pretty.js";
+import buildPrettyStream, {
+  type PrettyTransportOptions,
+} from "./transport/pretty.js";
 import "../layout/layout-store.node.js";
+
+const LEVEL_VERBOSE_ORDER = [
+  "trace",
+  "debug",
+  "info",
+  "warn",
+  "error",
+  "fatal",
+] as const;
+
+function resolveFileOption(
+  file?: string | FileLogOptions,
+): FileLogOptions | undefined {
+  if (!file) {
+    return undefined;
+  }
+  if (typeof file === "string") {
+    return { path: file, mkdir: true };
+  }
+  return { mkdir: true, ...file };
+}
+
+function mostVerboseLevel(a: string, b: string): string {
+  const ai = LEVEL_VERBOSE_ORDER.indexOf(a as (typeof LEVEL_VERBOSE_ORDER)[number]);
+  const bi = LEVEL_VERBOSE_ORDER.indexOf(b as (typeof LEVEL_VERBOSE_ORDER)[number]);
+  if (ai === -1) {
+    return b;
+  }
+  if (bi === -1) {
+    return a;
+  }
+  return ai <= bi ? a : b;
+}
 
 function optionsNeedMainThread(options: CreateLoggerOptions): boolean {
   return Boolean(
@@ -49,7 +88,7 @@ function applyRedact(
 function wrapPino(
   logger: pino.Logger,
   options: CreateLoggerOptions,
-): BlancLogger {
+): PBLogger {
   const logAt = (
     level: string,
     msg: string,
@@ -90,14 +129,67 @@ function wrapPino(
     error: (m, fields) => logAt("error", m, fields),
     fatal: (m, fields) => logAt("fatal", m, fields),
     event: (m, fields) =>
-      logAt("info", m, { ...applyRedact(options, fields), [BLANC_EVENT_KEY]: true }),
+      logAt("info", m, { ...applyRedact(options, fields), [PB_EVENT_KEY]: true }),
   };
+}
+
+function buildLoggerDestination(
+  resolvedOptions: CreateLoggerOptions,
+  formatCtx: PrettyTransportOptions,
+  consoleLevel: string,
+  fileOpts: FileLogOptions | undefined,
+  fileLevel: string | undefined,
+): pino.DestinationStream {
+  if (!fileOpts || !fileLevel) {
+    return optionsNeedMainThread(resolvedOptions)
+      ? buildPrettyStream(formatCtx)
+      : pino.transport({
+          target: prettyTargetPath(),
+          options: formatCtx,
+          worker: { env: prettyTransportWorkerEnv() },
+          ...(resolvedOptions.prettyTransportSync ? { sync: true } : {}),
+        } as pino.TransportSingleOptions<typeof formatCtx> & { sync?: boolean });
+  }
+
+  const fileDest = pino.destination({
+    dest: fileOpts.path,
+    mkdir: fileOpts.mkdir ?? true,
+    sync: Boolean(resolvedOptions.syncPretty),
+  });
+
+  if (optionsNeedMainThread(resolvedOptions)) {
+    const prettyStream = buildPrettyStream(formatCtx);
+    return pino.multistream([
+      { level: consoleLevel, stream: prettyStream },
+      { level: fileLevel, stream: fileDest },
+    ]);
+  }
+
+  return pino.transport({
+    targets: [
+      {
+        target: prettyTargetPath(),
+        options: formatCtx,
+        level: consoleLevel,
+        worker: { env: prettyTransportWorkerEnv() },
+      },
+      {
+        target: "pino/file",
+        options: {
+          destination: fileOpts.path,
+          mkdir: fileOpts.mkdir ?? true,
+        },
+        level: fileLevel,
+      },
+    ],
+    ...(resolvedOptions.prettyTransportSync ? { sync: true } : {}),
+  } as pino.TransportMultiOptions);
 }
 
 export function createLogger(
   module = "app",
   options: CreateLoggerOptions = {},
-): BlancLogger {
+): PBLogger {
   const resolvedOptions: CreateLoggerOptions = {
     ...options,
     forceColor:
@@ -107,23 +199,29 @@ export function createLogger(
   const level = toPinoLevel(
     resolvedOptions.level ? String(resolvedOptions.level) : "debug",
   );
-  const formatCtx = {
+  const formatCtx: PrettyTransportOptions = {
     options: resolvedOptions,
     columns: resolvedOptions.columns,
+    destination: resolvedOptions.consoleDestination,
   };
 
-  const destination = optionsNeedMainThread(resolvedOptions)
-    ? buildPrettyStream(formatCtx)
-    : pino.transport({
-        target: prettyTargetPath(),
-        options: formatCtx,
-        worker: { env: prettyTransportWorkerEnv() },
-        ...(resolvedOptions.prettyTransportSync ? { sync: true } : {}),
-      } as pino.TransportSingleOptions<typeof formatCtx> & { sync?: boolean });
+  const fileOpts = resolveFileOption(resolvedOptions.file);
+  const fileLevel = fileOpts
+    ? toPinoLevel(fileOpts.level ? String(fileOpts.level) : "info")
+    : undefined;
+  const rootLevel = fileLevel ? mostVerboseLevel(level, fileLevel) : level;
+
+  const destination = buildLoggerDestination(
+    resolvedOptions,
+    formatCtx,
+    level,
+    fileOpts,
+    fileLevel,
+  );
 
   const logger = pino(
     {
-      level,
+      level: rootLevel,
       base: { module },
       timestamp: pino.stdTimeFunctions.isoTime,
     },

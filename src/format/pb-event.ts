@@ -2,10 +2,10 @@ import { resolveEventLayoutTemplate } from "../layout/presets.js";
 import { resolveEmojiFromMeta } from "../layout/event-columns.js";
 import { formatEventLayoutSpans } from "../layout/event-template.js";
 import { formatStandardSpans } from "../layout/line.js";
-import { isBlancEventRecord } from "../record.js";
+import { isPBEventRecord } from "../record.js";
 import type { CreateLoggerOptions, LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 
-export function formatBlancEventSpans(
+export function formatPBEventSpans(
   record: PinoLogRecord,
   ctx: {
     module: string;
@@ -35,14 +35,14 @@ export function formatBlancEventSpans(
   );
 }
 
-export function blancEventFormatRecord(
+export function pbEventFormatRecord(
   options: CreateLoggerOptions,
 ): CreateLoggerOptions["formatRecord"] {
   return (record, ctx) => {
-    if (!isBlancEventRecord(record)) {
+    if (!isPBEventRecord(record)) {
       return null;
     }
-    return formatBlancEventSpans(record, {
+    return formatPBEventSpans(record, {
       module: ctx.module,
       layout: options.layout ?? ctx.options.layout,
       eventLayout: options.eventLayout ?? ctx.options.eventLayout,

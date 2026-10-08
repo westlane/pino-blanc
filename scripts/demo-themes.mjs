@@ -39,6 +39,10 @@ const ALL_THEMES = [
   "solarized-light",
   "gruvbox-dark",
   "gruvbox-light",
+  "nord",
+  "dracula",
+  "catppuccin-mocha",
+  "catppuccin-latte",
 ];
 
 const fromEnv = process.env.PINO_BLANC_THEME?.trim();
@@ -51,7 +55,15 @@ if (fromEnv && !ALL_THEMES.includes(fromEnv)) {
   process.exit(1);
 }
 
-const DEMO_MODES = ["all", "solarized", "gruvbox", "identity"];
+const DEMO_MODES = [
+  "all",
+  "solarized",
+  "gruvbox",
+  "nord",
+  "dracula",
+  "catppuccin",
+  "identity",
+];
 
 if (!DEMO_MODES.includes(demoMode)) {
   console.error(
@@ -69,6 +81,15 @@ function themesToRun() {
   }
   if (demoMode === "gruvbox") {
     return ["gruvbox-dark", "gruvbox-light"];
+  }
+  if (demoMode === "nord") {
+    return ["nord"];
+  }
+  if (demoMode === "dracula") {
+    return ["dracula"];
+  }
+  if (demoMode === "catppuccin") {
+    return ["catppuccin-mocha", "catppuccin-latte"];
   }
   return ALL_THEMES;
 }

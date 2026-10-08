@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
-  BLANC_CONTROL_META_KEYS,
-  BLANC_EVENT_KEY,
-  BLANC_LIVE_REPLACE_KEY,
-  isBlancEventRecord,
+  PB_CONTROL_META_KEYS,
+  PB_EVENT_KEY,
+  PB_LIVE_REPLACE_KEY,
+  isPBEventRecord,
   stripPinoBindings,
 } from "../src/record.js";
 
 describe("record", () => {
-  it("isBlancEventRecord accepts blancEvent only", () => {
-    expect(isBlancEventRecord({ [BLANC_EVENT_KEY]: true })).toBe(true);
-    expect(isBlancEventRecord({ other: true })).toBe(false);
-    expect(isBlancEventRecord({})).toBe(false);
+  it("isPBEventRecord accepts pbEvent only", () => {
+    expect(isPBEventRecord({ [PB_EVENT_KEY]: true })).toBe(true);
+    expect(isPBEventRecord({ other: true })).toBe(false);
+    expect(isPBEventRecord({})).toBe(false);
   });
 
   it("stripPinoBindings removes pino and event marker keys", () => {
@@ -20,7 +20,7 @@ describe("record", () => {
         level: 30,
         msg: "x",
         module: "m",
-        blancEvent: true,
+        pbEvent: true,
         did: "y5Yk",
       }),
     ).toEqual({ did: "y5Yk" });
@@ -32,9 +32,9 @@ describe("record", () => {
         {
           seq: 1,
           _emoji: "📨",
-          [BLANC_LIVE_REPLACE_KEY]: true,
+          [PB_LIVE_REPLACE_KEY]: true,
         },
-        [...BLANC_CONTROL_META_KEYS],
+        [...PB_CONTROL_META_KEYS],
       ),
     ).toEqual({ seq: 1 });
   });

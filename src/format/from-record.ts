@@ -1,7 +1,7 @@
-import { blancEventFormatRecord, formatBlancEventSpans } from "./blanc-event.js";
+import { formatPBEventSpans, pbEventFormatRecord } from "./pb-event.js";
 import { resolveEmojiFromMeta } from "../layout/event-columns.js";
 import { formatStandardSpans } from "../layout/line.js";
-import { isBlancEventRecord } from "../record.js";
+import { isPBEventRecord } from "../record.js";
 import type {
   CreateLoggerOptions,
   FormatRecord,
@@ -34,7 +34,7 @@ export function resolvePinoLogLine(
 
   const explicitFormatRecord = options.formatRecord;
   const formatRecord: FormatRecord | undefined =
-    explicitFormatRecord ?? blancEventFormatRecord(options);
+    explicitFormatRecord ?? pbEventFormatRecord(options);
   if (formatRecord) {
     const custom = formatRecord(input, {
       level,
@@ -45,14 +45,14 @@ export function resolvePinoLogLine(
     if (custom === null || custom === undefined) {
       // Built-in event formatter may return null for non-events (fall through).
       // An explicit formatRecord that returns null/undefined means “skip this line”
-      // — do not re-layout blanc events with unenriched spans.
-      if (isBlancEventRecord(input)) {
+      // — do not re-layout pb events with unenriched spans.
+      if (isPBEventRecord(input)) {
         if (explicitFormatRecord) {
           return { mode: "empty" };
         }
         return {
           mode: "spans",
-          spans: formatBlancEventSpans(input, {
+          spans: formatPBEventSpans(input, {
             module,
             layout: options.layout,
             eventLayout: options.eventLayout,

@@ -1,5 +1,5 @@
 import { jsonMetaSpans } from "../format/json-meta.js";
-import { BLANC_CONTROL_META_KEYS, stripPinoBindings } from "../record.js";
+import { PB_CONTROL_META_KEYS, stripPinoBindings } from "../record.js";
 import type { LogSpan, PinoLogRecord, SymbolMap } from "../types.js";
 import { expandPadBrackets } from "./pad-brackets.js";
 import { padEventNameColumn, resolveEmojiFromMeta } from "./event-columns.js";
@@ -77,7 +77,7 @@ export function eventLayoutUsesIdentity(template: string): boolean {
 
 function eventPayload(record: PinoLogRecord): Record<string, unknown> | undefined {
   const payload = stripPinoBindings(record, [
-    ...BLANC_CONTROL_META_KEYS,
+    ...PB_CONTROL_META_KEYS,
     ...EVENT_IDENTITY_META_KEYS,
   ]);
   // Event payloads use `name` as display data; pino also uses `name` as a binding.

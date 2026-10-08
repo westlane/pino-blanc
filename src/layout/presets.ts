@@ -214,7 +214,7 @@ export function resolveEventLayoutTemplate(eventLayout?: string): string | undef
   const presets = eventPresets();
   const entry = presets[id];
   if (!entry) {
-    // No event presets (or unknown id with no alias) — blanc falls back to text layout.
+    // No event presets (or unknown id with no alias) — falls back to text layout.
     if (!eventLayout) {
       return undefined;
     }

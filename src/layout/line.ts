@@ -1,6 +1,6 @@
 import { jsonMetaSpans } from "../format/json-meta.js";
 import {
-  BLANC_CONTROL_META_KEYS,
+  PB_CONTROL_META_KEYS,
   stripPinoBindings,
 } from "../record.js";
 import type { LogSpan, LogLevelName, PinoLogRecord } from "../types.js";
@@ -41,7 +41,7 @@ function resolveMetaPayload(
       ? record._metaText
       : undefined;
   const payload = stripPinoBindings(record, [
-    ...BLANC_CONTROL_META_KEYS,
+    ...PB_CONTROL_META_KEYS,
     ...EVENT_IDENTITY_META_KEYS,
   ]);
   const hasPayload = Boolean(payload && Object.keys(payload).length > 0);

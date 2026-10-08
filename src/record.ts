@@ -1,27 +1,27 @@
-/** NDJSON / bindings flag set by `BlancLogger.event()` for custom pretty layout. */
-export const BLANC_EVENT_KEY = "blancEvent";
+/** NDJSON / bindings flag set by `PBLogger.event()` for custom pretty layout. */
+export const PB_EVENT_KEY = "pbEvent";
 
 /** When true, pretty transport rewrites the previous live block in-place (TTY CSI). */
-export const BLANC_LIVE_REPLACE_KEY = "_liveReplace";
+export const PB_LIVE_REPLACE_KEY = "_liveReplace";
 
-export function isBlancEventRecord(
+export function isPBEventRecord(
   record: Record<string, unknown> | undefined | null,
 ): boolean {
   if (!record) {
     return false;
   }
-  return record[BLANC_EVENT_KEY] === true;
+  return record[PB_EVENT_KEY] === true;
 }
 
 /** Control keys omitted from pretty JSON meta (not user payload). */
-export const BLANC_CONTROL_META_KEYS = [
+export const PB_CONTROL_META_KEYS = [
   "_emoji",
-  BLANC_LIVE_REPLACE_KEY,
+  PB_LIVE_REPLACE_KEY,
 ] as const;
 
 /** Default pino binding keys to omit when treating the record as user meta. */
 export const PINO_BINDING_KEYS = [
-  BLANC_EVENT_KEY,
+  PB_EVENT_KEY,
   "level",
   "time",
   "module",

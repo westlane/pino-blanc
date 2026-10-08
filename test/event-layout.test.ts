@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { formatBlancEventSpans } from "../src/format/blanc-event.js";
+import { formatPBEventSpans } from "../src/format/pb-event.js";
 import { spansToPlain } from "../src/layout/line.js";
 import { displayWidth } from "../src/layout/width.js";
-import { BLANC_EVENT_KEY } from "../src/record.js";
+import { PB_EVENT_KEY } from "../src/record.js";
 
 describe("event layout (two-line)", () => {
   it("identity-event preset aligns JSON under event name", () => {
@@ -10,7 +10,7 @@ describe("event layout (two-line)", () => {
       level: 30,
       msg: "host.catalog.scheduled",
       module: "boot",
-      [BLANC_EVENT_KEY]: true,
+      [PB_EVENT_KEY]: true,
       _identityKind: "host",
       _identityBody: "energetic-domehut-y5Yk",
       _identityTintKey: "host-y5Yk",
@@ -18,7 +18,7 @@ describe("event layout (two-line)", () => {
       entries: 15,
     };
     const plain = spansToPlain(
-      formatBlancEventSpans(record, {
+      formatPBEventSpans(record, {
         module: "boot",
         eventLayout: "complex",
         symbolMap: { host: "/" },

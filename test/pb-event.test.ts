@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { formatBlancEventSpans } from "../src/format/blanc-event.js";
+import { formatPBEventSpans } from "../src/format/pb-event.js";
 import { jsonMetaSpans } from "../src/format/json-meta.js";
 import { spansToPlain } from "../src/layout/line.js";
-import { BLANC_EVENT_KEY } from "../src/record.js";
+import { PB_EVENT_KEY } from "../src/record.js";
 import { renderAnsi } from "../src/render/ansi.js";
 import { createTintResolver, resolveTheme } from "../src/color/theme.js";
 
-describe("blanc event rows", () => {
+describe("pb event rows", () => {
   it("uses event.default (emoji + event name; inline meta on row 1)", () => {
     const event = spansToPlain(
-      formatBlancEventSpans(
+      formatPBEventSpans(
         {
           level: 30,
           msg: "ws.batch_done",
           module: "demo",
-          [BLANC_EVENT_KEY]: true,
+          [PB_EVENT_KEY]: true,
           frames: 2,
         },
         { module: "demo" },
@@ -28,12 +28,12 @@ describe("blanc event rows", () => {
 
   it("uses event.complex (stacked meta on row 2)", () => {
     const event = spansToPlain(
-      formatBlancEventSpans(
+      formatPBEventSpans(
         {
           level: 30,
           msg: "ws.batch_done",
           module: "demo",
-          [BLANC_EVENT_KEY]: true,
+          [PB_EVENT_KEY]: true,
           frames: 2,
         },
         { module: "demo", eventLayout: "complex" },

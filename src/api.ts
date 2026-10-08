@@ -101,7 +101,7 @@ export {
   writeSessionBannerToConsole,
 } from "./format/render-box.js";
 export { centerInBar } from "./layout/center-bar.js";
-export { formatBlancEventSpans, blancEventFormatRecord } from "./format/blanc-event.js";
+export { formatPBEventSpans, pbEventFormatRecord } from "./format/pb-event.js";
 export { jsonMetaSpans } from "./format/json-meta.js";
 export {
   alignBodyBeforeTrailingModule,
@@ -123,10 +123,10 @@ export {
 } from "./layout/event-columns.js";
 export { displayWidth } from "./layout/width.js";
 export {
-  BLANC_CONTROL_META_KEYS,
-  BLANC_EVENT_KEY,
-  BLANC_LIVE_REPLACE_KEY,
-  isBlancEventRecord,
+  PB_CONTROL_META_KEYS,
+  PB_EVENT_KEY,
+  PB_LIVE_REPLACE_KEY,
+  isPBEventRecord,
   PINO_BINDING_KEYS,
   stripPinoBindings,
 } from "./record.js";
@@ -147,7 +147,7 @@ export {
 export { defineFormatRecord } from "./format/define-format-record.js";
 export type {
   BannerChrome,
-  BlancLogger,
+  PBLogger,
   Colorize,
   Redact,
   ChipChrome,
@@ -155,6 +155,7 @@ export type {
   ConsoleColorReset,
   ConsoleLeadingNewline,
   CreateLoggerOptions,
+  FileLogOptions,
   EventColumnSpec,
   FormatRecord,
   FormatRecordContext,

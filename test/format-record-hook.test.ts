@@ -55,9 +55,9 @@ describe("formatRecord hook", () => {
     expect(line).toBe("");
   });
 
-  it("explicit formatRecord null on blanc event suppresses (no unenriched fallback)", () => {
+  it("explicit formatRecord null on pb event suppresses (no unenriched fallback)", () => {
     const line = formatPinoLogLine(
-      { level: 30, msg: "host.identity.ready", module: "event", blancEvent: true, did: "did:host:x" },
+      { level: 30, msg: "host.identity.ready", module: "event", pbEvent: true, did: "did:host:x" },
       { options: { formatRecord: () => null } },
     );
     expect(line).toBe("");

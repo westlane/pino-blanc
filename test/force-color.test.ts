@@ -9,7 +9,7 @@ describe("forceColor", () => {
     process.env.NO_COLOR = "1";
     delete process.env.FORCE_COLOR;
     const line = formatPinoLogLine(
-      { level: 30, msg: "hello", module: "api", blancEvent: true },
+      { level: 30, msg: "hello", module: "api", pbEvent: true },
       { options: { theme: "solarized-dark" } },
       false,
     );
@@ -31,7 +31,7 @@ describe("forceColor", () => {
     const prev = process.env.PINO_BLANC_PLAIN;
     process.env.PINO_BLANC_PLAIN = "1";
     const line = formatPinoLogLine(
-      { level: 30, msg: "hello", module: "api", blancEvent: true },
+      { level: 30, msg: "hello", module: "api", pbEvent: true },
       { options: {} },
       false,
     );

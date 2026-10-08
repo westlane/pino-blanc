@@ -5,7 +5,7 @@ import type { LayoutData } from "../types/layout.js";
 export const layoutData: LayoutData = {
   "text": {
     "default": "[%lv%  ]  [----%md%----] [%ms% ----------------------] [%mt%]",
-    "complex": "[%lv%  ]  [%mj%][%ms% -----------------------------][------------- %md%]\n[------]  [----][%mt%]"
+    "complex": "[%lv%  ]  [%mj%][%ms% -----------------------------][----%md%----]\n[------]  [----][%mt%]"
   },
   "event": {
     "default": "[%mj%] [%ev% -----------------------] [%mt%]",

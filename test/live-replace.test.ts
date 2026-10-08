@@ -6,7 +6,7 @@ import {
   liveReplacePrefix,
   LiveReplaceTracker,
 } from "../src/format/live-replace.js";
-import { BLANC_LIVE_REPLACE_KEY } from "../src/record.js";
+import { PB_LIVE_REPLACE_KEY } from "../src/record.js";
 import buildPrettyStream from "../src/node/transport/pretty.js";
 
 describe("live-replace", () => {
@@ -23,8 +23,8 @@ describe("live-replace", () => {
   });
 
   it("isLiveReplaceRecord", () => {
-    expect(isLiveReplaceRecord({ [BLANC_LIVE_REPLACE_KEY]: true })).toBe(true);
-    expect(isLiveReplaceRecord({ [BLANC_LIVE_REPLACE_KEY]: false })).toBe(false);
+    expect(isLiveReplaceRecord({ [PB_LIVE_REPLACE_KEY]: true })).toBe(true);
+    expect(isLiveReplaceRecord({ [PB_LIVE_REPLACE_KEY]: false })).toBe(false);
     expect(isLiveReplaceRecord({})).toBe(false);
   });
 
@@ -57,7 +57,7 @@ describe("live-replace", () => {
         level: 30,
         msg: "ws.frame",
         module: "gateway",
-        blancEvent: true,
+        pbEvent: true,
         _liveReplace: true,
         seq,
       });
@@ -68,7 +68,7 @@ describe("live-replace", () => {
         level: 30,
         msg: "ws.batch_done",
         module: "gateway",
-        blancEvent: true,
+        pbEvent: true,
         frames: 2,
       })}\n`,
     );

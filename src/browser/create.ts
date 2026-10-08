@@ -1,8 +1,8 @@
 import { resolvePinoLogLine } from "../format/from-record.js";
 import { createTintResolver, resolveTheme } from "../color/theme.js";
 import { renderCss } from "../render/css.js";
-import { BLANC_EVENT_KEY } from "../record.js";
-import type { BlancLogger, CreateLoggerOptions, LogLevelName } from "../types.js";
+import { PB_EVENT_KEY } from "../record.js";
+import type { CreateLoggerOptions, LogLevelName, PBLogger } from "../types.js";
 import { parseLevelName } from "../parse-level.js";
 function toPinoLevelNumber(level: LogLevelName): number {
   switch (level) {
@@ -41,7 +41,7 @@ function consoleMethod(level: string): "log" | "info" | "warn" | "error" | "debu
 export function createBrowserLogger(
   module = "app",
   options: CreateLoggerOptions = {},
-): BlancLogger {
+): PBLogger {
   const theme = resolveTheme(options.theme, options.themeOverrides);
   const tint = createTintResolver(
     theme,
@@ -86,9 +86,9 @@ export function createBrowserLogger(
 
   const stubPino = {
     child: () => stubPino,
-  } as unknown as BlancLogger["pino"];
+  } as unknown as PBLogger["pino"];
 
-  const api: BlancLogger = {
+  const api: PBLogger = {
     pino: stubPino,
     child(bindings) {
       return createBrowserLogger(bindings.module, options);
@@ -102,7 +102,7 @@ export function createBrowserLogger(
     event: (m, fields) =>
       emit("info", m, {
         ...applyRedact(fields),
-        [BLANC_EVENT_KEY]: true,
+        [PB_EVENT_KEY]: true,
       } as object),
   };
 
