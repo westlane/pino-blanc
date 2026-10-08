@@ -3,7 +3,8 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -18,6 +19,6 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "themes/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "themes/**/*.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }

@@ -22,7 +22,7 @@ delete process.env.FORCE_COLOR;
 
 const { formatPinoLogLine } = await import(entry);
 const line = formatPinoLogLine(
-  { level: 30, msg: "ansi-check", module: "verify", blancEvent: true },
+  { level: 30, msg: "ansi-check", module: "verify", pbEvent: true },
   { options: { theme: "solarized-dark" } },
   false,
 );

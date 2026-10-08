@@ -43,6 +43,37 @@
       "development": "./src/node/transport/pretty.ts",
       "types": "./dist/src/node/transport/pretty.d.ts",
       "import": "./dist/src/node/transport/pretty.js"
+    },
+    "./react": {
+      "development": "./src/react/index.ts",
+      "types": "./dist/src/react/index.d.ts",
+      "import": "./dist/src/react/index.js"
+    },
+    "./vue": {
+      "development": "./src/vue/index.ts",
+      "types": "./dist/src/vue/index.d.ts",
+      "import": "./dist/src/vue/index.js"
+    },
+    "./svelte": {
+      "development": "./src/svelte/index.ts",
+      "types": "./dist/src/svelte/index.d.ts",
+      "import": "./dist/src/svelte/index.js"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "svelte": ">=4",
+    "vue": ">=3.3"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
     }
   },
   "files": [
@@ -63,8 +94,13 @@
     "demo": "yarn demo:themes",
     "demo:themes": "yarn build && node scripts/demo-themes.mjs",
     "demo:solarized": "yarn build && PINO_BLANC_DEMO=solarized node scripts/demo-themes.mjs",
+    "demo:gruvbox": "yarn build && PINO_BLANC_DEMO=gruvbox node scripts/demo-themes.mjs",
+    "demo:nord": "yarn build && PINO_BLANC_DEMO=nord node scripts/demo-themes.mjs",
+    "demo:dracula": "yarn build && PINO_BLANC_DEMO=dracula node scripts/demo-themes.mjs",
+    "demo:catppuccin": "yarn build && PINO_BLANC_DEMO=catppuccin node scripts/demo-themes.mjs",
     "demo:identity": "yarn build && PINO_BLANC_DEMO=identity node scripts/demo-themes.mjs",
     "demo:live": "yarn verify:ansi && PINO_BLANC_DEMO_FORCE_COLOR=1 node scripts/demo-live-ndjson.mjs",
+    "demo:gif": "yarn build && node scripts/render-readme-gif.mjs",
     "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
     "check": "yarn lint && yarn typecheck && yarn test && yarn build",
     "prepublishOnly": "yarn check",
@@ -74,20 +110,23 @@
     "js-yaml": "^5.4.3",
     "pino": "^9.14.0"
   },
-  "peerDependencies": {
-    "pino": "^9.0.0"
-  },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
+    "@napi-rs/canvas": "^1.0.10",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
     "eslint": "^9.28.0",
+    "gifenc": "^1.0.3",
     "globals": "^16.2.0",
     "husky": "^9.1.7",
     "pino": "^9.7.0",
+    "react": "^19.1.0",
+    "svelte": "^5.33.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "vue": "^3.5.13"
   },
   "engines": {
     "node": ">=20"
