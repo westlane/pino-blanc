@@ -59,6 +59,18 @@ function appendMetaSpans(
   meta: { metaText?: string; payload?: Record<string, unknown> },
 ): void {
   if (meta.metaText) {
+    const trimmed = meta.metaText.trimStart();
+    if ((trimmed.startsWith("{") || trimmed.startsWith("[")) && !meta.payload) {
+      try {
+        const parsed = JSON.parse(trimmed) as unknown;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          spans.push(...jsonMetaSpans(parsed as Record<string, unknown>));
+          return;
+        }
+      } catch {
+        // Plain text meta — fall through.
+      }
+    }
     spans.push({ text: meta.metaText, role: "message" });
     return;
   }

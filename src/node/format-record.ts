@@ -24,12 +24,11 @@ export function formatPinoLogLine(
 
   if (resolved.mode === "line") {
     let line = resolved.line;
-    if (!plain) {
-      line = applyConsoleOutputHygiene(line, input, ctx.options);
-    } else {
+    if (plain) {
       line = stripAnsiForPlainOutput(line);
     }
-    return line;
+    // Leading blank line + color reset apply even when pretty color is off.
+    return applyConsoleOutputHygiene(line, input, ctx.options);
   }
 
   const theme = resolveTheme(ctx.options.theme, ctx.options.themeOverrides);
@@ -48,10 +47,9 @@ export function formatPinoLogLine(
     useColor,
     ctx.options,
   );
-  if (useColor) {
-    colored = applyConsoleOutputHygiene(colored, input, ctx.options);
-  } else {
+  if (!useColor) {
     colored = stripAnsiForPlainOutput(colored);
   }
-  return colored;
+  // Leading blank line + color reset apply even when pretty color is off.
+  return applyConsoleOutputHygiene(colored, input, ctx.options);
 }

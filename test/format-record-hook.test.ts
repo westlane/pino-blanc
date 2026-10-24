@@ -47,6 +47,20 @@ describe("formatRecord hook", () => {
     expect(line.startsWith("\n")).toBe(false);
   });
 
+  it("consoleLeadingNewline applies in plain mode", () => {
+    const line = formatPinoLogLine(
+      { level: 30, msg: "x", module: "api" },
+      {
+        options: {
+          formatRecord: () => "LINE",
+          consoleLeadingNewline: true,
+        },
+      },
+      true,
+    );
+    expect(line.startsWith("\n")).toBe(true);
+  });
+
   it("formatRecord empty string yields empty output", () => {
     const line = formatPinoLogLine(
       { level: 30, msg: "x", module: "api" },

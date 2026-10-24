@@ -48,12 +48,13 @@ export function jsonMetaSpans(value: Record<string, unknown>): LogSpan[] {
       spans.push({
         text,
         role: isKey ? "accent" : "message",
+        tintKey: isKey ? "json:key" : "json:string",
       });
       i = end;
       continue;
     }
     if (ch === "{" || ch === "}" || ch === "[" || ch === "]" || ch === "," || ch === ":") {
-      spans.push({ text: ch, role: "meta" });
+      spans.push({ text: ch, role: "meta", tintKey: "json:punct" });
       i += 1;
       continue;
     }
@@ -70,7 +71,9 @@ export function jsonMetaSpans(value: Record<string, unknown>): LogSpan[] {
     }
     if (ch === "t" || ch === "f" || ch === "n") {
       const { text, end } = readWord(raw, i);
-      spans.push({ text, role: "meta" });
+      const tintKey =
+        text === "true" || text === "false" ? "json:bool" : text === "null" ? "json:null" : undefined;
+      spans.push({ text, role: "meta", ...(tintKey ? { tintKey } : {}) });
       i = end;
       continue;
     }

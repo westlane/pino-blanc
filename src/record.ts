@@ -16,6 +16,7 @@ export function isPBEventRecord(
 /** Control keys omitted from pretty JSON meta (not user payload). */
 export const PB_CONTROL_META_KEYS = [
   "_emoji",
+  "_logTier",
   PB_LIVE_REPLACE_KEY,
 ] as const;
 
