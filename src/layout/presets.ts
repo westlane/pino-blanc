@@ -11,7 +11,7 @@ const TEXT_LAYOUT_ALIASES: Record<string, string> = {
   "emoji-module": COMPLEX_LAYOUT,
   "module-first": COMPLEX_LAYOUT,
   classic: COMPLEX_LAYOUT,
-  /** Removed `text.identity`: identity chips are event-only. */
+  /** Legacy alias — identity chips are event-only; text.complex is module-trailing. */
   identity: COMPLEX_LAYOUT,
 };
 

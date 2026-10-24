@@ -32,6 +32,7 @@ describe("record", () => {
         {
           seq: 1,
           _emoji: "📨",
+          _logTier: "ambient",
           [PB_LIVE_REPLACE_KEY]: true,
         },
         [...PB_CONTROL_META_KEYS],

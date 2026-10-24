@@ -72,6 +72,38 @@ export function roleHex(
   return theme.roles?.[role as keyof NonNullable<LogTheme["roles"]>];
 }
 
+const JSON_TINT_PREFIX = "json:";
+
+export function isJsonSyntaxTintKey(tintKey: string | undefined): boolean {
+  return Boolean(tintKey?.startsWith(JSON_TINT_PREFIX));
+}
+
+/** Theme-aware hues for compact JSON meta rows (stacked `%mt%` on row 2). */
+export function jsonSyntaxHex(theme: LogTheme, tintKey: string): string | undefined {
+  if (!tintKey.startsWith(JSON_TINT_PREFIX)) {
+    return undefined;
+  }
+  const kind = tintKey.slice(JSON_TINT_PREFIX.length);
+  const ramp = theme.tintRamp;
+  const roles = theme.roles;
+  switch (kind) {
+    case "key":
+      return roles?.accent ?? ramp[1];
+    case "string":
+      return ramp[2] ?? roles?.message;
+    case "number":
+      return theme.levels.info ?? ramp[3];
+    case "bool":
+      return ramp[6] ?? roles?.accent;
+    case "null":
+      return roles?.meta ?? ramp[0];
+    case "punct":
+      return roles?.meta ?? ramp[0];
+    default:
+      return undefined;
+  }
+}
+
 export function builtInThemeIds(): string[] {
   return listBuiltInThemeIds();
 }

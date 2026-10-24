@@ -4,7 +4,7 @@ import {
   SURFACE_WHITE_HEX,
 } from "../color/chrome.js";
 import { colorFromIdAvoiding } from "../color/id.js";
-import { levelHex, roleHex } from "../color/theme.js";
+import { isJsonSyntaxTintKey, jsonSyntaxHex, levelHex, roleHex } from "../color/theme.js";
 import { splitPrefix } from "../layout/symbol.js";
 import type {
   ChipChrome,
@@ -90,9 +90,13 @@ export function resolveSpanHex(
   span: LogSpan,
   ctx: SpanRenderContext,
 ): string | undefined {
+  if (span.tintKey && isJsonSyntaxTintKey(span.tintKey)) {
+    return jsonSyntaxHex(ctx.theme, span.tintKey) ?? ctx.tint.resolve(span.tintKey) ?? undefined;
+  }
   const emphasis = rowEmphasisHex(ctx);
   if (
     emphasis &&
+    !isJsonSyntaxTintKey(span.tintKey) &&
     (span.role === "level" || span.role === "module" || span.role === "message")
   ) {
     return emphasis;
