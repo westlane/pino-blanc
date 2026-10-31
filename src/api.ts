@@ -121,6 +121,7 @@ export {
   PB_CONTROL_META_KEYS,
   PB_EVENT_KEY,
   PB_LIVE_REPLACE_KEY,
+  PB_MESSAGE_PARTS_KEY,
   isPBEventRecord,
   PINO_BINDING_KEYS,
   stripPinoBindings,

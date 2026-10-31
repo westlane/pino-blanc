@@ -4,6 +4,9 @@ export const PB_EVENT_KEY = "pbEvent";
 /** When true, pretty transport rewrites the previous live block in-place (TTY CSI). */
 export const PB_LIVE_REPLACE_KEY = "_liveReplace";
 
+/** Structured message parts consumed by app `formatRecord` hooks (omitted from meta row). */
+export const PB_MESSAGE_PARTS_KEY = "_pbMessageParts";
+
 export function isPBEventRecord(
   record: Record<string, unknown> | undefined | null,
 ): boolean {
@@ -18,6 +21,7 @@ export const PB_CONTROL_META_KEYS = [
   "_emoji",
   "_logTier",
   PB_LIVE_REPLACE_KEY,
+  PB_MESSAGE_PARTS_KEY,
 ] as const;
 
 /** Default pino binding keys to omit when treating the record as user meta. */
