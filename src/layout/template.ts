@@ -150,6 +150,15 @@ function fieldSpan(
       };
     }
     case "module": {
+      // Bare `%md%` (no `:N`) keeps natural width — browser consoles and freeform
+      // templates must not middle-ellipsis long module ids.
+      if (part.width === undefined) {
+        return {
+          text: `[${ctx.module}]`,
+          role: "module",
+          tintKey: ctx.module,
+        };
+      }
       const w = columnWidth("module", part);
       const align =
         part.align === "center"

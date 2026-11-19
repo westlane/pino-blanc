@@ -10,9 +10,11 @@ describe("layout plain output", () => {
     const complexPlain = spansToPlain(
       formatStandardSpans("info", "api", "hello world", COMPLEX_LAYOUT),
     );
-    expect(defaultPlain).toBe("INFO    [   api    ] hello world                ");
+    expect(defaultPlain).toBe(
+      "INFO    [         api          ] hello world                                                                   ",
+    );
     expect(complexPlain).toBe(
-      "INFO        hello world                       [   api    ]",
+      "INFO        hello world                                                                   [         api          ]",
     );
   });
 });
