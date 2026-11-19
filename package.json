@@ -1,6 +1,6 @@
 {
   "name": "@westlane/pino-blanc",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A themed logger to bring order and beauty to your logging experience. Built around Pino for low overhead compatibility with top frameworks and toolkits (Express, Hapi, Koa, VueJS, React, Svelte, Node). Works for browser console and HTML rendering, too.",
   "type": "module",
   "packageManager": "yarn@4.9.2",
@@ -49,9 +49,9 @@
       "import": "./dist/src/browser.js"
     },
     "./themes": {
-      "types": "./themes/index.ts",
-      "import": "./themes/index.ts",
-      "default": "./themes/index.ts"
+      "types": "./dist/themes/index.d.ts",
+      "import": "./dist/themes/index.js",
+      "default": "./dist/themes/index.js"
     },
     "./color": {
       "types": "./dist/src/color/did.d.ts",
@@ -93,9 +93,7 @@
   },
   "files": [
     "dist",
-    "src",
     "config",
-    "themes",
     "README.md",
     "LICENSE"
   ],
@@ -117,7 +115,7 @@
     "verify:ansi": "yarn build && node scripts/verify-ansi.mjs",
     "check": "yarn lint && yarn typecheck && yarn test && node scripts/verify-readme-badges.mjs && yarn build",
     "prepublishOnly": "yarn check",
-    "prepare": "husky"
+    "prepare": "node scripts/prepare.mjs"
   },
   "dependencies": {
     "js-yaml": "^5.4.3",
