@@ -18,6 +18,19 @@ describe("log layout template", () => {
     ]);
   });
 
+  it("bare %md% keeps full module id (no fixed-column ellipsis)", () => {
+    const plain = spansToPlain(
+      formatLayoutSpans("%lv%  %md% %ms%", {
+        level: "info",
+        module: "clay:socket-manager",
+        message: 'connecting to {"url":"ws://localhost:3030"}',
+      }),
+    );
+    expect(plain).toContain("[clay:socket-manager]");
+    expect(plain).toContain('connecting to {"url":"ws://localhost:3030"}');
+    expect(plain).not.toMatch(/\.\.\./);
+  });
+
   it("rejects unknown placeholders", () => {
     expect(() => parseLogLayout("%nope%")).toThrow(/Unknown log layout field/);
   });
@@ -74,6 +87,16 @@ describe("log layout template", () => {
     }
     expect(plain).toMatch(/\[\s*api\s*\]/);
     expect(plain).toContain("hello world");
+  });
+
+  it("complex layout keeps workspace ids and path lines intact", () => {
+    const msg = "Resource not found (GET /api/workspaces)";
+    const plain = spansToPlain(
+      formatStandardSpans("warn", "lantern.works", msg, COMPLEX_LAYOUT),
+    );
+    expect(plain).toMatch(/\[\s*lantern\.works\s*\]/);
+    expect(plain).toContain(msg);
+    expect(plain).not.toMatch(/\.\.\./);
   });
 
   it("%event% is an alias for %message%", () => {

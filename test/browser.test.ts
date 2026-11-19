@@ -13,6 +13,19 @@ describe("browser", () => {
     spy.mockRestore();
   });
 
+  it("createBrowserLogger does not middle-ellipsis module or message", () => {
+    const spy = vi.spyOn(console, "info").mockImplementation(() => {});
+    const log = createBrowserLogger("clay:socket-manager");
+    const msg =
+      'connecting to {"url":"ws://localhost:3030"}';
+    log.info(msg);
+    const printed = String(spy.mock.calls[0]?.[0] ?? "");
+    expect(printed).toContain("clay:socket-manager");
+    expect(printed).toContain(msg);
+    expect(printed).not.toMatch(/\.\.\./);
+    spy.mockRestore();
+  });
+
   it("createLogger is an alias of createBrowserLogger", () => {
     expect(createLogger).toBe(createBrowserLogger);
   });

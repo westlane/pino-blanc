@@ -38,6 +38,9 @@ function consoleMethod(level: string): "log" | "info" | "warn" | "error" | "debu
   }
 }
 
+/** Freeform text row: no pad-bracket column caps (avoids `clay...dge` / message ellipsis). */
+const BROWSER_TEXT_LAYOUT = "%lv%  %md% %ms%";
+
 export function createBrowserLogger(
   module = "app",
   options: CreateLoggerOptions = {},
@@ -48,6 +51,10 @@ export function createBrowserLogger(
     options.colorize,
     options.tint,
   );
+  const resolvedOptions: CreateLoggerOptions = {
+    ...options,
+    layout: options.layout ?? BROWSER_TEXT_LAYOUT,
+  };
 
   const applyRedact = (fields?: object): Record<string, unknown> => {
     const base =
@@ -65,7 +72,7 @@ export function createBrowserLogger(
       module,
       ...applyRedact(fields),
     };
-    const resolved = resolvePinoLogLine(record, options);
+    const resolved = resolvePinoLogLine(record, resolvedOptions);
     const method = consoleMethod(levelName);
     if (resolved.mode === "empty") {
       return;
@@ -79,7 +86,7 @@ export function createBrowserLogger(
       theme,
       tint,
       levelName,
-      options,
+      resolvedOptions,
     );
     console[method](text, ...styles);
   };
@@ -91,7 +98,7 @@ export function createBrowserLogger(
   const api: PBLogger = {
     pino: stubPino,
     child(bindings) {
-      return createBrowserLogger(bindings.module, options);
+      return createBrowserLogger(bindings.module, resolvedOptions);
     },
     trace: (m, fields) => emit("trace", m, fields),
     debug: (m, fields) => emit("debug", m, fields),
